@@ -1,0 +1,9 @@
+# Determinism policy scope for vr-definitions
+# Layer 0: Pure schema types — no computation, no I/O
+
+[scope]
+# All source files are strictly governed
+strict = ["src/**/*.rs"]
+
+# No allowlist exceptions — vr-definitions has no nondeterministic operations
+[allowlist]
