@@ -1,4 +1,4 @@
-//! `DigestBytes` newtype — a 32-byte BLAKE3 digest with strict hex serde.
+//! `DigestBytes` newtype — a 32-byte cryptographic digest with strict hex serde.
 
 use std::fmt;
 
@@ -8,7 +8,11 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use crate::constants::DIGEST_HEX_LEN;
 use crate::error::DefinitionError;
 
-/// A 32-byte BLAKE3 digest with strict hex serialization.
+/// A 32-byte cryptographic digest with strict hex serialization.
+///
+/// This is a shape type: it enforces the 32-byte / 64-hex-char wire
+/// format without binding to a specific commitment primitive. The
+/// active commitment primitive is declared by the specification version.
 ///
 /// Serializes as 64 lowercase hex characters.
 /// Deserialization rejects uppercase, non-canonical length, whitespace,

@@ -1,18 +1,23 @@
 //! # `vr-definitions` — Canonical type definitions for `VertRule`
 //!
-//! Layer 0 of the constitutional layer. Zero `vr-*` dependencies.
+//! Constitutional definitions with zero `vr-*` dependencies.
 //!
-//! Provides schema-shape types and validation rules used across
-//! the `VertRule` ecosystem. Does not perform hashing — only
-//! validates digest shape (hex length, lowercase, byte count).
+//! Each specification version defines an identity triple of
+//! `(spec_version, canonicalization, commitment_primitive)`.
+//! Types in this crate are shape types that enforce wire-format
+//! constraints without binding to a specific primitive. The active
+//! bindings are declared in [`constants`] under the version
+//! conservation clause: any change to canonicalization semantics,
+//! commitment primitives, or envelope structure increments the
+//! specification version.
 //!
 //! ## Types
 //!
-//! - [`DigestBytes`] — 32-byte BLAKE3 digest with strict hex serde
-//! - [`ReceiptType`] — Receipt classification enum
-//! - [`BoundaryOrigin`] — Boundary origin enum
+//! - [`DigestBytes`] — 32-byte cryptographic digest with strict hex serde
+//! - [`ReceiptType`] — Receipt classification discriminator
+//! - [`BoundaryOrigin`] — Boundary provenance discriminator
 //! - [`PolicyId`] — Opaque policy identifier
-//! - [`SchemaVersion`] — Schema version tag
+//! - [`SchemaVersion`] — Schema version tag (carries identity triple)
 //! - [`DefinitionError`] — Validation error types
 //!
 //! ## Constants

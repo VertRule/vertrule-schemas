@@ -1,9 +1,10 @@
-//! Receipt type enumeration — wire-compatible with the runtime.
+//! Receipt type enumeration — schema discriminator for receipt classification.
 
 use serde::{Deserialize, Serialize};
 
 /// Classification of receipt origin.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[non_exhaustive]
 #[serde(rename_all = "lowercase")]
 pub enum ReceiptType {
     /// Domain event receipt.

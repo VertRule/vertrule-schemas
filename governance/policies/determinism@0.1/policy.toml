@@ -70,49 +70,6 @@ injected_clock = ["Clock::now", "clock.now()"]
 # Use canonical JSON
 canonical_json = ["canonical_json::to_vec", "jcs::serialize"]
 
-# Scope configuration
-[scope]
-
-# Paths where policy is strictly enforced
-strict = [
-    "**/crates/vertrule-core/**",
-    "**/crates/vertrule-schema/**",
-    "**/crates/vertrule-crypto/**",
-    "**/crates/vr-num/**",
-]
-
-# Paths where policy is enforced with allowlist exceptions
-enforced = [
-    "**/crates/vertrule-adapters/**",
-    "**/crates/vertrule-app/**",
-]
-
-# Paths excluded from enforcement (tests, examples, benchmarks)
-excluded = [
-    "**/tests/**",
-    "**/examples/**",
-    "**/benches/**",
-    "**/fixtures/**",
-]
-
-# Lint integration
-[lints]
-
-# Custom dylint lints to run
-dylint = [
-    "no_system_time",
-    "no_hashmap_iteration",
-    "no_random",
-    "no_float_arithmetic",
-    "no_float_in_public_apis",
-]
-
-# Clippy lints to enforce
-clippy = [
-    "clippy::disallowed_methods",
-    "clippy::disallowed_types",
-]
-
 # Gate configuration
 [gate]
 name = "determinism"

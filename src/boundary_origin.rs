@@ -1,9 +1,10 @@
-//! Boundary origin enumeration — wire-compatible with the runtime.
+//! Boundary origin enumeration — schema discriminator for boundary provenance.
 
 use serde::{Deserialize, Serialize};
 
 /// Which boundary produced the receipt.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[non_exhaustive]
 #[serde(rename_all = "lowercase")]
 pub enum BoundaryOrigin {
     /// Engine-internal receipt.
