@@ -2,6 +2,7 @@
 
 /// Errors produced during type validation.
 #[derive(Debug, thiserror::Error)]
+#[non_exhaustive]
 pub enum DefinitionError {
     /// A digest hex string failed validation.
     #[error("invalid digest: {0}")]

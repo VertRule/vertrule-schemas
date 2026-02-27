@@ -3,7 +3,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Classification of receipt origin.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[non_exhaustive]
 #[serde(rename_all = "lowercase")]
 pub enum ReceiptType {

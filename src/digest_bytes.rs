@@ -5,7 +5,7 @@ use std::fmt;
 use serde::de;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-use crate::constants::DIGEST_HEX_LEN;
+use crate::constants::{DIGEST_BYTE_LEN, DIGEST_HEX_LEN};
 use crate::error::DefinitionError;
 
 /// A 32-byte cryptographic digest with strict hex serialization.
@@ -48,7 +48,11 @@ impl DigestBytes {
     /// Returns [`DefinitionError::InvalidDigest`] if the slice length is not 32.
     pub fn from_slice(bytes: &[u8]) -> Result<Self, DefinitionError> {
         let arr: [u8; 32] = bytes.try_into().map_err(|_| {
-            DefinitionError::InvalidDigest(format!("expected 32 bytes, got {}", bytes.len()))
+            DefinitionError::InvalidDigest(format!(
+                "expected {} bytes, got {}",
+                DIGEST_BYTE_LEN,
+                bytes.len()
+            ))
         })?;
         Ok(Self(arr))
     }

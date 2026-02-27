@@ -17,6 +17,7 @@
 //! - [`ReceiptType`] — Receipt classification discriminator
 //! - [`BoundaryOrigin`] — Boundary provenance discriminator
 //! - [`PolicyId`] — Opaque policy identifier
+//! - [`RBHInvariant`] — Constitutional identity continuity constraint (RBH)
 //! - [`SchemaVersion`] — Schema version tag (carries identity triple)
 //! - [`DefinitionError`] — Validation error types
 //!
@@ -36,6 +37,7 @@ pub mod constants;
 mod digest_bytes;
 mod error;
 mod policy_id;
+mod rbh_invariant;
 mod receipt_type;
 mod schema_version;
 
@@ -43,9 +45,30 @@ pub use boundary_origin::BoundaryOrigin;
 pub use digest_bytes::DigestBytes;
 pub use error::DefinitionError;
 pub use policy_id::PolicyId;
+pub use rbh_invariant::RBHInvariant;
 pub use receipt_type::ReceiptType;
 pub use schema_version::SchemaVersion;
 
 #[cfg(test)]
 #[path = "digest_bytes_tests.rs"]
 mod digest_bytes_tests;
+
+#[cfg(test)]
+#[path = "rbh_invariant_tests.rs"]
+mod rbh_invariant_tests;
+
+#[cfg(test)]
+#[path = "policy_id_tests.rs"]
+mod policy_id_tests;
+
+#[cfg(test)]
+#[path = "schema_version_tests.rs"]
+mod schema_version_tests;
+
+#[cfg(test)]
+#[path = "receipt_type_tests.rs"]
+mod receipt_type_tests;
+
+#[cfg(test)]
+#[path = "boundary_origin_tests.rs"]
+mod boundary_origin_tests;
