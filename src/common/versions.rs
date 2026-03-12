@@ -41,3 +41,7 @@ impl std::fmt::Display for SchemaVersion {
         write!(f, "{}", self.0)
     }
 }
+
+#[cfg(test)]
+#[path = "versions_tests.rs"]
+mod versions_tests;

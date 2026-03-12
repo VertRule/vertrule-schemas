@@ -5,7 +5,7 @@ use std::fmt;
 use serde::de;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-use crate::constants::{DIGEST_BYTE_LEN, DIGEST_HEX_LEN};
+use crate::common::algorithms::{DIGEST_BYTE_LEN, DIGEST_HEX_LEN};
 use crate::error::DefinitionError;
 
 /// A 32-byte cryptographic digest with strict hex serialization.
@@ -107,3 +107,7 @@ fn validate_hex(hex: &str) -> Result<(), DefinitionError> {
     }
     Ok(())
 }
+
+#[cfg(test)]
+#[path = "digest_bytes_tests.rs"]
+mod digest_bytes_tests;

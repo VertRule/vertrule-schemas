@@ -1,14 +1,14 @@
-# Per-crate governance manifest for vr-definitions
-# Constitutional type definitions
+# Per-crate governance manifest for vertrule-schemas
+# Constitutional schema types
 
 [crate]
-name = "vr-definitions"
+name = "vertrule-schemas"
 version = "0.1.0"
 publish = false
 extraction_ready = false
 
 [dependencies.constitutional]
-# vr-definitions has zero vr-* dependencies
+# vertrule-schemas has zero vr-* dependencies
 
 [stage]
 current = 0

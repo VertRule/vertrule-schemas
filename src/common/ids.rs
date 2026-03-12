@@ -29,3 +29,7 @@ impl std::fmt::Display for PolicyId {
         f.write_str(&self.0)
     }
 }
+
+#[cfg(test)]
+#[path = "ids_tests.rs"]
+mod ids_tests;

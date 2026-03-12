@@ -31,9 +31,10 @@ fn deserialize_rejects_unknown_variant() {
 }
 
 #[test]
-fn deserialize_rejects_uppercase() {
-    let result: Result<BoundaryOrigin, _> = serde_json::from_str("\"Engine\"");
-    assert!(result.is_err());
+fn deserialize_accepts_uppercase() -> Result<(), anyhow::Error> {
+    let parsed: BoundaryOrigin = serde_json::from_str("\"Engine\"")?;
+    assert_eq!(parsed, BoundaryOrigin::Engine);
+    Ok(())
 }
 
 #[test]

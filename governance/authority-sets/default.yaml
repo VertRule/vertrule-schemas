@@ -1,4 +1,4 @@
-# Authority set for vr-definitions (mirrors root)
+# Authority set for vertrule-schemas (mirrors root)
 #
 # Inherits from repository-level authority set.
 # Override only when crate-specific authority is needed.

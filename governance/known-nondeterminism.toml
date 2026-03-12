@@ -1,7 +1,7 @@
-# Known nondeterminism in vr-definitions
+# Known nondeterminism in vertrule-schemas
 # Stage 0: Progressive hardening
 #
-# vr-definitions is pure schema and validation.
+# vertrule-schemas is pure schema and validation.
 # No known sources of nondeterminism.
 
 # [items]
