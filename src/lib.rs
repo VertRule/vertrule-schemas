@@ -47,11 +47,13 @@
 
 pub mod common;
 pub mod context;
+pub mod jcs;
 pub mod receipts;
 
 // ── Crate-root modules (deferred from migration — see TODO in each) ─
 
 mod boundary_origin;
+mod canonical_payload;
 mod error;
 mod rbh_invariant;
 
@@ -59,9 +61,11 @@ mod rbh_invariant;
 
 pub use common::{DigestBytes, PolicyId, SchemaVersion};
 pub use error::DefinitionError;
+pub use jcs::{canonicalize, to_canon_bytes, to_canon_string, JcsError};
 pub use receipts::{ReceiptEnvelope, ReceiptMetaV1, ReceiptType};
 
 pub use boundary_origin::BoundaryOrigin;
+pub use canonical_payload::CanonicalPayload;
 pub use rbh_invariant::RBHInvariant;
 
 // ── Tests (deferred types keep their test modules at crate root) ────

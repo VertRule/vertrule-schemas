@@ -26,6 +26,19 @@ pub enum BoundaryOrigin {
     Training,
 }
 
+impl std::fmt::Display for BoundaryOrigin {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Engine => f.write_str("engine"),
+            Self::Adapter => f.write_str("adapter"),
+            Self::Numeric => f.write_str("numeric"),
+            Self::Governance => f.write_str("governance"),
+            Self::Model => f.write_str("model"),
+            Self::Training => f.write_str("training"),
+        }
+    }
+}
+
 impl<'de> Deserialize<'de> for BoundaryOrigin {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where

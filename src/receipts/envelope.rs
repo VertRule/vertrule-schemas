@@ -5,6 +5,7 @@
 
 use serde::{Deserialize, Serialize};
 
+use crate::canonical_payload::CanonicalPayload;
 use crate::{BoundaryOrigin, DigestBytes, ReceiptType, SchemaVersion};
 
 /// Public receipt envelope shared by producers and verifiers.
@@ -48,7 +49,11 @@ pub struct ReceiptEnvelope {
     pub canonicalization: Option<String>,
 
     /// Domain-specific payload content.
-    pub payload: serde_json::Value,
+    ///
+    /// Guarded against floating-point numbers at all nesting depths.
+    /// Floats are nondeterministic across platforms and forbidden in
+    /// the receipt spine.
+    pub payload: CanonicalPayload,
 }
 
 #[cfg(test)]

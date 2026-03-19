@@ -1,10 +1,20 @@
 //! Tests for `ReceiptEnvelope`.
 
 use crate::common::algorithms::{CANONICALIZATION, DIGEST_ALGORITHM};
-use crate::{DigestBytes, ReceiptEnvelope, ReceiptType, SchemaVersion};
+use crate::{CanonicalPayload, DigestBytes, ReceiptEnvelope, ReceiptType, SchemaVersion};
 
 fn digest(fill: u8) -> DigestBytes {
     DigestBytes::from_array([fill; 32])
+}
+
+fn payload(value: serde_json::Value) -> CanonicalPayload {
+    match CanonicalPayload::new(value) {
+        Ok(p) => p,
+        Err(e) => {
+            eprintln!("test payload rejected: {e}");
+            std::process::abort();
+        }
+    }
 }
 
 #[test]
@@ -21,7 +31,7 @@ fn serde_round_trip_minimal_envelope() -> Result<(), anyhow::Error> {
         boundary_origin: None,
         digest_algorithm: None,
         canonicalization: None,
-        payload: serde_json::json!({"hello": "world"}),
+        payload: payload(serde_json::json!({"hello": "world"})),
     };
 
     let json = serde_json::to_string(&envelope)?;
@@ -44,7 +54,7 @@ fn optional_fields_serialize_only_when_present() -> Result<(), anyhow::Error> {
         boundary_origin: None,
         digest_algorithm: None,
         canonicalization: None,
-        payload: serde_json::json!({"k": "v"}),
+        payload: payload(serde_json::json!({"k": "v"})),
     };
 
     let value = serde_json::to_value(&envelope)?;
@@ -72,7 +82,7 @@ fn algorithm_markers_round_trip_when_present() -> Result<(), anyhow::Error> {
         boundary_origin: Some(crate::BoundaryOrigin::Training),
         digest_algorithm: Some(DIGEST_ALGORITHM.to_string()),
         canonicalization: Some(CANONICALIZATION.to_string()),
-        payload: serde_json::json!({"loss": 0}),
+        payload: payload(serde_json::json!({"loss": 0})),
     };
 
     let json = serde_json::to_string(&envelope)?;
