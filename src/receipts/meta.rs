@@ -6,6 +6,7 @@ use crate::{DigestBytes, SchemaVersion};
 
 /// Metadata header for receipt format identification.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ReceiptMetaV1 {
     /// Envelope schema version.
     pub envelope_version: SchemaVersion,

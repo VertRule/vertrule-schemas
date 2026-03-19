@@ -20,7 +20,7 @@ fn accepts_strings_bools_nulls() {
 
 #[test]
 fn rejects_top_level_float() {
-    let value = serde_json::json!(3.14);
+    let value = serde_json::json!(3.7);
     let err = CanonicalPayload::new(value).err();
     assert!(err.is_some());
     assert!(err.as_ref().is_some_and(|e| e.contains("float")));
@@ -45,7 +45,7 @@ fn rejects_float_in_array() {
 #[test]
 fn serde_round_trip() -> Result<(), Box<dyn std::error::Error>> {
     let value = serde_json::json!({"schema": "test@0.1", "count": 42});
-    let payload = CanonicalPayload::new(value).map_err(|e| e)?;
+    let payload = CanonicalPayload::new(value)?;
     let json = serde_json::to_string(&payload)?;
     let parsed: CanonicalPayload = serde_json::from_str(&json)?;
     assert_eq!(parsed, payload);
