@@ -2,10 +2,8 @@
 //!
 //! This module collects types that are not scoped to a single domain
 //! (receipts, context, policy) but are used structurally throughout the
-//! constitutional layer: algorithm bindings, identifiers, version tags,
-//! and digest newtypes.
+//! constitutional layer: digest newtypes, identifiers, and version tags.
 
-pub mod algorithms;
 mod digest_bytes;
 mod ids;
 mod versions;

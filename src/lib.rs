@@ -6,15 +6,17 @@
 //! `(spec_version, canonicalization, commitment_primitive)`.
 //! Types in this crate are shape types that enforce wire-format
 //! constraints without binding to a specific primitive. The active
-//! bindings are declared in [`common::algorithms`] under the version
-//! conservation clause: any change to canonicalization semantics,
-//! commitment primitives, or envelope structure increments the
-//! specification version.
+//! bindings are colocated on the types they constrain:
+//! [`DigestBytes::BYTE_LEN`], [`DigestBytes::HEX_LEN`] for digest
+//! shape, and [`SchemaVersion::digest_algorithm`],
+//! [`SchemaVersion::canonicalization`] for version-derived identity.
+//! Any change to canonicalization semantics, commitment primitives,
+//! or envelope structure increments the specification version.
 //!
 //! ## Module layout
 //!
-//! - [`common`] — Cross-cutting primitives: algorithm bindings, digest
-//!   newtypes, identifiers, version tags.
+//! - [`common`] — Cross-cutting primitives: digest newtypes, identifiers,
+//!   version tags.
 //! - [`context`] — Execution-context types (placeholder, Phase 2).
 //! - [`receipts`] — Receipt-spine discriminators and constitutional envelope types.
 //!
@@ -32,13 +34,13 @@
 //! - [`SchemaVersion`] — Schema version tag (carries identity triple)
 //! - [`DefinitionError`] — Validation error types
 //!
-//! ## Constants
+//! ## Associated Constants
 //!
-//! - [`common::algorithms::ENVELOPE_VERSION_1`]
-//! - [`common::algorithms::DIGEST_ALGORITHM`]
-//! - [`common::algorithms::DIGEST_HEX_LEN`]
-//! - [`common::algorithms::DIGEST_BYTE_LEN`]
-//! - [`common::algorithms::CANONICALIZATION`]
+//! - [`DigestBytes::BYTE_LEN`] — 32
+//! - [`DigestBytes::HEX_LEN`] — 64
+//! - [`SchemaVersion::V1`] — spec version 1
+//! - [`SchemaVersion::digest_algorithm`] — `"BLAKE3"` (v1)
+//! - [`SchemaVersion::canonicalization`] — `"JCS"` (v1)
 
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 #![warn(missing_docs)]

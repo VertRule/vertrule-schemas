@@ -12,6 +12,14 @@ pub enum DefinitionError {
     #[error("invalid payload: {0}")]
     InvalidPayload(String),
 
+    /// A policy identifier failed validation.
+    #[error("invalid policy id: {0}")]
+    InvalidPolicyId(String),
+
+    /// A schema version number has no defined identity binding.
+    #[error("unsupported schema version: {0}")]
+    UnsupportedVersion(u32),
+
     /// JSON canonicalization failed.
     #[error("canonicalization failed: {0}")]
     Jcs(#[from] crate::jcs::JcsError),

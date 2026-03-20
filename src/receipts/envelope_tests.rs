@@ -1,6 +1,5 @@
 //! Tests for `ReceiptEnvelope`.
 
-use crate::common::algorithms::{CANONICALIZATION, DIGEST_ALGORITHM};
 use crate::{CanonicalPayload, DigestBytes, ReceiptEnvelope, ReceiptType, SchemaVersion};
 
 fn digest(fill: u8) -> DigestBytes {
@@ -74,8 +73,8 @@ fn algorithm_markers_round_trip_when_present() -> Result<(), anyhow::Error> {
         event_hash: digest(4),
         parent_id: Some(digest(5)),
         boundary_origin: Some(crate::BoundaryOrigin::Training),
-        digest_algorithm: Some(DIGEST_ALGORITHM.to_string()),
-        canonicalization: Some(CANONICALIZATION.to_string()),
+        digest_algorithm: Some(SchemaVersion::V1.digest_algorithm().to_string()),
+        canonicalization: Some(SchemaVersion::V1.canonicalization().to_string()),
         payload: payload(serde_json::json!({"loss": 0}))?,
     };
 

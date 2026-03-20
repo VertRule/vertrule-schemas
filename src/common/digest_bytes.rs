@@ -5,7 +5,6 @@ use std::fmt;
 use serde::de;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-use crate::common::algorithms::{DIGEST_BYTE_LEN, DIGEST_HEX_LEN};
 use crate::error::DefinitionError;
 
 /// A 32-byte cryptographic digest with strict hex serialization.
@@ -21,6 +20,12 @@ use crate::error::DefinitionError;
 pub struct DigestBytes([u8; 32]);
 
 impl DigestBytes {
+    /// Expected byte length of a digest (32 bytes).
+    pub const BYTE_LEN: usize = 32;
+
+    /// Expected hex string length of a digest (64 lowercase hex chars).
+    pub const HEX_LEN: usize = 64;
+
     /// Create from a raw byte array (infallible).
     #[must_use]
     pub const fn from_array(bytes: [u8; 32]) -> Self {
@@ -50,7 +55,7 @@ impl DigestBytes {
         let arr: [u8; 32] = bytes.try_into().map_err(|_| {
             DefinitionError::InvalidDigest(format!(
                 "expected {} bytes, got {}",
-                DIGEST_BYTE_LEN,
+                Self::BYTE_LEN,
                 bytes.len()
             ))
         })?;
@@ -91,9 +96,10 @@ impl<'de> Deserialize<'de> for DigestBytes {
 
 /// Validate that a hex string is exactly 64 lowercase hex characters.
 fn validate_hex(hex: &str) -> Result<(), DefinitionError> {
-    if hex.len() != DIGEST_HEX_LEN {
+    if hex.len() != DigestBytes::HEX_LEN {
         return Err(DefinitionError::InvalidDigest(format!(
-            "expected {DIGEST_HEX_LEN} hex chars, got {}",
+            "expected {} hex chars, got {}",
+            DigestBytes::HEX_LEN,
             hex.len()
         )));
     }
