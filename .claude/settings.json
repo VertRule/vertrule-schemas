@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./tooling/scripts/claude-determinism-hook.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

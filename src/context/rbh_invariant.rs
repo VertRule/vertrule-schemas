@@ -1,11 +1,3 @@
-// TODO(phase2): Determine the correct ontological home for `RBHInvariant`.
-// Candidates: `context/identity.rs` (if it is strictly a context-binding type)
-// or `receipts/envelope.rs` (if it is an envelope-level constraint).
-// Not forced into either location because it constrains continuation
-// admissibility across contexts — its semantics span both domains.
-// Isolated at crate root until the Phase 2 envelope/context shape clarifies
-// which module owns the cross-context identity continuity concept.
-
 //! Constitutional identity continuity constraint across sealed execution contexts.
 
 use serde::{Deserialize, Serialize};

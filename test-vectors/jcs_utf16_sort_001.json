@@ -1,0 +1,15 @@
+{
+  "schema_version": "vr.test_vector/v1",
+  "case_id": "jcs_utf16_sort_001",
+  "kind": "vector",
+  "applies_to": "vertrule-schemas::jcs",
+  "comparison_policy": "bitwise_exact",
+  "requires_features": [],
+  "source": "rfc8785-section-3.2.3",
+  "input": {
+    "json": "{\"\\u20ac\":\"Euro Sign\",\"\\r\":\"Carriage Return\",\"\\ufb33\":\"Hebrew Letter Dalet With Dagesh\",\"1\":\"One\",\"\\ud83d\\ude00\":\"Emoji: Grinning Face\",\"\\u0080\":\"Control\",\"\\u00f6\":\"Latin Small Letter O With Diaeresis\"}"
+  },
+  "expected": {
+    "canonical_string": "{\"\\r\":\"Carriage Return\",\"1\":\"One\",\"\u0080\":\"Control\",\"ö\":\"Latin Small Letter O With Diaeresis\",\"€\":\"Euro Sign\",\"😀\":\"Emoji: Grinning Face\",\"דּ\":\"Hebrew Letter Dalet With Dagesh\"}"
+  }
+}

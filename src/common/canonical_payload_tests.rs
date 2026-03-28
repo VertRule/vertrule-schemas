@@ -43,6 +43,24 @@ fn rejects_float_in_array() {
 }
 
 #[test]
+fn rejects_integer_outside_i_json_range() {
+    let value = serde_json::json!({"count": 9_007_199_254_740_992u64});
+    let err = CanonicalPayload::new(value).err();
+    assert!(err.is_some());
+    assert!(err
+        .as_ref()
+        .is_some_and(|e| e.contains("interoperable I-JSON range")));
+}
+
+#[test]
+fn rejects_noncharacters_in_strings() {
+    let value = serde_json::json!({"bad": "\u{FDD0}"});
+    let err = CanonicalPayload::new(value).err();
+    assert!(err.is_some());
+    assert!(err.as_ref().is_some_and(|e| e.contains("noncharacter")));
+}
+
+#[test]
 fn serde_round_trip() -> Result<(), Box<dyn std::error::Error>> {
     let value = serde_json::json!({"schema": "test@0.1", "count": 42});
     let payload = CanonicalPayload::new(value)?;
@@ -57,6 +75,16 @@ fn deserialization_rejects_float() {
     let json = r#"{"x": 3.14}"#;
     let result: Result<CanonicalPayload, _> = serde_json::from_str(json);
     assert!(result.is_err());
+}
+
+#[test]
+fn deserialization_rejects_duplicate_object_keys() {
+    let json = r#"{"x": 1, "x": 2}"#;
+    let result: Result<CanonicalPayload, _> = serde_json::from_str(json);
+    assert!(result.is_err());
+    if let Err(err) = result {
+        assert!(err.to_string().contains("duplicate property name"));
+    }
 }
 
 #[test]

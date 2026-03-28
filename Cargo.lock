@@ -209,6 +209,16 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror",
+ "vr-jcs",
+]
+
+[[package]]
+name = "vr-jcs"
+version = "0.2.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "zmij",
 ]
 
 [[package]]

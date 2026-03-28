@@ -1,0 +1,23 @@
+{
+  "schema_version": "vr.test_vector/v1",
+  "case_id": "envelope_reject_missing_field_001",
+  "kind": "reject",
+  "applies_to": "vertrule-schemas::receipts::envelope",
+  "comparison_policy": "error_class",
+  "source": "hand-authored",
+  "input": {
+    "envelope_json": {
+      "envelope_version": 1,
+      "receipt_type": "governance",
+      "context_digest": "0101010101010101010101010101010101010101010101010101010101010101",
+      "schema_digest": "0202020202020202020202020202020202020202020202020202020202020202",
+      "policy_digest": "0303030303030303030303030303030303030303030303030303030303030303",
+      "logical_time": 1000,
+      "payload": {"action": "create", "domain": "test.governance.v1"}
+    }
+  },
+  "expected_error": {
+    "kind": "deserialization_failure",
+    "contains": "event_hash"
+  }
+}

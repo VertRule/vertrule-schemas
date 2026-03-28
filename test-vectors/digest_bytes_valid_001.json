@@ -1,0 +1,16 @@
+{
+  "schema_version": "vr.test_vector/v1",
+  "case_id": "digest_bytes_valid_001",
+  "kind": "vector",
+  "applies_to": "vertrule-schemas::digest_bytes",
+  "comparison_policy": "bitwise_exact",
+  "requires_features": [],
+  "source": "hand-authored",
+  "input": {
+    "hex": "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
+  },
+  "expected": {
+    "hex_roundtrip": "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
+    "byte_length": 32
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "schema_version": "vr.test_vector/v1",
+  "case_id": "jcs_shuffle_invariant_001",
+  "kind": "determinism",
+  "applies_to": "vertrule-schemas::jcs",
+  "comparison_policy": "bitwise_exact",
+  "determinism_contract": "shuffled_field_order",
+  "source": "hand-authored",
+  "input": {
+    "variant_a": {"id": 123, "timestamp": 456789, "data": {"x": 1, "y": 2, "z": 3}, "tags": ["a", "b", "c"]},
+    "variant_b": {"tags": ["a", "b", "c"], "data": {"z": 3, "x": 1, "y": 2}, "timestamp": 456789, "id": 123}
+  },
+  "expected": {
+    "canonical_string": "{\"data\":{\"x\":1,\"y\":2,\"z\":3},\"id\":123,\"tags\":[\"a\",\"b\",\"c\"],\"timestamp\":456789}",
+    "blake3_hex": "a570bf8c42e0dc98b4581c85391c5b77271fa892d896be9641889d4ddba27344"
+  }
+}

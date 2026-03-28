@@ -1,0 +1,14 @@
+{
+  "schema_version": "vr.test_vector/v1",
+  "case_id": "jcs_reject_duplicate_key_001",
+  "kind": "reject",
+  "applies_to": "vertrule-schemas::jcs",
+  "comparison_policy": "error_class_contains",
+  "source": "hand-authored",
+  "input": {
+    "json": "{\"outer\":{\"a\":1,\"a\":2}}"
+  },
+  "expected_error": {
+    "contains": "duplicate property name"
+  }
+}

@@ -10,14 +10,15 @@ any verifier implementation must understand.
 
 - Zero `vr-*` runtime dependencies
 - Zero unsafe code
-- No floating-point arithmetic
-- Deterministic serialization (serde + strict hex)
+- No floating-point values in trust-critical payloads
+- RFC 8785 canonical JSON for digest / signature inputs
 
 ## Public Types
 
 | Type | Purpose |
 |------|---------|
 | `DigestBytes` | 32-byte cryptographic digest with strict lowercase hex serde |
+| `IJsonUInt` | Non-negative integer guaranteed to round-trip in I-JSON |
 | `ReceiptEnvelope` | Constitutional public receipt envelope |
 | `ReceiptMetaV1` | Receipt metadata header |
 | `ReceiptType` | Receipt classification discriminator (7 variants) |
@@ -38,7 +39,8 @@ any verifier implementation must understand.
 ## Usage
 
 ```rust
-use vertrule_schemas::{DigestBytes, ReceiptEnvelope, ReceiptType, BoundaryOrigin};
+use vertrule_schemas::{to_canon_string, DigestBytes};
+use serde_json::json;
 
 // Parse a hex digest
 let digest = DigestBytes::from_hex(
@@ -47,6 +49,10 @@ let digest = DigestBytes::from_hex(
 
 // Strict validation: rejects uppercase, wrong length, non-hex
 assert!(DigestBytes::from_hex("A1B2...").is_err());
+
+// Canonicalize structured JSON for hashing/signing
+let canon = to_canon_string(&json!({"z": 1, "a": 2}))?;
+assert_eq!(canon, r#"{"a":2,"z":1}"#);
 ```
 
 ## Build

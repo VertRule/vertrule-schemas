@@ -49,7 +49,7 @@ impl<'de> Deserialize<'de> for ReceiptType {
         D: Deserializer<'de>,
     {
         let value = String::deserialize(deserializer)?;
-        match value.to_ascii_lowercase().as_str() {
+        match value.as_str() {
             "event" => Ok(Self::Event),
             "llm" => Ok(Self::Llm),
             "mri" => Ok(Self::Mri),

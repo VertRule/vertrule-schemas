@@ -5,7 +5,7 @@ use std::fmt;
 use serde::de;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
-use crate::error::DefinitionError;
+use super::error::DefinitionError;
 
 /// A 32-byte cryptographic digest with strict hex serialization.
 ///

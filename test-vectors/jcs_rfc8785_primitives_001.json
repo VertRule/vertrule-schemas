@@ -1,0 +1,15 @@
+{
+  "schema_version": "vr.test_vector/v1",
+  "case_id": "jcs_rfc8785_primitives_001",
+  "kind": "vector",
+  "applies_to": "vertrule-schemas::jcs",
+  "comparison_policy": "bitwise_exact",
+  "requires_features": [],
+  "source": "rfc8785-section-3.2.2",
+  "input": {
+    "json": "{\"numbers\":[333333333.33333329,1E30,4.50,2e-3,0.000000000000000000000000001],\"string\":\"\\u20ac$\\u000F\\u000aA'\\u0042\\u0022\\u005c\\\\\\\"\\/\",\"literals\":[null,true,false]}"
+  },
+  "expected": {
+    "canonical_string": "{\"literals\":[null,true,false],\"numbers\":[333333333.3333333,1e+30,4.5,0.002,1e-27],\"string\":\"€$\\u000f\\nA'B\\\"\\\\\\\\\\\"/\"}"
+  }
+}

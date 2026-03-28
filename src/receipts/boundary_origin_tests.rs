@@ -31,10 +31,15 @@ fn deserialize_rejects_unknown_variant() {
 }
 
 #[test]
-fn deserialize_accepts_uppercase() -> Result<(), anyhow::Error> {
-    let parsed: BoundaryOrigin = serde_json::from_str("\"Engine\"")?;
-    assert_eq!(parsed, BoundaryOrigin::Engine);
-    Ok(())
+fn deserialize_rejects_title_case() {
+    let result: Result<BoundaryOrigin, _> = serde_json::from_str("\"Engine\"");
+    assert!(result.is_err(), "title case must be rejected");
+}
+
+#[test]
+fn deserialize_rejects_upper_case() {
+    let result: Result<BoundaryOrigin, _> = serde_json::from_str("\"ADAPTER\"");
+    assert!(result.is_err(), "upper case must be rejected");
 }
 
 #[test]

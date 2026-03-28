@@ -1,0 +1,15 @@
+{
+  "schema_version": "vr.test_vector/v1",
+  "case_id": "digest_bytes_reject_short_001",
+  "kind": "reject",
+  "applies_to": "vertrule-schemas::digest_bytes",
+  "comparison_policy": "error_kind_exact",
+  "source": "hand-authored",
+  "input": {
+    "hex": "ababababababababababababababababababababababababababababababab"
+  },
+  "expected_error": {
+    "kind": "InvalidDigest",
+    "contains": "64"
+  }
+}

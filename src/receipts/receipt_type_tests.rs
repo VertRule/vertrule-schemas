@@ -32,10 +32,15 @@ fn deserialize_rejects_unknown_variant() {
 }
 
 #[test]
-fn deserialize_accepts_uppercase() -> Result<(), anyhow::Error> {
-    let parsed: ReceiptType = serde_json::from_str("\"Event\"")?;
-    assert_eq!(parsed, ReceiptType::Event);
-    Ok(())
+fn deserialize_rejects_title_case() {
+    let result: Result<ReceiptType, _> = serde_json::from_str("\"Event\"");
+    assert!(result.is_err(), "title case must be rejected");
+}
+
+#[test]
+fn deserialize_rejects_upper_case() {
+    let result: Result<ReceiptType, _> = serde_json::from_str("\"GOVERNANCE\"");
+    assert!(result.is_err(), "upper case must be rejected");
 }
 
 #[test]

@@ -1,8 +1,3 @@
-// TODO(phase2): Migrate to `receipts/` once the adapter shape is defined.
-// Deferred because `BoundaryOrigin` is semantically scoped to adapter-boundary
-// receipts and placing it without its natural sibling (`receipts/adapter.rs`)
-// would be premature classification.
-
 //! Boundary origin enumeration — schema discriminator for boundary provenance.
 
 use serde::{Deserialize, Deserializer, Serialize};
@@ -45,7 +40,7 @@ impl<'de> Deserialize<'de> for BoundaryOrigin {
         D: Deserializer<'de>,
     {
         let value = String::deserialize(deserializer)?;
-        match value.to_ascii_lowercase().as_str() {
+        match value.as_str() {
             "engine" => Ok(Self::Engine),
             "adapter" => Ok(Self::Adapter),
             "numeric" => Ok(Self::Numeric),

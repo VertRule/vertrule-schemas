@@ -1,0 +1,16 @@
+{
+  "schema_version": "vr.test_vector/v1",
+  "case_id": "jcs_roundtrip_001",
+  "kind": "vector",
+  "applies_to": "vertrule-schemas::jcs",
+  "comparison_policy": "bitwise_exact",
+  "requires_features": [],
+  "source": "hand-authored",
+  "input": {
+    "json": {"z": 1, "a": 2}
+  },
+  "expected": {
+    "canonical_string": "{\"a\":2,\"z\":1}",
+    "blake3_hex": "bf45b62781e04b92e506fd95427f1b4b60579334474ca10bbd16317cde8dcbbb"
+  }
+}

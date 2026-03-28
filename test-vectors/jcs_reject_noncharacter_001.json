@@ -1,0 +1,14 @@
+{
+  "schema_version": "vr.test_vector/v1",
+  "case_id": "jcs_reject_noncharacter_001",
+  "kind": "reject",
+  "applies_to": "vertrule-schemas::jcs",
+  "comparison_policy": "error_class_contains",
+  "source": "hand-authored",
+  "input": {
+    "json": "{\"bad\":\"\\uFDD0\"}"
+  },
+  "expected_error": {
+    "contains": "forbidden noncharacter"
+  }
+}

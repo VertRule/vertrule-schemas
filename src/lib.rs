@@ -17,7 +17,7 @@
 //!
 //! - [`common`] — Cross-cutting primitives: digest newtypes, identifiers,
 //!   version tags.
-//! - [`context`] — Execution-context types (placeholder, Phase 2).
+//! - [`context`] — Execution-context types: identity continuity constraints.
 //! - [`receipts`] — Receipt-spine discriminators and constitutional envelope types.
 //!
 //! ## Re-exported types
@@ -25,6 +25,7 @@
 //! All public types are re-exported at the crate root for ergonomic access.
 //!
 //! - [`DigestBytes`] — 32-byte cryptographic digest with strict hex serde
+//! - [`IJsonUInt`] — non-negative integer guaranteed to round-trip in I-JSON
 //! - [`ReceiptEnvelope`] — Constitutional public receipt envelope
 //! - [`ReceiptMetaV1`] — Constitutional receipt metadata header
 //! - [`ReceiptType`] — Receipt classification discriminator
@@ -52,30 +53,16 @@ pub mod context;
 pub mod jcs;
 pub mod receipts;
 
-// ── Crate-root modules (deferred from migration — see TODO in each) ─
-
-mod boundary_origin;
-mod canonical_payload;
-mod error;
-mod rbh_invariant;
-
 // ── Ergonomic re-exports ────────────────────────────────────────────
 
-pub use common::{DigestBytes, PolicyId, SchemaVersion};
-pub use error::DefinitionError;
-pub use jcs::{canonicalize, to_canon_bytes, to_canon_string, JcsError};
-pub use receipts::{ReceiptEnvelope, ReceiptMetaV1, ReceiptType};
-
-pub use boundary_origin::BoundaryOrigin;
-pub use canonical_payload::CanonicalPayload;
-pub use rbh_invariant::RBHInvariant;
-
-// ── Tests (deferred types keep their test modules at crate root) ────
-
-#[cfg(test)]
-#[path = "boundary_origin_tests.rs"]
-mod boundary_origin_tests;
-
-#[cfg(test)]
-#[path = "rbh_invariant_tests.rs"]
-mod rbh_invariant_tests;
+pub use common::{
+    CanonicalPayload, DefinitionError, DigestBytes, IJsonUInt, PolicyId, SchemaId, SchemaVersion,
+};
+pub use context::RBHInvariant;
+pub use jcs::{
+    to_canon_bytes, to_canon_bytes_from_slice, to_canon_string, to_canon_string_from_str, JcsError,
+};
+pub use receipts::{
+    compute_event_hash, BoundaryOrigin, ProjectsToReceiptEnvelope, ReceiptEnvelope, ReceiptMetaV1,
+    ReceiptType,
+};

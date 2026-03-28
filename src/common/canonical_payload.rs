@@ -1,17 +1,20 @@
 //! Determinism-safe payload wrapper for receipt envelopes.
 //!
 //! Wraps `serde_json::Value` with a construction guard that rejects
-//! floating-point numbers at any nesting depth. Floats are nondeterministic
-//! across platforms and serialization libraries — they must not enter
-//! the receipt spine.
+//! values that the receipt trust surface does not admit: floating-point
+//! numbers, integers outside the interoperable I-JSON range, and strings
+//! containing forbidden noncharacters.
 
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
+
+use crate::jcs::{deserialize_json_value_no_duplicates, is_safe_integer, validate_string_contents};
 
 /// A JSON value guaranteed free of floating-point numbers.
 ///
 /// Construction rejects any `serde_json::Value` tree containing
-/// `Value::Number` entries with fractional parts. Integer numbers
-/// are permitted.
+/// `Value::Number` entries with fractional parts. Integer numbers are
+/// permitted only when they fit within the interoperable I-JSON integer
+/// range `[-(2^53)+1, (2^53)-1]`.
 ///
 /// This closes the determinism gap at the type boundary: if a
 /// `CanonicalPayload` exists, its contents are safe for canonical
@@ -57,22 +60,47 @@ impl<'de> Deserialize<'de> for CanonicalPayload {
     where
         D: Deserializer<'de>,
     {
-        let value = serde_json::Value::deserialize(deserializer)?;
+        let value = deserialize_json_value_no_duplicates(deserializer)?;
         Self::new(value).map_err(serde::de::Error::custom)
     }
 }
 
-/// Recursively reject floating-point numbers in a JSON value tree.
+/// Recursively reject values outside the payload determinism contract.
 fn reject_floats(value: &serde_json::Value, path: &str) -> Result<(), String> {
     match value {
         serde_json::Value::Number(n) => {
-            if n.is_f64() && !n.is_i64() && !n.is_u64() {
+            if let Some(i) = n.as_i64() {
+                if !is_safe_integer(i) {
+                    let display_path = if path.is_empty() { "<root>" } else { path };
+                    return Err(format!(
+                        "integer at {display_path}: {i} exceeds the interoperable I-JSON range"
+                    ));
+                }
+                return Ok(());
+            }
+
+            if let Some(u) = n.as_u64() {
+                if u > crate::IJsonUInt::MAX {
+                    let display_path = if path.is_empty() { "<root>" } else { path };
+                    return Err(format!(
+                        "integer at {display_path}: {u} exceeds the interoperable I-JSON range"
+                    ));
+                }
+                return Ok(());
+            }
+
+            if n.is_f64() {
                 let display_path = if path.is_empty() { "<root>" } else { path };
                 return Err(format!(
                     "float at {display_path}: {n} — floats are nondeterministic and forbidden in receipt payloads"
                 ));
             }
+
             Ok(())
+        }
+        serde_json::Value::String(s) => {
+            let display_path = if path.is_empty() { "<root>" } else { path };
+            validate_string_contents(s, display_path)
         }
         serde_json::Value::Array(arr) => {
             for (i, item) in arr.iter().enumerate() {
@@ -83,6 +111,7 @@ fn reject_floats(value: &serde_json::Value, path: &str) -> Result<(), String> {
         }
         serde_json::Value::Object(map) => {
             for (key, val) in map {
+                validate_string_contents(key, "object property name")?;
                 let child_path = if path.is_empty() {
                     key.clone()
                 } else {
