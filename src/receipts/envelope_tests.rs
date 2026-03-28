@@ -244,9 +244,9 @@ fn validate_integrity_fails_on_tampered_event_hash() -> Result<(), DefinitionErr
     envelope.event_hash = digest(0xff);
     let result = envelope.validate_integrity();
     assert!(result.is_err());
-    let err = result.err().ok_or_else(|| DefinitionError::IntegrityViolation(
-        "expected Err but got Ok".to_string(),
-    ))?;
+    let err = result.err().ok_or_else(|| {
+        DefinitionError::IntegrityViolation("expected Err but got Ok".to_string())
+    })?;
     assert!(err.to_string().contains("integrity violation"));
     Ok(())
 }
@@ -268,9 +268,9 @@ fn validate_integrity_fails_on_wrong_digest_algorithm_marker() -> Result<(), Def
     envelope.digest_algorithm = Some("SHA-256".to_string());
     let result = envelope.validate_integrity();
     assert!(result.is_err());
-    let err = result.err().ok_or_else(|| DefinitionError::IntegrityViolation(
-        "expected Err but got Ok".to_string(),
-    ))?;
+    let err = result.err().ok_or_else(|| {
+        DefinitionError::IntegrityViolation("expected Err but got Ok".to_string())
+    })?;
     assert!(err.to_string().contains("marker mismatch"));
     assert!(err.to_string().contains("digest_algorithm"));
     Ok(())
@@ -293,9 +293,9 @@ fn validate_integrity_fails_on_wrong_canonicalization_marker() -> Result<(), Def
     envelope.canonicalization = Some("XML-C14N".to_string());
     let result = envelope.validate_integrity();
     assert!(result.is_err());
-    let err = result.err().ok_or_else(|| DefinitionError::IntegrityViolation(
-        "expected Err but got Ok".to_string(),
-    ))?;
+    let err = result.err().ok_or_else(|| {
+        DefinitionError::IntegrityViolation("expected Err but got Ok".to_string())
+    })?;
     assert!(err.to_string().contains("marker mismatch"));
     assert!(err.to_string().contains("canonicalization"));
     Ok(())
@@ -345,9 +345,9 @@ fn validate_integrity_detects_tampered_payload_on_v2() -> Result<(), DefinitionE
         .map_err(|e| DefinitionError::InvalidPayload(e.to_string()))?;
 
     let result = envelope.validate_integrity();
-    let err = result.err().ok_or_else(|| DefinitionError::IntegrityViolation(
-        "expected Err but got Ok".to_string(),
-    ))?;
+    let err = result.err().ok_or_else(|| {
+        DefinitionError::IntegrityViolation("expected Err but got Ok".to_string())
+    })?;
     assert!(err.to_string().contains("integrity violation"));
     Ok(())
 }

@@ -1,9 +1,12 @@
 [package]
+# Publish gate: requires release constitution compliance and substrate boundary review.
 publish = false
 name = "vertrule-schemas"
 version = "0.1.0"
 edition = "2021"
-description = "Canonical schema types for the VertRule constitutional layer — zero vr-* deps"
+license = "Apache-2.0"
+description = "Canonical schema types for the VertRule constitutional layer"
+repository = "https://github.com/VertRule/vertrule-schemas"
 
 [dependencies]
 blake3 = "1"

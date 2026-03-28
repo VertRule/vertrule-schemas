@@ -47,8 +47,7 @@ fn make_v2_envelope() -> Result<ReceiptEnvelope, DefinitionError> {
         canonicalization: None,
         payload,
     };
-    envelope.event_hash = compute_event_hash(&envelope)
-        .map_err(DefinitionError::Jcs)?;
+    envelope.event_hash = compute_event_hash(&envelope).map_err(DefinitionError::Jcs)?;
     Ok(envelope)
 }
 
@@ -57,9 +56,11 @@ fn compute_event_hash_for(
     payload: &CanonicalPayload,
     _version: SchemaVersion,
 ) -> Result<DigestBytes, DefinitionError> {
-    let canon_bytes = crate::jcs::to_canon_bytes(payload.as_value())
-        .map_err(DefinitionError::Jcs)?;
-    Ok(DigestBytes::from_array(*blake3::hash(&canon_bytes).as_bytes()))
+    let canon_bytes =
+        crate::jcs::to_canon_bytes(payload.as_value()).map_err(DefinitionError::Jcs)?;
+    Ok(DigestBytes::from_array(
+        *blake3::hash(&canon_bytes).as_bytes(),
+    ))
 }
 
 // ── V1: payload-only commitment ────────────────────────────────────
@@ -108,7 +109,10 @@ fn v2_tamper_receipt_type() -> Result<(), DefinitionError> {
     let original_hash = envelope.event_hash;
     envelope.receipt_type = ReceiptType::Governance;
     let recomputed = compute_event_hash(&envelope).map_err(DefinitionError::Jcs)?;
-    assert_ne!(original_hash, recomputed, "changing receipt_type must change event_hash");
+    assert_ne!(
+        original_hash, recomputed,
+        "changing receipt_type must change event_hash"
+    );
     Ok(())
 }
 
@@ -118,7 +122,10 @@ fn v2_tamper_context_digest() -> Result<(), DefinitionError> {
     let original_hash = envelope.event_hash;
     envelope.context_digest = DigestBytes::from_array([1u8; 32]);
     let recomputed = compute_event_hash(&envelope).map_err(DefinitionError::Jcs)?;
-    assert_ne!(original_hash, recomputed, "changing context_digest must change event_hash");
+    assert_ne!(
+        original_hash, recomputed,
+        "changing context_digest must change event_hash"
+    );
     Ok(())
 }
 
@@ -128,7 +135,10 @@ fn v2_tamper_schema_digest() -> Result<(), DefinitionError> {
     let original_hash = envelope.event_hash;
     envelope.schema_digest = DigestBytes::from_array([2u8; 32]);
     let recomputed = compute_event_hash(&envelope).map_err(DefinitionError::Jcs)?;
-    assert_ne!(original_hash, recomputed, "changing schema_digest must change event_hash");
+    assert_ne!(
+        original_hash, recomputed,
+        "changing schema_digest must change event_hash"
+    );
     Ok(())
 }
 
@@ -138,7 +148,10 @@ fn v2_tamper_policy_digest() -> Result<(), DefinitionError> {
     let original_hash = envelope.event_hash;
     envelope.policy_digest = DigestBytes::from_array([3u8; 32]);
     let recomputed = compute_event_hash(&envelope).map_err(DefinitionError::Jcs)?;
-    assert_ne!(original_hash, recomputed, "changing policy_digest must change event_hash");
+    assert_ne!(
+        original_hash, recomputed,
+        "changing policy_digest must change event_hash"
+    );
     Ok(())
 }
 
@@ -148,7 +161,10 @@ fn v2_tamper_logical_time() -> Result<(), DefinitionError> {
     let original_hash = envelope.event_hash;
     envelope.logical_time = IJsonUInt::new(9999)?;
     let recomputed = compute_event_hash(&envelope).map_err(DefinitionError::Jcs)?;
-    assert_ne!(original_hash, recomputed, "changing logical_time must change event_hash");
+    assert_ne!(
+        original_hash, recomputed,
+        "changing logical_time must change event_hash"
+    );
     Ok(())
 }
 
@@ -158,7 +174,10 @@ fn v2_tamper_parent_id() -> Result<(), DefinitionError> {
     let original_hash = envelope.event_hash;
     envelope.parent_id = Some(DigestBytes::from_array([4u8; 32]));
     let recomputed = compute_event_hash(&envelope).map_err(DefinitionError::Jcs)?;
-    assert_ne!(original_hash, recomputed, "changing parent_id must change event_hash");
+    assert_ne!(
+        original_hash, recomputed,
+        "changing parent_id must change event_hash"
+    );
     Ok(())
 }
 
@@ -168,7 +187,10 @@ fn v2_tamper_boundary_origin() -> Result<(), DefinitionError> {
     let original_hash = envelope.event_hash;
     envelope.boundary_origin = Some(BoundaryOrigin::Adapter);
     let recomputed = compute_event_hash(&envelope).map_err(DefinitionError::Jcs)?;
-    assert_ne!(original_hash, recomputed, "changing boundary_origin must change event_hash");
+    assert_ne!(
+        original_hash, recomputed,
+        "changing boundary_origin must change event_hash"
+    );
     Ok(())
 }
 
@@ -179,7 +201,10 @@ fn v2_tamper_payload() -> Result<(), DefinitionError> {
     envelope.payload = CanonicalPayload::new(serde_json::json!({"tampered": true}))
         .map_err(DefinitionError::InvalidPayload)?;
     let recomputed = compute_event_hash(&envelope).map_err(DefinitionError::Jcs)?;
-    assert_ne!(original_hash, recomputed, "changing payload must change event_hash");
+    assert_ne!(
+        original_hash, recomputed,
+        "changing payload must change event_hash"
+    );
     Ok(())
 }
 
@@ -224,6 +249,9 @@ fn v1_and_v2_hashes_differ_for_same_payload() -> Result<(), DefinitionError> {
     v2.event_hash = zero_digest(); // ensure placeholder for computation
     let h2 = compute_event_hash(&v2).map_err(DefinitionError::Jcs)?;
 
-    assert_ne!(h1, h2, "V1 and V2 must produce different hashes (different commitment scopes)");
+    assert_ne!(
+        h1, h2,
+        "V1 and V2 must produce different hashes (different commitment scopes)"
+    );
     Ok(())
 }

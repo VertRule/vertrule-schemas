@@ -6,8 +6,7 @@ use crate::{
 
 /// Build a minimal valid envelope for testing.
 fn test_envelope(payload_json: serde_json::Value) -> Result<ReceiptEnvelope, DefinitionError> {
-    let payload = CanonicalPayload::new(payload_json)
-        .map_err(DefinitionError::InvalidPayload)?;
+    let payload = CanonicalPayload::new(payload_json).map_err(DefinitionError::InvalidPayload)?;
     let canon_bytes = crate::jcs::to_canon_bytes(&payload)?;
     let event_hash = DigestBytes::from_array(blake3::hash(&canon_bytes).into());
     let zero_digest = DigestBytes::from_array([0u8; 32]);
@@ -56,8 +55,8 @@ fn projected_event_hash_matches_payload() -> Result<(), DefinitionError> {
     let receipt = TestReceipt { value: 42 };
     let envelope = receipt.project()?;
 
-    let canon_bytes = crate::jcs::to_canon_bytes(&envelope.payload)
-        .map_err(DefinitionError::Jcs)?;
+    let canon_bytes =
+        crate::jcs::to_canon_bytes(&envelope.payload).map_err(DefinitionError::Jcs)?;
     let recomputed = DigestBytes::from_array(blake3::hash(&canon_bytes).into());
 
     assert_eq!(
@@ -73,7 +72,10 @@ fn projection_is_deterministic() -> Result<(), DefinitionError> {
     let e1 = receipt.project()?;
     let e2 = receipt.project()?;
 
-    assert_eq!(e1.event_hash, e2.event_hash, "same input must produce same event_hash");
+    assert_eq!(
+        e1.event_hash, e2.event_hash,
+        "same input must produce same event_hash"
+    );
     assert_eq!(
         crate::jcs::to_canon_bytes(&e1).map_err(DefinitionError::Jcs)?,
         crate::jcs::to_canon_bytes(&e2).map_err(DefinitionError::Jcs)?,
@@ -99,10 +101,9 @@ fn projected_envelope_round_trips_through_json() -> Result<(), DefinitionError> 
     let receipt = TestReceipt { value: 42 };
     let envelope = receipt.project()?;
 
-    let json = crate::jcs::to_canon_string(&envelope)
-        .map_err(DefinitionError::Jcs)?;
-    let parsed: ReceiptEnvelope = serde_json::from_str(&json)
-        .map_err(|e| DefinitionError::Jcs(crate::JcsError::from(e)))?;
+    let json = crate::jcs::to_canon_string(&envelope).map_err(DefinitionError::Jcs)?;
+    let parsed: ReceiptEnvelope =
+        serde_json::from_str(&json).map_err(|e| DefinitionError::Jcs(crate::JcsError::from(e)))?;
 
     assert_eq!(envelope.event_hash, parsed.event_hash);
     assert_eq!(envelope.receipt_type, parsed.receipt_type);
