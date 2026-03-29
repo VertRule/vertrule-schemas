@@ -1,6 +1,5 @@
 [package]
 # Publish gate: requires release constitution compliance and substrate boundary review.
-publish = false
 name = "vertrule-schemas"
 version = "0.1.0"
 edition = "2021"
@@ -14,11 +13,12 @@ hex = "0.4"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["arbitrary_precision"] }
 thiserror = "1"
-vr-jcs = { path = "../vr-jcs" }
+vr-jcs = { version = "0.2.0", path = "../vr-jcs" }
 
 [dev-dependencies]
 anyhow = "1"
 blake3 = "1"
+vr-jcs = { version = "0.2.0", path = "../vr-jcs" }
 
 [lints.rust]
 unsafe_code = "deny"

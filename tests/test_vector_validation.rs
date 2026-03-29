@@ -15,7 +15,7 @@ mod common;
 
 use common::{assert_error_contains, load_vector, need, vr_test};
 
-use vertrule_schemas::jcs::{to_canon_bytes, to_canon_bytes_from_slice};
+use vr_jcs::{to_canon_bytes, to_canon_bytes_from_slice};
 use vertrule_schemas::{DefinitionError, DigestBytes, ReceiptEnvelope};
 
 // ---------------------------------------------------------------------------

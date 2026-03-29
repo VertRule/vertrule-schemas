@@ -50,7 +50,7 @@
 
 pub mod common;
 pub mod context;
-pub mod jcs;
+pub(crate) mod jcs;
 pub mod receipts;
 
 // ── Ergonomic re-exports ────────────────────────────────────────────
@@ -59,10 +59,6 @@ pub use common::{
     CanonicalPayload, DefinitionError, DigestBytes, IJsonUInt, PolicyId, SchemaId, SchemaVersion,
 };
 pub use context::RBHInvariant;
-pub use jcs::{
-    to_canon_bytes, to_canon_bytes_from_slice, to_canon_string, to_canon_string_from_str, JcsError,
-};
 pub use receipts::{
-    compute_event_hash, BoundaryOrigin, ProjectsToReceiptEnvelope, ReceiptEnvelope, ReceiptMetaV1,
-    ReceiptType,
+    BoundaryOrigin, ProjectsToReceiptEnvelope, ReceiptEnvelope, ReceiptMetaV1, ReceiptType,
 };

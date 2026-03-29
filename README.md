@@ -39,7 +39,8 @@ any verifier implementation must understand.
 ## Usage
 
 ```rust
-use vertrule_schemas::{to_canon_string, DigestBytes};
+use vertrule_schemas::DigestBytes;
+use vr_jcs::to_canon_string;
 use serde_json::json;
 
 // Parse a hex digest
@@ -50,7 +51,7 @@ let digest = DigestBytes::from_hex(
 // Strict validation: rejects uppercase, wrong length, non-hex
 assert!(DigestBytes::from_hex("A1B2...").is_err());
 
-// Canonicalize structured JSON for hashing/signing
+// Canonicalize structured JSON for hashing/signing (via vr-jcs)
 let canon = to_canon_string(&json!({"z": 1, "a": 2}))?;
 assert_eq!(canon, r#"{"a":2,"z":1}"#);
 ```

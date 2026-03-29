@@ -12,8 +12,8 @@
 
 use serde_json::Value;
 
-use crate::jcs::to_canon_bytes;
-use crate::{DigestBytes, JcsError, ReceiptEnvelope};
+use crate::jcs::{to_canon_bytes, JcsError};
+use crate::{DigestBytes, ReceiptEnvelope};
 
 /// Compute the `event_hash` for an envelope according to its version's
 /// commitment scope.

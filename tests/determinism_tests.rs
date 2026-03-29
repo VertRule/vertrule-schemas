@@ -14,7 +14,7 @@ mod common;
 
 use common::{assert_deterministic, load_vector, need, vr_test};
 
-use vertrule_schemas::jcs::to_canon_bytes;
+use vr_jcs::to_canon_bytes;
 use vertrule_schemas::{DigestBytes, ReceiptEnvelope};
 
 // ---------------------------------------------------------------------------
