@@ -51,6 +51,7 @@
 pub mod common;
 pub mod context;
 pub(crate) mod jcs;
+pub mod mri;
 pub mod receipts;
 
 // ── Ergonomic re-exports ────────────────────────────────────────────
@@ -59,6 +60,10 @@ pub use common::{
     CanonicalPayload, DefinitionError, DigestBytes, IJsonUInt, PolicyId, SchemaId, SchemaVersion,
 };
 pub use context::RBHInvariant;
+pub use mri::{
+    BatchReduction, GradientCouplingPayload, MriBatchPayload, ReductionAxis, ReductionMode,
+    ReductionProvenance, TokenReduction,
+};
 pub use receipts::{
     BoundaryOrigin, ProjectsToReceiptEnvelope, ReceiptEnvelope, ReceiptMetaV1, ReceiptType,
 };
