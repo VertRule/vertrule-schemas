@@ -30,6 +30,7 @@ use super::reduction::ReductionProvenance;
 /// When either gradient profile has zero norm, `profile_cosine` is
 /// defined as `0.0` (orthogonal by convention).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct GradientCouplingPayload {
     /// Schema identifier. Must be `"mri2.gradient_coupling@0.1"`.
     pub schema: String,

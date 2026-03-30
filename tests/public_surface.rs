@@ -71,8 +71,8 @@ fn public_surface_nouns_are_usable() -> Result<(), anyhow::Error> {
     let _ = BoundaryOrigin::Engine;
 
     // CanonicalPayload
-    let payload = CanonicalPayload::new(serde_json::json!({"k": "v"}))
-        .map_err(|e| anyhow::anyhow!("{e}"))?;
+    let payload =
+        CanonicalPayload::new(serde_json::json!({"k": "v"})).map_err(|e| anyhow::anyhow!("{e}"))?;
     assert!(payload.as_value().is_object());
 
     // ReceiptEnvelope is a pure data struct

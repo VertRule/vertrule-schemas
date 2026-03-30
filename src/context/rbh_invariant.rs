@@ -36,6 +36,7 @@ use crate::DigestBytes;
 /// All fields are [`DigestBytes`] values serialized as 64 lowercase hex
 /// characters. JCS field ordering is deterministic.
 #[derive(Clone, Debug, Eq, PartialEq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 #[non_exhaustive]
 pub struct RBHInvariant {
     /// BLAKE3 digest of the parent (upstream) sealed execution context.

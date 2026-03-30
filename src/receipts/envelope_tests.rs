@@ -111,4 +111,3 @@ fn rejects_logical_time_outside_i_json_range() {
         assert!(err.to_string().contains("invalid I-JSON number"));
     }
 }
-

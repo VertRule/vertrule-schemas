@@ -14,8 +14,8 @@ mod common;
 
 use common::{assert_deterministic, load_vector, need, vr_test};
 
-use vr_jcs::to_canon_bytes;
 use vertrule_schemas::{DigestBytes, ReceiptEnvelope};
+use vr_jcs::to_canon_bytes;
 
 // ---------------------------------------------------------------------------
 // L1: Shuffled-input canonical equality — JCS

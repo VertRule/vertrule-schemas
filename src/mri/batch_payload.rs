@@ -23,6 +23,7 @@ use super::reduction::ReductionProvenance;
 /// [`CanonicalPayload`]: crate::CanonicalPayload
 /// [`ReceiptEnvelope`]: crate::ReceiptEnvelope
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct MriBatchPayload {
     /// Schema identifier (e.g., `"mri2.batch_invariant@0.1"`).
     pub schema: String,
@@ -81,7 +82,11 @@ mod tests {
     fn sample_provenance() -> ReductionProvenance {
         ReductionProvenance {
             reduction_mode: ReductionMode::PerExampleThenMean,
-            reduced_axes: vec![ReductionAxis::Token, ReductionAxis::Hidden, ReductionAxis::Batch],
+            reduced_axes: vec![
+                ReductionAxis::Token,
+                ReductionAxis::Hidden,
+                ReductionAxis::Batch,
+            ],
             token_reduction: TokenReduction::Mean,
             batch_reduction: BatchReduction::Mean,
         }

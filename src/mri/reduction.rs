@@ -64,6 +64,7 @@ pub enum BatchReduction {
 /// whether two invariant values are comparable, and whether the scalar
 /// summary was formed before or after semantic collapse.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct ReductionProvenance {
     /// Which reduction mode was applied.
     pub reduction_mode: ReductionMode,
@@ -114,7 +115,11 @@ mod tests {
     fn provenance_canonical_json() -> Result<(), anyhow::Error> {
         let prov = ReductionProvenance {
             reduction_mode: ReductionMode::PerExampleThenMean,
-            reduced_axes: vec![ReductionAxis::Token, ReductionAxis::Hidden, ReductionAxis::Batch],
+            reduced_axes: vec![
+                ReductionAxis::Token,
+                ReductionAxis::Hidden,
+                ReductionAxis::Batch,
+            ],
             token_reduction: TokenReduction::Mean,
             batch_reduction: BatchReduction::Mean,
         };

@@ -15,8 +15,8 @@ mod common;
 
 use common::{assert_error_contains, load_vector, need, vr_test};
 
-use vr_jcs::{to_canon_bytes, to_canon_bytes_from_slice};
 use vertrule_schemas::{DefinitionError, DigestBytes, ReceiptEnvelope};
+use vr_jcs::{to_canon_bytes, to_canon_bytes_from_slice};
 
 // ---------------------------------------------------------------------------
 // L1: Known-answer vectors — JCS

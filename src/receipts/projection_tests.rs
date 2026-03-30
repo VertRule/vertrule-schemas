@@ -102,8 +102,8 @@ fn projected_envelope_round_trips_through_json() -> Result<(), DefinitionError> 
     let envelope = receipt.project()?;
 
     let json = crate::jcs::to_canon_string(&envelope).map_err(DefinitionError::Jcs)?;
-    let parsed: ReceiptEnvelope =
-        serde_json::from_str(&json).map_err(|e| DefinitionError::Jcs(crate::jcs::JcsError::from(e)))?;
+    let parsed: ReceiptEnvelope = serde_json::from_str(&json)
+        .map_err(|e| DefinitionError::Jcs(crate::jcs::JcsError::from(e)))?;
 
     assert_eq!(envelope.event_hash, parsed.event_hash);
     assert_eq!(envelope.receipt_type, parsed.receipt_type);

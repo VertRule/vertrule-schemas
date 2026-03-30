@@ -13,12 +13,12 @@ hex = "0.4"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["arbitrary_precision"] }
 thiserror = "1"
-vr-jcs = { version = "0.2.0", path = "../vr-jcs" }
+vr-jcs = "0.2"
 
 [dev-dependencies]
 anyhow = "1"
 blake3 = "1"
-vr-jcs = { version = "0.2.0", path = "../vr-jcs" }
+vr-jcs = "0.2"
 
 [lints.rust]
 unsafe_code = "deny"
