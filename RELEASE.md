@@ -16,6 +16,10 @@ constants.
 - `RBHInvariant` — identity continuity constraint
 - `ProjectsToReceiptEnvelope` — projection trait
 - `DefinitionError` — validation errors
+- `MriBatchPayload` — batch-aware MRI receipt payload with per-example vectors
+- `GradientCouplingPayload` — gradient coupling profile payload
+- `ReductionProvenance`, `ReductionMode`, `ReductionAxis`,
+  `TokenReduction`, `BatchReduction` — reduction semantics for MRI payloads
 
 ## Key decisions
 

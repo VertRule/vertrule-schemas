@@ -36,6 +36,15 @@ use vertrule_schemas::ProjectsToReceiptEnvelope;
 // Error
 use vertrule_schemas::DefinitionError;
 
+// MRI domain types
+use vertrule_schemas::BatchReduction;
+use vertrule_schemas::GradientCouplingPayload;
+use vertrule_schemas::MriBatchPayload;
+use vertrule_schemas::ReductionAxis;
+use vertrule_schemas::ReductionMode;
+use vertrule_schemas::ReductionProvenance;
+use vertrule_schemas::TokenReduction;
+
 // Scoped export (not root)
 use vertrule_schemas::receipts::compute_event_hash;
 
@@ -93,6 +102,15 @@ fn public_surface_nouns_are_usable() -> Result<(), anyhow::Error> {
     let _ = std::any::type_name::<RBHInvariant>();
     let _ = std::any::type_name::<DefinitionError>();
     let _ = std::any::type_name::<dyn ProjectsToReceiptEnvelope>();
+
+    // MRI domain types exist
+    let _ = std::any::type_name::<MriBatchPayload>();
+    let _ = std::any::type_name::<GradientCouplingPayload>();
+    let _ = std::any::type_name::<ReductionProvenance>();
+    let _ = ReductionMode::PerExampleThenMean;
+    let _ = ReductionAxis::Token;
+    let _ = TokenReduction::Mean;
+    let _ = BatchReduction::Mean;
 
     Ok(())
 }

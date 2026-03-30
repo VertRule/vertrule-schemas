@@ -80,21 +80,22 @@ mod tests {
     use super::*;
 
     #[test]
-    fn reduction_mode_roundtrips() {
+    fn reduction_mode_roundtrips() -> Result<(), anyhow::Error> {
         let modes = [
             ReductionMode::BatchCollapsed,
             ReductionMode::PerExampleThenMean,
             ReductionMode::MicrobatchEquivalent,
         ];
         for mode in &modes {
-            let json = serde_json::to_string(mode).expect("serialize");
-            let parsed: ReductionMode = serde_json::from_str(&json).expect("deserialize");
+            let json = serde_json::to_string(mode)?;
+            let parsed: ReductionMode = serde_json::from_str(&json)?;
             assert_eq!(*mode, parsed);
         }
+        Ok(())
     }
 
     #[test]
-    fn reduction_axis_roundtrips() {
+    fn reduction_axis_roundtrips() -> Result<(), anyhow::Error> {
         let axes = [
             ReductionAxis::Batch,
             ReductionAxis::Token,
@@ -102,23 +103,25 @@ mod tests {
             ReductionAxis::Head,
         ];
         for axis in &axes {
-            let json = serde_json::to_string(axis).expect("serialize");
-            let parsed: ReductionAxis = serde_json::from_str(&json).expect("deserialize");
+            let json = serde_json::to_string(axis)?;
+            let parsed: ReductionAxis = serde_json::from_str(&json)?;
             assert_eq!(*axis, parsed);
         }
+        Ok(())
     }
 
     #[test]
-    fn provenance_canonical_json() {
+    fn provenance_canonical_json() -> Result<(), anyhow::Error> {
         let prov = ReductionProvenance {
             reduction_mode: ReductionMode::PerExampleThenMean,
             reduced_axes: vec![ReductionAxis::Token, ReductionAxis::Hidden, ReductionAxis::Batch],
             token_reduction: TokenReduction::Mean,
             batch_reduction: BatchReduction::Mean,
         };
-        let json1 = serde_json::to_string(&prov).expect("serialize");
-        let json2 = serde_json::to_string(&prov).expect("serialize");
+        let json1 = serde_json::to_string(&prov)?;
+        let json2 = serde_json::to_string(&prov)?;
         assert_eq!(json1, json2);
+        Ok(())
     }
 
     #[test]

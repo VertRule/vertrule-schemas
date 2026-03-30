@@ -42,6 +42,15 @@ pub trait ProjectsToReceiptEnvelope { .. }
 
 // Error
 pub enum DefinitionError { .. }
+
+// MRI domain types (batch-aware receipt payloads)
+pub struct MriBatchPayload { .. }
+pub struct GradientCouplingPayload { .. }
+pub struct ReductionProvenance { .. }
+pub enum ReductionMode { .. }
+pub enum ReductionAxis { .. }
+pub enum TokenReduction { .. }
+pub enum BatchReduction { .. }
 ```
 
 ## Scoped Exports (not root-exported)

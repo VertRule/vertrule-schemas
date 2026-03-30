@@ -106,15 +106,16 @@ mod tests {
     }
 
     #[test]
-    fn scalar_only_payload_passes_float_guard() {
+    fn scalar_only_payload_passes_float_guard() -> Result<(), anyhow::Error> {
         let payload = scalar_only();
-        let value = serde_json::to_value(&payload).expect("serialize");
+        let value = serde_json::to_value(&payload)?;
         let result = CanonicalPayload::new(value);
         assert!(result.is_ok());
+        Ok(())
     }
 
     #[test]
-    fn full_vector_payload_passes_float_guard() {
+    fn full_vector_payload_passes_float_guard() -> Result<(), anyhow::Error> {
         let payload = MriBatchPayload {
             schema: "mri2.batch_invariant@0.1".to_string(),
             layer: 3,
@@ -130,13 +131,14 @@ mod tests {
             c_per_example: Some(vec![0x40E0_0000, 0x4100_0000]),
             degenerate_mask: Some(vec![0, 1]),
         };
-        let value = serde_json::to_value(&payload).expect("serialize");
+        let value = serde_json::to_value(&payload)?;
         let result = CanonicalPayload::new(value);
         assert!(result.is_ok());
+        Ok(())
     }
 
     #[test]
-    fn full_payload_roundtrips_through_json() {
+    fn full_payload_roundtrips_through_json() -> Result<(), anyhow::Error> {
         let payload = MriBatchPayload {
             schema: "mri2.batch_invariant@0.1".to_string(),
             layer: 5,
@@ -152,15 +154,16 @@ mod tests {
             c_per_example: None,
             degenerate_mask: Some(vec![0, 0]),
         };
-        let json = serde_json::to_string(&payload).expect("serialize");
-        let parsed: MriBatchPayload = serde_json::from_str(&json).expect("deserialize");
+        let json = serde_json::to_string(&payload)?;
+        let parsed: MriBatchPayload = serde_json::from_str(&json)?;
         assert_eq!(payload, parsed);
+        Ok(())
     }
 
     #[test]
-    fn absent_fields_omitted_from_json() {
+    fn absent_fields_omitted_from_json() -> Result<(), anyhow::Error> {
         let payload = scalar_only();
-        let json = serde_json::to_string(&payload).expect("serialize");
+        let json = serde_json::to_string(&payload)?;
         assert!(!json.contains("batch_len"));
         assert!(!json.contains("q_per_example"));
         assert!(!json.contains("e_scalar"));
@@ -170,5 +173,6 @@ mod tests {
         assert!(!json.contains("h_per_example"));
         assert!(!json.contains("c_per_example"));
         assert!(!json.contains("degenerate_mask"));
+        Ok(())
     }
 }

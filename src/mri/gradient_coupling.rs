@@ -90,25 +90,28 @@ mod tests {
     }
 
     #[test]
-    fn passes_canonical_payload_guard() {
+    fn passes_canonical_payload_guard() -> Result<(), anyhow::Error> {
         let payload = sample_payload();
-        let value = serde_json::to_value(&payload).expect("serialize");
+        let value = serde_json::to_value(&payload)?;
         assert!(CanonicalPayload::new(value).is_ok());
+        Ok(())
     }
 
     #[test]
-    fn roundtrips_through_json() {
+    fn roundtrips_through_json() -> Result<(), anyhow::Error> {
         let payload = sample_payload();
-        let json = serde_json::to_string(&payload).expect("serialize");
-        let parsed: GradientCouplingPayload = serde_json::from_str(&json).expect("deserialize");
+        let json = serde_json::to_string(&payload)?;
+        let parsed: GradientCouplingPayload = serde_json::from_str(&json)?;
         assert_eq!(payload, parsed);
+        Ok(())
     }
 
     #[test]
-    fn zero_cosine_passes_guard() {
+    fn zero_cosine_passes_guard() -> Result<(), anyhow::Error> {
         let mut payload = sample_payload();
         payload.profile_cosine = 0; // 0.0f32 as bits
-        let value = serde_json::to_value(&payload).expect("serialize");
+        let value = serde_json::to_value(&payload)?;
         assert!(CanonicalPayload::new(value).is_ok());
+        Ok(())
     }
 }
