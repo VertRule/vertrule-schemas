@@ -46,7 +46,7 @@ envelope.envelope_version = SchemaVersion::V2;
 ### Step 2: Use `compute_event_hash` after all fields are set
 
 ```rust
-use vertrule_schemas::compute_event_hash;
+use vertrule_schemas::receipts::compute_event_hash;
 
 // Build envelope with all fields populated...
 let mut envelope = ReceiptEnvelope {

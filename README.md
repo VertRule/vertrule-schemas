@@ -8,40 +8,68 @@ any verifier implementation must understand.
 
 ## Design Constraints
 
-- Zero `vr-*` runtime dependencies
+- Single `vr-*` dependency: [`vr-jcs`](https://crates.io/crates/vr-jcs) (JCS canonicalization primitive)
 - Zero unsafe code
 - No floating-point values in trust-critical payloads
 - RFC 8785 canonical JSON for digest / signature inputs
 
 ## Public Types
 
+### Core
+
 | Type | Purpose |
 |------|---------|
 | `DigestBytes` | 32-byte cryptographic digest with strict lowercase hex serde |
 | `IJsonUInt` | Non-negative integer guaranteed to round-trip in I-JSON |
+| `CanonicalPayload` | Float-guarded JSON payload |
+| `PolicyId` | Opaque policy identifier |
+| `SchemaId` | Validated schema identifier (`vr.<domain>.<name>@<major>.<minor>`) |
+| `SchemaVersion` | Schema version tag (carries identity triple) |
+| `DefinitionError` | Validation error type |
+
+### Receipts
+
+| Type | Purpose |
+|------|---------|
 | `ReceiptEnvelope` | Constitutional public receipt envelope |
 | `ReceiptMetaV1` | Receipt metadata header |
 | `ReceiptType` | Receipt classification discriminator (7 variants) |
 | `BoundaryOrigin` | Boundary provenance discriminator (6 variants) |
-| `PolicyId` | Opaque policy identifier |
+| `ProjectsToReceiptEnvelope` | Canonical projection trait |
+
+### Context
+
+| Type | Purpose |
+|------|---------|
 | `RBHInvariant` | Identity continuity constraint (Receipt-Boundary Handshake) |
-| `SchemaVersion` | Schema version tag |
-| `DefinitionError` | Validation error type |
 
-### Constants
+### MRI Domain
 
-- `ENVELOPE_VERSION_1` — current envelope version
-- `DIGEST_ALGORITHM` — `"BLAKE3"`
-- `DIGEST_HEX_LEN` — 64
-- `DIGEST_BYTE_LEN` — 32
-- `CANONICALIZATION` — `"JCS"`
+| Type | Purpose |
+|------|---------|
+| `MriBatchPayload` | Batch-aware MRI invariant payload |
+| `GradientCouplingPayload` | Gradient coupling diagnostic payload |
+| `ReductionProvenance` | Reduction pipeline provenance |
+| `ReductionMode` | Batch reduction strategy |
+| `ReductionAxis` | Tensor axis discriminator |
+| `TokenReduction` | Token aggregation method |
+| `BatchReduction` | Batch aggregation method |
+
+### Associated Constants
+
+| Constant | Value |
+|----------|-------|
+| `DigestBytes::BYTE_LEN` | 32 |
+| `DigestBytes::HEX_LEN` | 64 |
+| `SchemaVersion::V1` | Spec version 1 (payload-only commitment) |
+| `SchemaVersion::V2` | Spec version 2 (full-envelope commitment) |
+| `SchemaVersion::digest_algorithm()` | `"BLAKE3"` |
+| `SchemaVersion::canonicalization()` | `"JCS"` |
 
 ## Usage
 
 ```rust
 use vertrule_schemas::DigestBytes;
-use vr_jcs::to_canon_string;
-use serde_json::json;
 
 // Parse a hex digest
 let digest = DigestBytes::from_hex(
@@ -50,8 +78,15 @@ let digest = DigestBytes::from_hex(
 
 // Strict validation: rejects uppercase, wrong length, non-hex
 assert!(DigestBytes::from_hex("A1B2...").is_err());
+```
 
-// Canonicalize structured JSON for hashing/signing (via vr-jcs)
+JCS canonicalization is provided by [`vr-jcs`](https://crates.io/crates/vr-jcs)
+(a direct dependency of this crate, but not re-exported):
+
+```rust
+use vr_jcs::to_canon_string;
+use serde_json::json;
+
 let canon = to_canon_string(&json!({"z": 1, "a": 2}))?;
 assert_eq!(canon, r#"{"a":2,"z":1}"#);
 ```
