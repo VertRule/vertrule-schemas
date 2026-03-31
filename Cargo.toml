@@ -6,6 +6,20 @@ edition = "2021"
 license = "Apache-2.0"
 description = "Canonical schema types for the VertRule constitutional layer"
 repository = "https://github.com/VertRule/vertrule-schemas"
+keywords = ["receipts", "verification", "schemas", "canonical-json", "deterministic"]
+categories = ["encoding", "data-structures"]
+exclude = [
+    ".claude/**",
+    ".github/**",
+    ".vr/**",
+    "operator_private/**",
+    "tooling/**",
+    "justfile",
+    "PRE_RELEASE_CHECKLIST.md",
+    "PUBLIC_SURFACE.md",
+    "RELEASE.md",
+    "RELEASE_CONSTITUTION.md",
+]
 
 [dependencies]
 blake3 = "1"
