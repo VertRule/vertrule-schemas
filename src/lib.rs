@@ -88,6 +88,4 @@ pub use mri::{
     BatchReduction, GradientCouplingPayload, MriBatchPayload, ReductionAxis, ReductionMode,
     ReductionProvenance, TokenReduction,
 };
-pub use receipts::{
-    BoundaryOrigin, ProjectsToReceiptEnvelope, ReceiptEnvelope, ReceiptType,
-};
+pub use receipts::{BoundaryOrigin, ProjectsToReceiptEnvelope, ReceiptEnvelope, ReceiptType};

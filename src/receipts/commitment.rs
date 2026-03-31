@@ -25,7 +25,9 @@ pub fn compute_event_hash(envelope: &ReceiptEnvelope) -> Result<DigestBytes, Jcs
         map.remove("event_hash");
     }
     let canon_bytes = to_canon_bytes(&value)?;
-    Ok(DigestBytes::from_array(*blake3::hash(&canon_bytes).as_bytes()))
+    Ok(DigestBytes::from_array(
+        *blake3::hash(&canon_bytes).as_bytes(),
+    ))
 }
 
 #[cfg(test)]
