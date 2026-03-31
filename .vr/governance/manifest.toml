@@ -3,12 +3,12 @@
 
 [crate]
 name = "vertrule-schemas"
-version = "0.1.0"
-publish = false
-extraction_ready = false
+version = "0.2.0"
+publish = true
+extraction_ready = true
 
 [dependencies.constitutional]
-# vertrule-schemas has zero vr-* dependencies
+# vertrule-schemas depends only on vr-jcs (canonicalization primitive)
 
 [stage]
 current = 0

@@ -1,4 +1,4 @@
-# vertrule-schemas Public Surface (v0.1)
+# vertrule-schemas Public Surface (v0.2)
 
 Canonical schema types for the VertRule receipt system.
 This crate contains **nouns only** — wire shapes, validated scalar
@@ -18,7 +18,6 @@ no validation judgments.
 ```rust
 // Wire shapes
 pub struct ReceiptEnvelope { .. }   // Pure data, no methods
-pub struct ReceiptMetaV1 { .. }
 
 // Discriminators
 pub enum ReceiptType { .. }
@@ -32,7 +31,7 @@ pub struct PolicyId { .. }
 pub struct SchemaId { .. }
 
 // Version tag (carries identity triple)
-pub struct SchemaVersion { .. }     // V1, V2, digest_algorithm(), canonicalization()
+pub struct SchemaVersion { .. }     // V1, digest_algorithm(), canonicalization()
 
 // Context constraint
 pub struct RBHInvariant { .. }

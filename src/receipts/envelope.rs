@@ -31,7 +31,12 @@ pub struct ReceiptEnvelope {
     /// Monotonic logical clock value.
     pub logical_time: IJsonUInt,
 
-    /// Digest of the canonical payload bytes.
+    /// Commitment digest over the full envelope.
+    ///
+    /// Computed as `BLAKE3(JCS(envelope \ {event_hash}))`: the canonical
+    /// JSON of every field except `event_hash` itself is hashed. Mutating
+    /// any trust-bearing field without recomputing this digest fails
+    /// verification.
     pub event_hash: DigestBytes,
 
     /// Previous envelope `event_hash`, when this envelope is chained.
