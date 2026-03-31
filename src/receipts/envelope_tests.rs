@@ -9,7 +9,7 @@ fn digest(fill: u8) -> DigestBytes {
 }
 
 fn payload(value: serde_json::Value) -> Result<CanonicalPayload, anyhow::Error> {
-    CanonicalPayload::new(value).map_err(|e| anyhow::anyhow!(e))
+    Ok(CanonicalPayload::new(value)?)
 }
 
 #[test]
@@ -109,5 +109,35 @@ fn rejects_logical_time_outside_i_json_range() {
     assert!(result.is_err());
     if let Err(err) = result {
         assert!(err.to_string().contains("invalid I-JSON number"));
+    }
+}
+
+#[test]
+fn rejects_unknown_fields() {
+    let json = format!(
+        r#"{{
+            "envelope_version":1,
+            "receipt_type":"governance",
+            "context_digest":"{}",
+            "schema_digest":"{}",
+            "policy_digest":"{}",
+            "logical_time":1,
+            "event_hash":"{}",
+            "payload":{{"k":"v"}},
+            "unexpected_field":"should fail"
+        }}"#,
+        digest(1),
+        digest(2),
+        digest(3),
+        digest(4)
+    );
+
+    let result = serde_json::from_str::<ReceiptEnvelope>(&json);
+    assert!(result.is_err(), "unknown fields must be rejected");
+    if let Err(err) = result {
+        assert!(
+            err.to_string().contains("unknown field"),
+            "error should mention unknown field, got: {err}"
+        );
     }
 }

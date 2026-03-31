@@ -10,8 +10,14 @@ use crate::{BoundaryOrigin, CanonicalPayload, DigestBytes, IJsonUInt};
 use crate::{ReceiptType, SchemaVersion};
 
 /// Public receipt envelope shared by producers and verifiers.
+///
+/// Marked `#[non_exhaustive]` so that new optional fields can be added
+/// in minor versions without breaking downstream struct construction.
+/// Consumers should use `..Default`-style patterns or builder helpers
+/// to remain forward-compatible.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
+#[non_exhaustive]
 pub struct ReceiptEnvelope {
     /// Envelope schema version.
     pub envelope_version: SchemaVersion,
@@ -48,10 +54,18 @@ pub struct ReceiptEnvelope {
     pub boundary_origin: Option<BoundaryOrigin>,
 
     /// Optional explicit digest binding marker.
+    ///
+    /// This crate accepts any string value. Validation that the marker
+    /// matches the `envelope_version` identity triple is a
+    /// `vertrule-verifier` responsibility.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub digest_algorithm: Option<String>,
 
     /// Optional explicit canonicalization binding marker.
+    ///
+    /// This crate accepts any string value. Validation that the marker
+    /// matches the `envelope_version` identity triple is a
+    /// `vertrule-verifier` responsibility.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub canonicalization: Option<String>,
 

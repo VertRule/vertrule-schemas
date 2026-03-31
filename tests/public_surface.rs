@@ -69,25 +69,21 @@ fn public_surface_nouns_are_usable() -> Result<(), anyhow::Error> {
     let _ = BoundaryOrigin::Engine;
 
     // CanonicalPayload
-    let payload =
-        CanonicalPayload::new(serde_json::json!({"k": "v"})).map_err(|e| anyhow::anyhow!("{e}"))?;
+    let payload = CanonicalPayload::new(serde_json::json!({"k": "v"}))?;
     assert!(payload.as_value().is_object());
 
-    // ReceiptEnvelope is a pure data struct
-    let envelope = ReceiptEnvelope {
-        envelope_version: SchemaVersion::V1,
-        receipt_type: ReceiptType::Governance,
-        context_digest: d,
-        schema_digest: d,
-        policy_digest: d,
-        logical_time: t,
-        event_hash: d,
-        parent_id: None,
-        boundary_origin: None,
-        digest_algorithm: None,
-        canonicalization: None,
-        payload,
-    };
+    // ReceiptEnvelope is #[non_exhaustive] — construct via deserialization
+    let envelope_json = serde_json::json!({
+        "envelope_version": 1,
+        "receipt_type": "governance",
+        "context_digest": d.to_hex(),
+        "schema_digest": d.to_hex(),
+        "policy_digest": d.to_hex(),
+        "logical_time": t.get(),
+        "event_hash": d.to_hex(),
+        "payload": payload.as_value(),
+    });
+    let envelope: ReceiptEnvelope = serde_json::from_value(envelope_json)?;
     let _json = serde_json::to_string(&envelope)?;
 
     // Scoped: compute_event_hash is accessible via receipts::

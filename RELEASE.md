@@ -1,40 +1,53 @@
-# vertrule-schemas v0.2.0 Release Notes
+# vertrule-schemas v0.2.1 Release Notes
 
-Canonical schema types for the VertRule receipt system. This crate is
-**nouns only** — wire shapes, validated scalar types, and associated
-constants.
+Rigor and hardening follow-up to v0.2.0. No new public types.
 
-## What ships
+## Changes from 0.2.0
 
-- `ReceiptEnvelope` — pure data struct, no methods
-- `ReceiptType`, `BoundaryOrigin` — receipt discriminators
-- `DigestBytes` — 32-byte digest with strict hex serde
-- `IJsonUInt` — non-negative integer safe for I-JSON round-trip
-- `CanonicalPayload` — float-guarded JSON payload
-- `SchemaVersion` — version tag carrying identity triple (V1)
-- `PolicyId`, `SchemaId` — opaque identifiers
-- `RBHInvariant` — identity continuity constraint
-- `ProjectsToReceiptEnvelope` — projection trait
-- `DefinitionError` — validation errors
-- `MriBatchPayload` — batch-aware MRI receipt payload with per-example vectors
-- `GradientCouplingPayload` — gradient coupling profile payload
-- `ReductionProvenance`, `ReductionMode`, `ReductionAxis`,
-  `TokenReduction`, `BatchReduction` — reduction semantics for MRI payloads
+- **Integrated dormant JCS compliance tests**: `src/jcs_tests.rs` was
+  orphaned and never compiled. Now included in the active test tree
+  (+14 RFC 8785 tests).
+- **Normalized `CanonicalPayload` constructor errors**:
+  `CanonicalPayload::new()` returns `Result<Self, DefinitionError>`
+  instead of `Result<Self, String>`.
+- **Hardened public type evolution posture**: `ReceiptEnvelope` and all
+  MRI public types (`MriBatchPayload`, `GradientCouplingPayload`,
+  `ReductionProvenance`, `ReductionMode`, `ReductionAxis`,
+  `TokenReduction`, `BatchReduction`) are now `#[non_exhaustive]`.
+- **MRI schema fields use `SchemaId`**: `MriBatchPayload::schema` and
+  `GradientCouplingPayload::schema` are now validated `SchemaId` instead
+  of bare `String`. Wire format changes from `mri2.*` to `vr.mri.*`.
+- **MRI doc invariants clarified**: length constraints on per-example
+  vectors are documented as producer obligations, not type guarantees.
+- **`compute_event_hash` hardened**: silent `if let` replaced with
+  explicit `let...else` failure path.
+- **Frozen known-answer test**: `compute_event_hash` output is pinned
+  against a specific hex digest.
+- **Unknown-field rejection test**: proves `deny_unknown_fields` on
+  `ReceiptEnvelope`.
+- **Algorithm marker ownership documented**: `digest_algorithm` and
+  `canonicalization` fields are explicitly documented as verifier-validated.
+- **Unused error variants documented**: `MarkerMismatch` and
+  `IntegrityViolation` are documented as downstream contract types.
+- **`SchemaId` doctest cleaned**: `.unwrap()` replaced with `?`.
+- **Public docs tightened**: removed overclaims about "nouns only / no
+  hashing" — crate now accurately describes itself as providing
+  protocol-scoped commitment support.
 
-## Changes from 0.1.x
+## Breaking changes
 
-- **Single schema version**: `SchemaVersion::V1` is the only supported
-  version, with full-envelope commitment (`BLAKE3(JCS(envelope \ {event_hash}))`).
-  The legacy payload-only commitment model and `SchemaVersion::V2` have been removed.
-- **`ReceiptMetaV1` removed**: no longer part of the public surface.
-- **Migration doc removed**: no migration path exists or is needed.
-- **Package boundary cleaned**: internal files (`.claude/`, `.vr/`, `tooling/`,
-  process docs) are excluded from the published crate.
+- `CanonicalPayload::new()` returns `DefinitionError` instead of `String`.
+- `ReceiptEnvelope` is `#[non_exhaustive]` — external struct literal
+  construction no longer compiles. Use deserialization or a builder.
+- `MriBatchPayload::schema` and `GradientCouplingPayload::schema` are
+  `SchemaId` instead of `String`. Wire identifiers change from
+  `mri2.batch_invariant@0.1` to `vr.mri.batch_invariant@0.1`.
+- MRI enums and structs are `#[non_exhaustive]`.
 
 ## Boundary rule
 
 | Crate | Allowed role |
 |-------|-------------|
 | `vr-jcs` | Canonicalization primitive |
-| `vertrule-schemas` | Nouns / wire shapes / validated scalar types |
+| `vertrule-schemas` | Wire shapes, validated scalars, commitment support |
 | `vertrule-verifier` | Judgment over public artifacts |

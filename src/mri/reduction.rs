@@ -11,6 +11,7 @@ use serde::{Deserialize, Serialize};
 /// and determines whether per-example vectors are meaningful.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
+#[non_exhaustive]
 pub enum ReductionMode {
     /// Batch dimension collapsed first: `mean([B,T,D])` then invariant.
     BatchCollapsed,
@@ -25,6 +26,7 @@ pub enum ReductionMode {
 /// Tensor axis that was reduced during invariant computation.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
+#[non_exhaustive]
 pub enum ReductionAxis {
     /// Batch dimension.
     Batch,
@@ -39,6 +41,7 @@ pub enum ReductionAxis {
 /// How tokens were aggregated within each example.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
+#[non_exhaustive]
 pub enum TokenReduction {
     /// Mean across all token positions.
     Mean,
@@ -51,6 +54,7 @@ pub enum TokenReduction {
 /// How batch elements were aggregated.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
+#[non_exhaustive]
 pub enum BatchReduction {
     /// Mean across all batch elements.
     Mean,
@@ -65,6 +69,7 @@ pub enum BatchReduction {
 /// summary was formed before or after semantic collapse.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
+#[non_exhaustive]
 pub struct ReductionProvenance {
     /// Which reduction mode was applied.
     pub reduction_mode: ReductionMode,

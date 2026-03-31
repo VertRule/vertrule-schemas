@@ -23,7 +23,9 @@ fn rejects_top_level_float() {
     let value = serde_json::json!(3.7);
     let err = CanonicalPayload::new(value).err();
     assert!(err.is_some());
-    assert!(err.as_ref().is_some_and(|e| e.contains("float")));
+    assert!(err
+        .as_ref()
+        .is_some_and(|e| e.to_string().contains("float")));
 }
 
 #[test]
@@ -31,7 +33,9 @@ fn rejects_nested_float() {
     let value = serde_json::json!({"data": {"temperature": 98.6}});
     let err = CanonicalPayload::new(value).err();
     assert!(err.is_some());
-    assert!(err.as_ref().is_some_and(|e| e.contains("temperature")));
+    assert!(err
+        .as_ref()
+        .is_some_and(|e| e.to_string().contains("temperature")));
 }
 
 #[test]
@@ -39,7 +43,7 @@ fn rejects_float_in_array() {
     let value = serde_json::json!({"values": [1, 2.5, 3]});
     let err = CanonicalPayload::new(value).err();
     assert!(err.is_some());
-    assert!(err.as_ref().is_some_and(|e| e.contains("[1]")));
+    assert!(err.as_ref().is_some_and(|e| e.to_string().contains("[1]")));
 }
 
 #[test]
@@ -49,7 +53,7 @@ fn rejects_integer_outside_i_json_range() {
     assert!(err.is_some());
     assert!(err
         .as_ref()
-        .is_some_and(|e| e.contains("interoperable I-JSON range")));
+        .is_some_and(|e| e.to_string().contains("interoperable I-JSON range")));
 }
 
 #[test]
@@ -57,7 +61,9 @@ fn rejects_noncharacters_in_strings() {
     let value = serde_json::json!({"bad": "\u{FDD0}"});
     let err = CanonicalPayload::new(value).err();
     assert!(err.is_some());
-    assert!(err.as_ref().is_some_and(|e| e.contains("noncharacter")));
+    assert!(err
+        .as_ref()
+        .is_some_and(|e| e.to_string().contains("noncharacter")));
 }
 
 #[test]

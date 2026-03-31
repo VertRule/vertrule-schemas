@@ -6,6 +6,7 @@
 use serde::{Deserialize, Serialize};
 
 use super::reduction::ReductionProvenance;
+use crate::SchemaId;
 
 /// Batch-aware MRI invariant payload.
 ///
@@ -16,17 +17,21 @@ use super::reduction::ReductionProvenance;
 /// Float values use `u32` IEEE-754 bit patterns (the `F32Bits` convention)
 /// to satisfy the canonical payload float guard.
 ///
-/// All per-example vector fields (`*_per_example`) must have length
-/// equal to `batch_len` when present. The `degenerate_mask` records
-/// which (layer, example) pairs were excluded from loss computation.
+/// **Producer obligation**: per-example vector fields (`*_per_example`)
+/// and `degenerate_mask` should have length equal to `batch_len` when
+/// present. This type does not enforce that invariant at construction;
+/// enforcement is a verifier responsibility. The `degenerate_mask`
+/// records which (layer, example) pairs were excluded from loss
+/// computation.
 ///
 /// [`CanonicalPayload`]: crate::CanonicalPayload
 /// [`ReceiptEnvelope`]: crate::ReceiptEnvelope
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
+#[non_exhaustive]
 pub struct MriBatchPayload {
-    /// Schema identifier (e.g., `"mri2.batch_invariant@0.1"`).
-    pub schema: String,
+    /// Schema identifier (e.g., `"vr.mri.batch_invariant@0.1"`).
+    pub schema: SchemaId,
     /// Layer index (0-based).
     pub layer: u32,
 
@@ -52,7 +57,7 @@ pub struct MriBatchPayload {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub batch_len: Option<u32>,
 
-    // ── Per-example vectors (F32Bits, length == batch_len) ─────────
+    // ── Per-example vectors (F32Bits, length should equal batch_len) ──
     /// Optional per-example Q values.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub q_per_example: Option<Vec<u32>>,
@@ -68,7 +73,8 @@ pub struct MriBatchPayload {
 
     // ── Degeneracy mask ────────────────────────────────────────────
     /// Per-example degeneracy flags (1 = degenerate / excluded from
-    /// loss computation, 0 = normal). Length must equal `batch_len`.
+    /// loss computation, 0 = normal). Length should equal `batch_len`
+    /// (producer obligation, not enforced by this type).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub degenerate_mask: Option<Vec<u8>>,
 }
@@ -92,9 +98,9 @@ mod tests {
         }
     }
 
-    fn scalar_only() -> MriBatchPayload {
-        MriBatchPayload {
-            schema: "mri2.batch_invariant@0.1".to_string(),
+    fn scalar_only() -> Result<MriBatchPayload, anyhow::Error> {
+        Ok(MriBatchPayload {
+            schema: SchemaId::new("vr.mri.batch_invariant@0.1".to_string())?,
             layer: 0,
             q_scalar: 0x3F80_0000,
             e_scalar: None,
@@ -107,12 +113,16 @@ mod tests {
             h_per_example: None,
             c_per_example: None,
             degenerate_mask: None,
-        }
+        })
+    }
+
+    fn mri_schema() -> Result<SchemaId, anyhow::Error> {
+        Ok(SchemaId::new("vr.mri.batch_invariant@0.1".to_string())?)
     }
 
     #[test]
     fn scalar_only_payload_passes_float_guard() -> Result<(), anyhow::Error> {
-        let payload = scalar_only();
+        let payload = scalar_only()?;
         let value = serde_json::to_value(&payload)?;
         let result = CanonicalPayload::new(value);
         assert!(result.is_ok());
@@ -122,7 +132,7 @@ mod tests {
     #[test]
     fn full_vector_payload_passes_float_guard() -> Result<(), anyhow::Error> {
         let payload = MriBatchPayload {
-            schema: "mri2.batch_invariant@0.1".to_string(),
+            schema: mri_schema()?,
             layer: 3,
             q_scalar: 0x3F80_0000,
             e_scalar: Some(0x4000_0000),
@@ -145,7 +155,7 @@ mod tests {
     #[test]
     fn full_payload_roundtrips_through_json() -> Result<(), anyhow::Error> {
         let payload = MriBatchPayload {
-            schema: "mri2.batch_invariant@0.1".to_string(),
+            schema: mri_schema()?,
             layer: 5,
             q_scalar: 0x4120_0000,
             e_scalar: Some(0x4140_0000),
@@ -167,7 +177,7 @@ mod tests {
 
     #[test]
     fn absent_fields_omitted_from_json() -> Result<(), anyhow::Error> {
-        let payload = scalar_only();
+        let payload = scalar_only()?;
         let json = serde_json::to_string(&payload)?;
         assert!(!json.contains("batch_len"));
         assert!(!json.contains("q_per_example"));

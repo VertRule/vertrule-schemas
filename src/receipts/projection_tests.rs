@@ -7,7 +7,7 @@ use crate::{
 
 /// Build a minimal valid envelope for testing.
 fn test_envelope(payload_json: serde_json::Value) -> Result<ReceiptEnvelope, DefinitionError> {
-    let payload = CanonicalPayload::new(payload_json).map_err(DefinitionError::InvalidPayload)?;
+    let payload = CanonicalPayload::new(payload_json)?;
     let zero_digest = DigestBytes::from_array([0u8; 32]);
     let logical_time = IJsonUInt::new(1)?;
 

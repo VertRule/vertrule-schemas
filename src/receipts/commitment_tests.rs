@@ -9,8 +9,7 @@ fn zero_digest() -> DigestBytes {
 }
 
 fn make_envelope() -> Result<ReceiptEnvelope, DefinitionError> {
-    let payload = CanonicalPayload::new(serde_json::json!({"v": 1}))
-        .map_err(DefinitionError::InvalidPayload)?;
+    let payload = CanonicalPayload::new(serde_json::json!({"v": 1}))?;
 
     let mut envelope = ReceiptEnvelope {
         envelope_version: SchemaVersion::V1,
@@ -45,6 +44,22 @@ fn deterministic() -> Result<(), DefinitionError> {
     let e1 = make_envelope()?;
     let e2 = make_envelope()?;
     assert_eq!(e1.event_hash, e2.event_hash);
+    Ok(())
+}
+
+/// Frozen known-answer test: the `event_hash` of `make_envelope()` must
+/// equal this specific hex digest. If this test fails, the commitment
+/// model has changed — either intentionally (update the constant) or
+/// as a regression.
+#[test]
+fn known_answer_event_hash() -> Result<(), DefinitionError> {
+    const EXPECTED: &str = "afb004776f6af36416ea0c1f0d5de9bf87b7d54dd02aea40a19fbdfb24967ea7";
+    let envelope = make_envelope()?;
+    assert_eq!(
+        envelope.event_hash.to_hex(),
+        EXPECTED,
+        "compute_event_hash known-answer mismatch — commitment model may have changed"
+    );
     Ok(())
 }
 
@@ -145,8 +160,7 @@ fn tamper_boundary_origin() -> Result<(), DefinitionError> {
 fn tamper_payload() -> Result<(), DefinitionError> {
     let mut envelope = make_envelope()?;
     let original_hash = envelope.event_hash;
-    envelope.payload = CanonicalPayload::new(serde_json::json!({"tampered": true}))
-        .map_err(DefinitionError::InvalidPayload)?;
+    envelope.payload = CanonicalPayload::new(serde_json::json!({"tampered": true}))?;
     let recomputed = compute_event_hash(&envelope).map_err(DefinitionError::Jcs)?;
     assert_ne!(
         original_hash, recomputed,
@@ -159,8 +173,7 @@ fn tamper_payload() -> Result<(), DefinitionError> {
 fn changing_payload_changes_hash() -> Result<(), DefinitionError> {
     let e1 = make_envelope()?;
 
-    let payload2 = CanonicalPayload::new(serde_json::json!({"v": 999}))
-        .map_err(DefinitionError::InvalidPayload)?;
+    let payload2 = CanonicalPayload::new(serde_json::json!({"v": 999}))?;
     let mut e2 = ReceiptEnvelope {
         envelope_version: SchemaVersion::V1,
         receipt_type: ReceiptType::Event,

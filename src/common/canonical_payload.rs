@@ -8,6 +8,7 @@
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 use crate::jcs::{deserialize_json_value_no_duplicates, is_safe_integer, validate_string_contents};
+use crate::DefinitionError;
 
 /// A JSON value guaranteed free of floating-point numbers.
 ///
@@ -27,8 +28,9 @@ impl CanonicalPayload {
     ///
     /// # Errors
     ///
-    /// Returns a description of the first float found.
-    pub fn new(value: serde_json::Value) -> Result<Self, String> {
+    /// Returns [`DefinitionError::InvalidPayload`] if the tree contains
+    /// floats, integers outside the I-JSON range, or forbidden noncharacters.
+    pub fn new(value: serde_json::Value) -> Result<Self, DefinitionError> {
         reject_floats(&value, "")?;
         Ok(Self(value))
     }
@@ -66,15 +68,15 @@ impl<'de> Deserialize<'de> for CanonicalPayload {
 }
 
 /// Recursively reject values outside the payload determinism contract.
-fn reject_floats(value: &serde_json::Value, path: &str) -> Result<(), String> {
+fn reject_floats(value: &serde_json::Value, path: &str) -> Result<(), DefinitionError> {
     match value {
         serde_json::Value::Number(n) => {
             if let Some(i) = n.as_i64() {
                 if !is_safe_integer(i) {
                     let display_path = if path.is_empty() { "<root>" } else { path };
-                    return Err(format!(
+                    return Err(DefinitionError::InvalidPayload(format!(
                         "integer at {display_path}: {i} exceeds the interoperable I-JSON range"
-                    ));
+                    )));
                 }
                 return Ok(());
             }
@@ -82,25 +84,25 @@ fn reject_floats(value: &serde_json::Value, path: &str) -> Result<(), String> {
             if let Some(u) = n.as_u64() {
                 if u > crate::IJsonUInt::MAX {
                     let display_path = if path.is_empty() { "<root>" } else { path };
-                    return Err(format!(
+                    return Err(DefinitionError::InvalidPayload(format!(
                         "integer at {display_path}: {u} exceeds the interoperable I-JSON range"
-                    ));
+                    )));
                 }
                 return Ok(());
             }
 
             if n.is_f64() {
                 let display_path = if path.is_empty() { "<root>" } else { path };
-                return Err(format!(
+                return Err(DefinitionError::InvalidPayload(format!(
                     "float at {display_path}: {n} — floats are nondeterministic and forbidden in receipt payloads"
-                ));
+                )));
             }
 
             Ok(())
         }
         serde_json::Value::String(s) => {
             let display_path = if path.is_empty() { "<root>" } else { path };
-            validate_string_contents(s, display_path)
+            validate_string_contents(s, display_path).map_err(DefinitionError::InvalidPayload)
         }
         serde_json::Value::Array(arr) => {
             for (i, item) in arr.iter().enumerate() {
@@ -111,7 +113,8 @@ fn reject_floats(value: &serde_json::Value, path: &str) -> Result<(), String> {
         }
         serde_json::Value::Object(map) => {
             for (key, val) in map {
-                validate_string_contents(key, "object property name")?;
+                validate_string_contents(key, "object property name")
+                    .map_err(DefinitionError::InvalidPayload)?;
                 let child_path = if path.is_empty() {
                     key.clone()
                 } else {

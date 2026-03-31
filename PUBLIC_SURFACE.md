@@ -1,9 +1,10 @@
 # vertrule-schemas Public Surface (v0.2)
 
 Canonical schema types for the VertRule receipt system.
-This crate contains **nouns only** — wire shapes, validated scalar
-types, and associated constants. No construction logic, no hashing,
-no validation judgments.
+This crate contains wire shapes, validated scalar types, associated
+constants, and protocol-scoped commitment support
+(`compute_event_hash`). Verification judgments live in
+`vertrule-verifier`.
 
 ## Governing Rule
 

@@ -21,9 +21,12 @@ use crate::{DigestBytes, ReceiptEnvelope};
 /// Returns [`JcsError`] if JCS canonicalization fails.
 pub fn compute_event_hash(envelope: &ReceiptEnvelope) -> Result<DigestBytes, JcsError> {
     let mut value = serde_json::to_value(envelope)?;
-    if let Value::Object(ref mut map) = value {
-        map.remove("event_hash");
-    }
+    let Value::Object(ref mut map) = value else {
+        return Err(JcsError::InvalidString(
+            "envelope did not serialize to a JSON object".to_string(),
+        ));
+    };
+    map.remove("event_hash");
     let canon_bytes = to_canon_bytes(&value)?;
     Ok(DigestBytes::from_array(
         *blake3::hash(&canon_bytes).as_bytes(),

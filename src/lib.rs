@@ -1,7 +1,8 @@
 //! # `vertrule-schemas` — Canonical schema types for `VertRule`
 //!
-//! Constitutional definitions. The only `vr-*` dependency is [`vr-jcs`]
-//! (JCS canonicalization primitive).
+//! Constitutional definitions and protocol-scoped commitment support.
+//! The only `vr-*` dependency is [`vr-jcs`] (JCS canonicalization
+//! primitive).
 //!
 //! Each specification version defines an identity triple of
 //! `(spec_version, canonicalization, commitment_primitive)`.

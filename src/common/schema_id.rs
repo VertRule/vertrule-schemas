@@ -31,11 +31,14 @@ use crate::DefinitionError;
 /// ```
 /// use vertrule_schemas::SchemaId;
 ///
-/// let id = SchemaId::new("vr.openclaw.ingress@0.1".to_string()).unwrap();
+/// # fn main() -> Result<(), vertrule_schemas::DefinitionError> {
+/// let id = SchemaId::new("vr.openclaw.ingress@0.1".to_string())?;
 /// assert_eq!(id.domain(), "openclaw");
 /// assert_eq!(id.name(), "ingress");
 /// assert_eq!(id.version(), "0.1");
 /// assert_eq!(id.as_str(), "vr.openclaw.ingress@0.1");
+/// # Ok(())
+/// # }
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize)]
 #[serde(transparent)]

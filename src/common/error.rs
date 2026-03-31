@@ -33,10 +33,16 @@ pub enum DefinitionError {
     Jcs(#[from] crate::jcs::JcsError),
 
     /// An algorithm marker conflicts with the schema version's identity triple.
+    ///
+    /// Not constructed by this crate. Defined here for downstream
+    /// consumers (`vertrule-verifier`) that validate marker consistency.
     #[error("marker mismatch: {0}")]
     MarkerMismatch(String),
 
     /// The `event_hash` does not match the recomputed commitment.
+    ///
+    /// Not constructed by this crate. Defined here for downstream
+    /// consumers (`vertrule-verifier`) that verify envelope integrity.
     #[error("integrity violation: {0}")]
     IntegrityViolation(String),
 }

@@ -7,8 +7,16 @@ pub(crate) use vr_jcs::to_canon_bytes;
 pub(crate) use vr_jcs::JcsError;
 
 #[cfg(test)]
+pub(crate) use vr_jcs::to_canon_bytes_from_slice;
+#[cfg(test)]
 pub(crate) use vr_jcs::to_canon_string;
+#[cfg(test)]
+pub(crate) use vr_jcs::to_canon_string_from_str;
 
 pub(crate) use vr_jcs::deserialize_json_value_no_duplicates;
 pub(crate) use vr_jcs::is_safe_integer;
 pub(crate) use vr_jcs::validate_string_contents;
+
+#[cfg(test)]
+#[path = "jcs_tests.rs"]
+mod jcs_tests;

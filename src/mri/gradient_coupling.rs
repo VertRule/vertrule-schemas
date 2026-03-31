@@ -12,6 +12,7 @@
 use serde::{Deserialize, Serialize};
 
 use super::reduction::ReductionProvenance;
+use crate::SchemaId;
 
 /// Per-layer gradient coupling diagnostic payload.
 ///
@@ -31,26 +32,30 @@ use super::reduction::ReductionProvenance;
 /// defined as `0.0` (orthogonal by convention).
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
+#[non_exhaustive]
 pub struct GradientCouplingPayload {
-    /// Schema identifier. Must be `"mri2.gradient_coupling@0.1"`.
-    pub schema: String,
+    /// Schema identifier (e.g., `"vr.mri.gradient_coupling@0.1"`).
+    pub schema: SchemaId,
 
     /// Training step at which this diagnostic was computed.
     pub step: u64,
 
-    /// Number of model layers. Must be > 0.
+    /// Number of model layers. Should be > 0 (producer obligation).
     pub num_layers: u32,
 
-    /// Per-layer `‖∇L_Q‖`, `F32Bits` encoded. Length must equal `num_layers`.
+    /// Per-layer `‖∇L_Q‖`, `F32Bits` encoded. Length should equal
+    /// `num_layers` (producer obligation, not enforced by this type).
     pub grad_q_norms: Vec<u32>,
 
-    /// Per-layer `‖∇L_LM‖`, `F32Bits` encoded. Length must equal `num_layers`.
+    /// Per-layer `‖∇L_LM‖`, `F32Bits` encoded. Length should equal
+    /// `num_layers` (producer obligation, not enforced by this type).
     pub grad_lm_norms: Vec<u32>,
 
     /// Per-layer magnitude ratio `‖∇L_Q‖ / ‖∇L_LM‖`, `F32Bits` encoded.
     /// Clamped to `0.0` when denominator is below epsilon.
     /// This is magnitude-only — does not indicate direction.
-    /// Length must equal `num_layers`.
+    /// Length should equal `num_layers` (producer obligation, not
+    /// enforced by this type).
     pub coupling_ratios: Vec<u32>,
 
     /// Cosine similarity between the two per-layer norm profiles.
@@ -77,9 +82,9 @@ mod tests {
         }
     }
 
-    fn sample_payload() -> GradientCouplingPayload {
-        GradientCouplingPayload {
-            schema: "mri2.gradient_coupling@0.1".to_string(),
+    fn sample_payload() -> Result<GradientCouplingPayload, anyhow::Error> {
+        Ok(GradientCouplingPayload {
+            schema: SchemaId::new("vr.mri.gradient_coupling@0.1".to_string())?,
             step: 100,
             num_layers: 4,
             grad_q_norms: vec![0x3C23_D70A, 0x3CA3_D70A, 0x3D23_D70A, 0x3DA3_D70A],
@@ -87,12 +92,12 @@ mod tests {
             coupling_ratios: vec![0x3C23_D70A, 0x3CA3_D70A, 0x3D23_D70A, 0x3DA3_D70A],
             profile_cosine: 0x3F60_0000, // ~0.875
             provenance: sample_provenance(),
-        }
+        })
     }
 
     #[test]
     fn passes_canonical_payload_guard() -> Result<(), anyhow::Error> {
-        let payload = sample_payload();
+        let payload = sample_payload()?;
         let value = serde_json::to_value(&payload)?;
         assert!(CanonicalPayload::new(value).is_ok());
         Ok(())
@@ -100,7 +105,7 @@ mod tests {
 
     #[test]
     fn roundtrips_through_json() -> Result<(), anyhow::Error> {
-        let payload = sample_payload();
+        let payload = sample_payload()?;
         let json = serde_json::to_string(&payload)?;
         let parsed: GradientCouplingPayload = serde_json::from_str(&json)?;
         assert_eq!(payload, parsed);
@@ -109,7 +114,7 @@ mod tests {
 
     #[test]
     fn zero_cosine_passes_guard() -> Result<(), anyhow::Error> {
-        let mut payload = sample_payload();
+        let mut payload = sample_payload()?;
         payload.profile_cosine = 0; // 0.0f32 as bits
         let value = serde_json::to_value(&payload)?;
         assert!(CanonicalPayload::new(value).is_ok());
