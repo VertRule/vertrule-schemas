@@ -32,7 +32,6 @@ any verifier implementation must understand.
 | Type | Purpose |
 |------|---------|
 | `ReceiptEnvelope` | Constitutional public receipt envelope |
-| `ReceiptMetaV1` | Receipt metadata header |
 | `ReceiptType` | Receipt classification discriminator (7 variants) |
 | `BoundaryOrigin` | Boundary provenance discriminator (6 variants) |
 | `ProjectsToReceiptEnvelope` | Canonical projection trait |
@@ -61,8 +60,7 @@ any verifier implementation must understand.
 |----------|-------|
 | `DigestBytes::BYTE_LEN` | 32 |
 | `DigestBytes::HEX_LEN` | 64 |
-| `SchemaVersion::V1` | Spec version 1 (payload-only commitment) |
-| `SchemaVersion::V2` | Spec version 2 (full-envelope commitment) |
+| `SchemaVersion::V1` | The current schema version (full-envelope commitment) |
 | `SchemaVersion::digest_algorithm()` | `"BLAKE3"` |
 | `SchemaVersion::canonicalization()` | `"JCS"` |
 

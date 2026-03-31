@@ -44,8 +44,6 @@ fn v1_canonicalization() {
 
 #[test]
 fn ord() {
-    // V1 is currently the only supported version, but Ord is derived
-    // from u32 and must remain correct when V2 is introduced.
     assert_eq!(SchemaVersion::V1, SchemaVersion::V1);
 }
 
@@ -69,6 +67,11 @@ fn rejects_zero() {
 }
 
 #[test]
+fn rejects_two() {
+    assert!(SchemaVersion::new(2).is_err());
+}
+
+#[test]
 fn rejects_unsupported_version() {
     assert!(SchemaVersion::new(42).is_err());
 }
@@ -87,5 +90,11 @@ fn deserialize_rejects_unsupported() {
 #[test]
 fn deserialize_rejects_zero() {
     let result: Result<SchemaVersion, _> = serde_json::from_str("0");
+    assert!(result.is_err());
+}
+
+#[test]
+fn deserialize_rejects_two() {
+    let result: Result<SchemaVersion, _> = serde_json::from_str("2");
     assert!(result.is_err());
 }

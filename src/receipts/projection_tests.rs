@@ -1,3 +1,4 @@
+use super::commitment::compute_event_hash;
 use super::projection::ProjectsToReceiptEnvelope;
 use crate::{
     BoundaryOrigin, CanonicalPayload, DefinitionError, DigestBytes, IJsonUInt, ReceiptEnvelope,
@@ -7,25 +8,25 @@ use crate::{
 /// Build a minimal valid envelope for testing.
 fn test_envelope(payload_json: serde_json::Value) -> Result<ReceiptEnvelope, DefinitionError> {
     let payload = CanonicalPayload::new(payload_json).map_err(DefinitionError::InvalidPayload)?;
-    let canon_bytes = crate::jcs::to_canon_bytes(&payload)?;
-    let event_hash = DigestBytes::from_array(blake3::hash(&canon_bytes).into());
     let zero_digest = DigestBytes::from_array([0u8; 32]);
     let logical_time = IJsonUInt::new(1)?;
 
-    Ok(ReceiptEnvelope {
+    let mut envelope = ReceiptEnvelope {
         envelope_version: SchemaVersion::V1,
         receipt_type: ReceiptType::Event,
         context_digest: zero_digest,
         schema_digest: zero_digest,
         policy_digest: zero_digest,
         logical_time,
-        event_hash,
+        event_hash: zero_digest, // placeholder
         parent_id: None,
         boundary_origin: Some(BoundaryOrigin::Engine),
         digest_algorithm: None,
         canonicalization: None,
         payload,
-    })
+    };
+    envelope.event_hash = compute_event_hash(&envelope).map_err(DefinitionError::Jcs)?;
+    Ok(envelope)
 }
 
 /// A trivial receipt type for testing the projection contract.
@@ -51,17 +52,15 @@ fn projection_produces_valid_envelope() -> Result<(), DefinitionError> {
 }
 
 #[test]
-fn projected_event_hash_matches_payload() -> Result<(), DefinitionError> {
+fn projected_event_hash_matches_recomputed() -> Result<(), DefinitionError> {
     let receipt = TestReceipt { value: 42 };
     let envelope = receipt.project()?;
 
-    let canon_bytes =
-        crate::jcs::to_canon_bytes(&envelope.payload).map_err(DefinitionError::Jcs)?;
-    let recomputed = DigestBytes::from_array(blake3::hash(&canon_bytes).into());
+    let recomputed = compute_event_hash(&envelope).map_err(DefinitionError::Jcs)?;
 
     assert_eq!(
         envelope.event_hash, recomputed,
-        "event_hash must equal BLAKE3(JCS(payload))"
+        "event_hash must equal recomputed commitment"
     );
     Ok(())
 }

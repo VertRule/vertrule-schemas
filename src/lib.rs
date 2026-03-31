@@ -41,7 +41,6 @@
 //! ### Receipt types
 //!
 //! - [`ReceiptEnvelope`] — constitutional public receipt envelope
-//! - [`ReceiptMetaV1`] — constitutional receipt metadata header
 //! - [`ReceiptType`] — receipt classification discriminator
 //! - [`BoundaryOrigin`] — boundary provenance discriminator
 //! - [`ProjectsToReceiptEnvelope`] — canonical projection trait
@@ -64,8 +63,7 @@
 //!
 //! - [`DigestBytes::BYTE_LEN`] — 32
 //! - [`DigestBytes::HEX_LEN`] — 64
-//! - [`SchemaVersion::V1`] — spec version 1 (payload-only commitment)
-//! - [`SchemaVersion::V2`] — spec version 2 (full-envelope commitment)
+//! - [`SchemaVersion::V1`] — the current schema version (full-envelope commitment)
 //! - [`SchemaVersion::digest_algorithm`] — `"BLAKE3"`
 //! - [`SchemaVersion::canonicalization`] — `"JCS"`
 
@@ -91,5 +89,5 @@ pub use mri::{
     ReductionProvenance, TokenReduction,
 };
 pub use receipts::{
-    BoundaryOrigin, ProjectsToReceiptEnvelope, ReceiptEnvelope, ReceiptMetaV1, ReceiptType,
+    BoundaryOrigin, ProjectsToReceiptEnvelope, ReceiptEnvelope, ReceiptType,
 };

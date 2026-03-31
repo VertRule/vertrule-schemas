@@ -1,4 +1,4 @@
-//! Public surface regression test for vertrule-schemas v0.1.
+//! Public surface regression test for vertrule-schemas.
 //!
 //! Asserts that the blessed public API symbols (constitutional nouns only)
 //! compile and are usable. Review against `PUBLIC_SURFACE.md` when preparing
@@ -13,7 +13,6 @@
 
 // Wire shapes
 use vertrule_schemas::ReceiptEnvelope;
-use vertrule_schemas::ReceiptMetaV1;
 
 // Discriminators
 use vertrule_schemas::BoundaryOrigin;
@@ -62,7 +61,6 @@ fn public_surface_nouns_are_usable() -> Result<(), anyhow::Error> {
 
     // SchemaVersion
     assert_eq!(SchemaVersion::V1.get(), 1);
-    assert_eq!(SchemaVersion::V2.get(), 2);
     assert_eq!(SchemaVersion::V1.digest_algorithm(), "BLAKE3");
     assert_eq!(SchemaVersion::V1.canonicalization(), "JCS");
 
@@ -96,7 +94,6 @@ fn public_surface_nouns_are_usable() -> Result<(), anyhow::Error> {
     let _hash = compute_event_hash(&envelope).map_err(|e| anyhow::anyhow!("{e}"))?;
 
     // Suppress unused-import warnings for types used only as existence checks
-    let _ = std::any::type_name::<ReceiptMetaV1>();
     let _ = std::any::type_name::<PolicyId>();
     let _ = std::any::type_name::<SchemaId>();
     let _ = std::any::type_name::<RBHInvariant>();

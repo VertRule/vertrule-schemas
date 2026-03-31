@@ -7,14 +7,12 @@
 mod boundary_origin;
 mod commitment;
 mod envelope;
-mod meta;
 mod projection;
 mod receipt_type;
 
 pub use boundary_origin::BoundaryOrigin;
 pub use commitment::compute_event_hash;
 pub use envelope::ReceiptEnvelope;
-pub use meta::ReceiptMetaV1;
 pub use projection::ProjectsToReceiptEnvelope;
 pub use receipt_type::ReceiptType;
 

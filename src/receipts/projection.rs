@@ -11,15 +11,11 @@
 //!
 //! | Property | Preserved | How |
 //! |----------|-----------|-----|
-//! | Identity | `event_hash` matches version commitment scope | Via [`compute_event_hash`](crate::receipts::compute_event_hash) |
+//! | Identity | `event_hash` commits all trust-bearing fields | Via [`compute_event_hash`](crate::receipts::compute_event_hash) |
 //! | Provenance | `boundary_origin` maps to correct origin | Direct field mapping |
 //! | Schema binding | `schema_digest` matches the schema governing payload | Emitter responsibility |
 //! | Payload commitment | `payload` contains trust-bearing content | Domain-specific serialization |
 //! | Chain linkage | `parent_id` preserves chain position if applicable | Optional but must not be lost |
-//!
-//! The commitment scope depends on `envelope_version`:
-//! - **V1**: `BLAKE3(JCS(payload))` — payload only
-//! - **V2**: `BLAKE3(JCS(envelope \ {event_hash}))` — all trust-bearing fields
 //!
 //! # What may remain private
 //!
