@@ -1,5 +1,4 @@
 [package]
-# Publish gate: requires release constitution compliance and substrate boundary review.
 name = "vertrule-schemas"
 version = "0.2.0"
 edition = "2021"
@@ -15,10 +14,8 @@ exclude = [
     "operator_private/**",
     "tooling/**",
     "justfile",
-    "PRE_RELEASE_CHECKLIST.md",
     "PUBLIC_SURFACE.md",
     "RELEASE.md",
-    "RELEASE_CONSTITUTION.md",
 ]
 
 [dependencies]
