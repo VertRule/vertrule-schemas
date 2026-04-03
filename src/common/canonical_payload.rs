@@ -102,7 +102,12 @@ fn reject_floats(value: &serde_json::Value, path: &str) -> Result<(), Definition
                 )));
             }
 
-            Ok(())
+            // With `arbitrary_precision`, a number token can be neither
+            // i64, u64, nor finite f64 (e.g. `1e400`). Reject it.
+            let display_path = if path.is_empty() { "<root>" } else { path };
+            Err(DefinitionError::InvalidPayload(format!(
+                "number at {display_path}: {n} is not representable as a safe integer"
+            )))
         }
         serde_json::Value::String(s) => {
             let display_path = if path.is_empty() { "<root>" } else { path };

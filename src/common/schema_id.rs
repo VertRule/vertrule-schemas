@@ -69,17 +69,21 @@ impl SchemaId {
     #[must_use]
     pub fn domain(&self) -> &str {
         // Safety: validated at construction — "vr." prefix and first "." after it are guaranteed.
-        self.0
+        let result = self
+            .0
             .strip_prefix("vr.")
             .and_then(|rest| rest.find('.').map(|pos| &rest[..pos]))
-            .unwrap_or("")
+            .unwrap_or("");
+        debug_assert!(!result.is_empty());
+        result
     }
 
     /// Return the name segment (e.g., `"ingress"` from `"vr.openclaw.ingress@0.1"`).
     #[must_use]
     pub fn name(&self) -> &str {
         // Safety: validated at construction — second "." and "@" are guaranteed.
-        self.0
+        let result = self
+            .0
             .strip_prefix("vr.")
             .and_then(|rest| {
                 let dot = rest.find('.')?;
@@ -87,14 +91,18 @@ impl SchemaId {
                 let at = after_domain.find('@')?;
                 Some(&after_domain[..at])
             })
-            .unwrap_or("")
+            .unwrap_or("");
+        debug_assert!(!result.is_empty());
+        result
     }
 
     /// Return the version string (e.g., `"0.1"` from `"vr.openclaw.ingress@0.1"`).
     #[must_use]
     pub fn version(&self) -> &str {
         // Safety: validated at construction — "@" separator is guaranteed.
-        self.0.find('@').map_or("", |pos| &self.0[pos + 1..])
+        let result = self.0.find('@').map_or("", |pos| &self.0[pos + 1..]);
+        debug_assert!(!result.is_empty());
+        result
     }
 }
 
