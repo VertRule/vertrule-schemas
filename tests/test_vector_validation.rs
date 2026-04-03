@@ -16,7 +16,7 @@ mod common;
 use common::{assert_error_contains, load_vector, need, vr_test};
 
 use vertrule_schemas::{DefinitionError, DigestBytes, ReceiptEnvelope};
-use vr_jcs::{to_canon_bytes, to_canon_bytes_from_slice};
+use vr_jcs::to_canon_bytes_from_slice;
 
 // ---------------------------------------------------------------------------
 // L1: Known-answer vectors — JCS
@@ -36,7 +36,8 @@ vr_test!(
             "expected.blake3_hex",
         )?;
 
-        let canon_bytes = to_canon_bytes(input)?;
+        let json = serde_json::to_vec(input)?;
+        let canon_bytes = to_canon_bytes_from_slice(&json)?;
         let canon_string = String::from_utf8(canon_bytes.clone())
             .map_err(|e| anyhow::anyhow!("canonical bytes not valid UTF-8: {e}"))?;
 
@@ -247,7 +248,8 @@ vr_test!(
         )?;
 
         // Verify canonical BLAKE3 digest
-        let canon_bytes = to_canon_bytes(&envelope)?;
+        let json = serde_json::to_vec(&envelope)?;
+        let canon_bytes = to_canon_bytes_from_slice(&json)?;
         let digest_hex = blake3::hash(&canon_bytes).to_hex().to_string();
 
         need(

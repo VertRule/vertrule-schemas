@@ -6,7 +6,7 @@ use std::collections::BTreeMap;
 #[test]
 fn to_canon_string_sorts_ascii_keys() -> Result<(), JcsError> {
     let value = json!({"z": 1, "a": 2, "m": 3});
-    let string = to_canon_string(&value)?;
+    let string = to_canon_string_from_str(&serde_json::to_string(&value)?)?;
     assert_eq!(string, r#"{"a":2,"m":3,"z":1}"#);
     Ok(())
 }
@@ -18,7 +18,7 @@ fn to_canon_string_sorts_keys_by_utf16_code_units() -> Result<(), JcsError> {
         "\u{10000}": 1
     });
 
-    let string = to_canon_string(&value)?;
+    let string = to_canon_string_from_str(&serde_json::to_string(&value)?)?;
     let expected = format!(r#"{{"{}":1,"{}":2}}"#, '\u{10000}', '\u{E000}');
     assert_eq!(string, expected);
     Ok(())
@@ -81,7 +81,7 @@ fn to_canon_string_uses_ecmascript_number_rendering_rules() -> Result<(), JcsErr
         0.0,
         1.0
     ]);
-    let string = to_canon_string(&value)?;
+    let string = to_canon_string_from_str(&serde_json::to_string(&value)?)?;
     assert_eq!(
         string,
         "[0.000001,0.0000012,1e-7,100000000000000000000,1e+21,1000000,0,0,1]"
@@ -96,7 +96,7 @@ fn to_canon_string_preserves_array_order_and_recurses_objects() -> Result<(), Jc
         "a": [{"b": 4, "a": 3}]
     });
 
-    let string = to_canon_string(&value)?;
+    let string = to_canon_string_from_str(&serde_json::to_string(&value)?)?;
     assert_eq!(string, r#"{"a":[{"a":3,"b":4}],"z":[{"a":1,"b":2}]}"#);
     Ok(())
 }
@@ -115,7 +115,8 @@ fn to_canon_bytes_struct() -> Result<(), JcsError> {
     data.insert("mango".to_string(), 2);
 
     let receipt = Receipt { id: 42, data };
-    let bytes = to_canon_bytes(&receipt)?;
+    let json = serde_json::to_vec(&receipt)?;
+    let bytes = to_canon_bytes_from_slice(&json)?;
     let string = String::from_utf8(bytes)
         .map_err(|e| JcsError::InvalidString(format!("canonical output was not UTF-8: {e}")))?;
 
@@ -128,9 +129,9 @@ fn to_canon_bytes_struct() -> Result<(), JcsError> {
 
 #[test]
 fn canon_bytes_equals_canon_string_bytes() -> Result<(), JcsError> {
-    let value = json!({"a": 1, "b": 2});
-    let bytes = to_canon_bytes(&value)?;
-    let string = to_canon_string(&value)?;
+    let json = serde_json::to_string(&json!({"a": 1, "b": 2}))?;
+    let bytes = to_canon_bytes_from_slice(json.as_bytes())?;
+    let string = to_canon_string_from_str(&json)?;
     assert_eq!(bytes, string.as_bytes());
     Ok(())
 }
@@ -163,17 +164,20 @@ fn raw_json_rejects_noncharacters() {
 }
 
 #[test]
-fn to_canon_bytes_rejects_non_exact_large_integer() {
-    let result = to_canon_bytes(&json!(9_007_199_254_740_993u64));
+fn to_canon_bytes_rejects_non_exact_large_integer() -> Result<(), serde_json::Error> {
+    let json = serde_json::to_vec(&json!(9_007_199_254_740_993u64))?;
+    let result = to_canon_bytes_from_slice(&json);
     assert!(result.is_err());
     if let Err(err) = result {
         assert!(err.to_string().contains("not exactly representable"));
     }
+    Ok(())
 }
 
 #[test]
 fn to_canon_bytes_accepts_exact_large_integer() -> Result<(), JcsError> {
-    let string = to_canon_string(&json!(9_007_199_254_740_992u64))?;
+    let json = serde_json::to_string(&json!(9_007_199_254_740_992u64))?;
+    let string = to_canon_string_from_str(&json)?;
     assert_eq!(string, "9007199254740992");
     Ok(())
 }

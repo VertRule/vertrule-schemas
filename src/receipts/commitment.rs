@@ -8,7 +8,7 @@
 
 use serde_json::Value;
 
-use crate::jcs::{to_canon_bytes, JcsError};
+use crate::jcs::{to_canon_bytes_from_slice, JcsError};
 use crate::{DigestBytes, ReceiptEnvelope};
 
 /// Compute the `event_hash` for an envelope.
@@ -27,7 +27,8 @@ pub fn compute_event_hash(envelope: &ReceiptEnvelope) -> Result<DigestBytes, Jcs
         ));
     };
     map.remove("event_hash");
-    let canon_bytes = to_canon_bytes(&value)?;
+    let json_bytes = serde_json::to_vec(&value)?;
+    let canon_bytes = to_canon_bytes_from_slice(&json_bytes)?;
     Ok(DigestBytes::from_array(
         *blake3::hash(&canon_bytes).as_bytes(),
     ))

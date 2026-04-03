@@ -15,7 +15,7 @@ mod common;
 use common::{assert_deterministic, load_vector, need, vr_test};
 
 use vertrule_schemas::{DigestBytes, ReceiptEnvelope};
-use vr_jcs::to_canon_bytes;
+use vr_jcs::to_canon_bytes_from_slice;
 
 // ---------------------------------------------------------------------------
 // L1: Shuffled-input canonical equality — JCS
@@ -39,8 +39,10 @@ vr_test!(
             "expected.blake3_hex",
         )?;
 
-        let bytes_a = to_canon_bytes(variant_a)?;
-        let bytes_b = to_canon_bytes(variant_b)?;
+        let json_a = serde_json::to_vec(variant_a)?;
+        let json_b = serde_json::to_vec(variant_b)?;
+        let bytes_a = to_canon_bytes_from_slice(&json_a)?;
+        let bytes_b = to_canon_bytes_from_slice(&json_b)?;
 
         // Bitwise identity between shuffled variants
         need(
@@ -72,7 +74,8 @@ vr_test!(
 
 vr_test!(
     /// Determinism axis: repeated invocation → identical bytes.
-    /// `to_canon_bytes` called 5 times on the same input produces identical output.
+    /// `to_canon_bytes_from_slice` called 5 times on the same input produces
+    /// identical output.
     fn jcs_repeated_invocation_determinism() {
         let input = serde_json::json!({
             "z_field": 999,
@@ -81,8 +84,9 @@ vr_test!(
             "array": [3, 2, 1]
         });
 
+        let json = serde_json::to_vec(&input)?;
         assert_deterministic(
-            || to_canon_bytes(&input).map_err(|e| anyhow::anyhow!("{e}")),
+            || to_canon_bytes_from_slice(&json).map_err(|e| anyhow::anyhow!("{e}")),
             5,
             "jcs_repeated_invocation",
         )?;
@@ -133,7 +137,8 @@ vr_test!(
                     serde_json::to_string(&envelope).map_err(|e| anyhow::anyhow!("{e}"))?;
                 let reparsed: ReceiptEnvelope =
                     serde_json::from_str(&serialized).map_err(|e| anyhow::anyhow!("{e}"))?;
-                let canon = to_canon_bytes(&reparsed).map_err(|e| anyhow::anyhow!("{e}"))?;
+                let json = serde_json::to_vec(&reparsed).map_err(|e| anyhow::anyhow!("{e}"))?;
+                let canon = to_canon_bytes_from_slice(&json).map_err(|e| anyhow::anyhow!("{e}"))?;
                 Ok(canon)
             },
             5,
@@ -157,9 +162,10 @@ vr_test!(
             "payload": {"domain": "test.v1", "action": "verify"}
         });
 
+        let json = serde_json::to_vec(&input).map_err(|e| anyhow::anyhow!("{e}"))?;
         let mut digests = Vec::new();
         for _ in 0..5 {
-            let bytes = to_canon_bytes(&input).map_err(|e| anyhow::anyhow!("{e}"))?;
+            let bytes = to_canon_bytes_from_slice(&json).map_err(|e| anyhow::anyhow!("{e}"))?;
             let hex = blake3::hash(&bytes).to_hex().to_string();
             digests.push(hex);
         }

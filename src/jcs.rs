@@ -3,13 +3,9 @@
 //! Internal re-exports from `vr_jcs` for use within this crate.
 //! External consumers should depend on `vr-jcs` directly.
 
-pub(crate) use vr_jcs::to_canon_bytes;
+pub(crate) use vr_jcs::to_canon_bytes_from_slice;
 pub(crate) use vr_jcs::JcsError;
 
-#[cfg(test)]
-pub(crate) use vr_jcs::to_canon_bytes_from_slice;
-#[cfg(test)]
-pub(crate) use vr_jcs::to_canon_string;
 #[cfg(test)]
 pub(crate) use vr_jcs::to_canon_string_from_str;
 

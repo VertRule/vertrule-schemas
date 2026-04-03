@@ -75,9 +75,13 @@ fn projection_is_deterministic() -> Result<(), DefinitionError> {
         e1.event_hash, e2.event_hash,
         "same input must produce same event_hash"
     );
+    let e1_json =
+        serde_json::to_vec(&e1).map_err(|e| DefinitionError::Jcs(crate::jcs::JcsError::from(e)))?;
+    let e2_json =
+        serde_json::to_vec(&e2).map_err(|e| DefinitionError::Jcs(crate::jcs::JcsError::from(e)))?;
     assert_eq!(
-        crate::jcs::to_canon_bytes(&e1).map_err(DefinitionError::Jcs)?,
-        crate::jcs::to_canon_bytes(&e2).map_err(DefinitionError::Jcs)?,
+        crate::jcs::to_canon_bytes_from_slice(&e1_json).map_err(DefinitionError::Jcs)?,
+        crate::jcs::to_canon_bytes_from_slice(&e2_json).map_err(DefinitionError::Jcs)?,
         "same input must produce identical canonical bytes"
     );
     Ok(())
@@ -100,7 +104,9 @@ fn projected_envelope_round_trips_through_json() -> Result<(), DefinitionError> 
     let receipt = TestReceipt { value: 42 };
     let envelope = receipt.project()?;
 
-    let json = crate::jcs::to_canon_string(&envelope).map_err(DefinitionError::Jcs)?;
+    let intermediate = serde_json::to_string(&envelope)
+        .map_err(|e| DefinitionError::Jcs(crate::jcs::JcsError::from(e)))?;
+    let json = crate::jcs::to_canon_string_from_str(&intermediate).map_err(DefinitionError::Jcs)?;
     let parsed: ReceiptEnvelope = serde_json::from_str(&json)
         .map_err(|e| DefinitionError::Jcs(crate::jcs::JcsError::from(e)))?;
 
