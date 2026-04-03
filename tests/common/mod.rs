@@ -1,31 +1,8 @@
 //! Shared test helpers for vertrule-schemas integration tests.
-//!
-//! Local copies of `vr_test!`, `need()`, and fixture loading utilities.
-//! Consolidation into a shared harness crate is tracked as debt TD-001.
 
 // Included as `mod common` from multiple test binaries — not all
 // functions are used in every binary.
 #![allow(dead_code)]
-
-/// Wraps a test body in a closure that returns `anyhow::Result<()>`.
-macro_rules! vr_test {
-    ( $(#[$meta:meta])* fn $name:ident() $body:block ) => {
-        $(#[$meta])*
-        #[test]
-        fn $name() {
-            #[allow(clippy::redundant_closure_call)]
-            let res: anyhow::Result<()> = (|| {
-                $body
-                Ok(())
-            })();
-            if let Err(e) = res {
-                panic!("{e}");
-            }
-        }
-    };
-}
-
-pub(crate) use vr_test;
 
 /// Convert an `Option` to a `Result` with a static error message.
 pub(crate) fn need<T>(option: Option<T>, what: &'static str) -> anyhow::Result<T> {

@@ -68,6 +68,10 @@ impl<'de> Deserialize<'de> for CanonicalPayload {
 }
 
 /// Recursively reject values outside the payload determinism contract.
+///
+/// Path strings are only constructed on the error path. The `path`
+/// parameter is passed through for leaf errors but child paths are
+/// built lazily — only when a recursive call actually fails.
 fn reject_floats(value: &serde_json::Value, path: &str) -> Result<(), DefinitionError> {
     match value {
         serde_json::Value::Number(n) => {
@@ -106,8 +110,10 @@ fn reject_floats(value: &serde_json::Value, path: &str) -> Result<(), Definition
         }
         serde_json::Value::Array(arr) => {
             for (i, item) in arr.iter().enumerate() {
-                let child_path = format!("{path}[{i}]");
-                reject_floats(item, &child_path)?;
+                if reject_floats(item, path).is_err() {
+                    let child_path = format!("{path}[{i}]");
+                    reject_floats(item, &child_path)?;
+                }
             }
             Ok(())
         }
@@ -115,12 +121,14 @@ fn reject_floats(value: &serde_json::Value, path: &str) -> Result<(), Definition
             for (key, val) in map {
                 validate_string_contents(key, "object property name")
                     .map_err(DefinitionError::InvalidPayload)?;
-                let child_path = if path.is_empty() {
-                    key.clone()
-                } else {
-                    format!("{path}.{key}")
-                };
-                reject_floats(val, &child_path)?;
+                if reject_floats(val, path).is_err() {
+                    let child_path = if path.is_empty() {
+                        key.to_string()
+                    } else {
+                        format!("{path}.{key}")
+                    };
+                    reject_floats(val, &child_path)?;
+                }
             }
             Ok(())
         }

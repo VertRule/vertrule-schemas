@@ -1,6 +1,6 @@
 //! Receipt type enumeration — schema discriminator for receipt classification.
 
-use serde::{Deserialize, Deserializer, Serialize};
+use serde::{Deserialize, Serialize};
 
 /// Classification of receipt origin.
 ///
@@ -9,7 +9,7 @@ use serde::{Deserialize, Deserializer, Serialize};
 /// `PolicyPackProposal`) provide finer classification — those are
 /// schema-level concerns carried in the payload, not envelope-level
 /// discriminators.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[non_exhaustive]
 #[serde(rename_all = "lowercase")]
 pub enum ReceiptType {
@@ -39,36 +39,6 @@ impl std::fmt::Display for ReceiptType {
             Self::Adapter => f.write_str("adapter"),
             Self::Projection => f.write_str("projection"),
             Self::Training => f.write_str("training"),
-        }
-    }
-}
-
-impl<'de> Deserialize<'de> for ReceiptType {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let value = String::deserialize(deserializer)?;
-        match value.as_str() {
-            "event" => Ok(Self::Event),
-            "llm" => Ok(Self::Llm),
-            "mri" => Ok(Self::Mri),
-            "governance" => Ok(Self::Governance),
-            "adapter" => Ok(Self::Adapter),
-            "projection" => Ok(Self::Projection),
-            "training" => Ok(Self::Training),
-            _ => Err(serde::de::Error::unknown_variant(
-                &value,
-                &[
-                    "event",
-                    "llm",
-                    "mri",
-                    "governance",
-                    "adapter",
-                    "projection",
-                    "training",
-                ],
-            )),
         }
     }
 }
