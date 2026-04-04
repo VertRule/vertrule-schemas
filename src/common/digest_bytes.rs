@@ -20,10 +20,10 @@ use super::error::DefinitionError;
 pub struct DigestBytes([u8; 32]);
 
 impl DigestBytes {
-    /// Expected byte length of a digest (32 bytes).
+    /// 32 bytes.
     pub const BYTE_LEN: usize = 32;
 
-    /// Expected hex string length of a digest (64 lowercase hex chars).
+    /// 64 lowercase hex characters.
     pub const HEX_LEN: usize = 64;
 
     /// Create from a raw byte array (infallible).
@@ -62,7 +62,7 @@ impl DigestBytes {
         Ok(Self(arr))
     }
 
-    /// Return a reference to the inner 32 bytes.
+    /// The raw bytes.
     #[must_use]
     pub const fn as_bytes(&self) -> &[u8; 32] {
         &self.0

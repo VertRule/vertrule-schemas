@@ -35,7 +35,7 @@ impl IJsonUInt {
         }
     }
 
-    /// Return the inner integer.
+    /// The inner `u64`.
     #[must_use]
     pub const fn get(self) -> u64 {
         self.0

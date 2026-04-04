@@ -45,7 +45,7 @@ impl SchemaVersion {
         }
     }
 
-    /// Return the inner version number.
+    /// The version number.
     #[must_use]
     pub const fn get(self) -> u32 {
         self.0

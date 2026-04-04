@@ -2,15 +2,15 @@
 
 // Included as `mod common` from multiple test binaries — not all
 // functions are used in every binary.
-#![allow(dead_code)]
+#![allow(dead_code, clippy::redundant_pub_crate)]
 
 /// Convert an `Option` to a `Result` with a static error message.
-pub(crate) fn need<T>(option: Option<T>, what: &'static str) -> anyhow::Result<T> {
+pub(super) fn need<T>(option: Option<T>, what: &'static str) -> anyhow::Result<T> {
     option.ok_or_else(|| anyhow::anyhow!(what))
 }
 
 /// Load a test vector file by name (without `.json` extension).
-pub(crate) fn load_vector(name: &str) -> anyhow::Result<serde_json::Value> {
+pub(super) fn load_vector(name: &str) -> anyhow::Result<serde_json::Value> {
     let manifest = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let path = manifest.join("test-vectors").join(format!("{name}.json"));
     let bytes = std::fs::read(&path)?;
@@ -21,7 +21,7 @@ pub(crate) fn load_vector(name: &str) -> anyhow::Result<serde_json::Value> {
 /// Assert that a rejection test produces an error whose Display output
 /// contains the expected substring. This is R2/R3 strength.
 /// For R1 strength, callers should match the concrete error variant directly.
-pub(crate) fn assert_error_contains<T, E: std::fmt::Display>(
+pub(super) fn assert_error_contains<T, E: std::fmt::Display>(
     result: Result<T, E>,
     expected_substring: &str,
     case_id: &str,
@@ -44,7 +44,7 @@ pub(crate) fn assert_error_contains<T, E: std::fmt::Display>(
 }
 
 /// Assert that a function produces identical bytes across N invocations.
-pub(crate) fn assert_deterministic<F>(f: F, n: usize, case_id: &str) -> anyhow::Result<()>
+pub(super) fn assert_deterministic<F>(f: F, n: usize, case_id: &str) -> anyhow::Result<()>
 where
     F: Fn() -> anyhow::Result<Vec<u8>>,
 {

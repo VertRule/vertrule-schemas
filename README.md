@@ -69,13 +69,19 @@ any verifier implementation must understand.
 ```rust
 use vertrule_schemas::DigestBytes;
 
-// Parse a hex digest
-let digest = DigestBytes::from_hex(
-    "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"
-)?;
+fn main() -> Result<(), vertrule_schemas::DefinitionError> {
+    // Parse a hex digest
+    let digest = DigestBytes::from_hex(
+        "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"
+    )?;
 
-// Strict validation: rejects uppercase, wrong length, non-hex
-assert!(DigestBytes::from_hex("A1B2...").is_err());
+    // Strict validation: rejects uppercase, wrong length, non-hex
+    assert!(DigestBytes::from_hex(
+        "A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6A1B2C3D4E5F6A1B2"
+    ).is_err());
+
+    Ok(())
+}
 ```
 
 JCS canonicalization is provided by [`vr-jcs`](https://crates.io/crates/vr-jcs)
@@ -85,8 +91,11 @@ JCS canonicalization is provided by [`vr-jcs`](https://crates.io/crates/vr-jcs)
 use vr_jcs::to_canon_string;
 use serde_json::json;
 
-let canon = to_canon_string(&json!({"z": 1, "a": 2}))?;
-assert_eq!(canon, r#"{"a":2,"z":1}"#);
+fn main() -> Result<(), vr_jcs::JcsError> {
+    let canon = to_canon_string(&json!({"z": 1, "a": 2}))?;
+    assert_eq!(canon, r#"{"a":2,"z":1}"#);
+    Ok(())
+}
 ```
 
 ## Build

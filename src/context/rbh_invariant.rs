@@ -50,7 +50,7 @@ pub struct RBHInvariant {
 }
 
 impl RBHInvariant {
-    /// Create a new `RBHInvariant`.
+    /// Bind three upstream digests into a continuation constraint.
     #[must_use]
     pub const fn new(
         parent_context_digest: DigestBytes,

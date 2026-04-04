@@ -31,7 +31,7 @@ impl PolicyId {
         Ok(Self(id))
     }
 
-    /// Return the inner string as a slice.
+    /// The identifier string.
     #[must_use]
     pub fn as_str(&self) -> &str {
         &self.0
