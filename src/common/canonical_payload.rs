@@ -128,7 +128,7 @@ fn reject_floats(value: &serde_json::Value, path: &str) -> Result<(), Definition
                     .map_err(DefinitionError::InvalidPayload)?;
                 if reject_floats(val, path).is_err() {
                     let child_path = if path.is_empty() {
-                        key.to_string()
+                        key.clone()
                     } else {
                         format!("{path}.{key}")
                     };
