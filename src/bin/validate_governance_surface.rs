@@ -4,6 +4,7 @@
 //! It does not verify upstream governance sources or produce receipts.
 //! Exit 0 on success, exit 1 on any violation.
 
+use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 use std::path::Path;
 use std::process;
@@ -85,13 +86,13 @@ fn validate() -> Vec<String> {
     }
 
     // I5: policy-set invariants
-    let policy_ids_from_bindings = policy_obj
+    let policy_digests_from_bindings = policy_obj
         .as_ref()
-        .map_or_else(BTreeSet::new, |obj| validate_policy_set(obj, &mut errors));
+        .map_or_else(BTreeMap::new, |obj| validate_policy_set(obj, &mut errors));
 
     // I6: manifest invariants
     if let Some(table) = &manifest_table {
-        validate_manifest(table, &policy_ids_from_bindings, &mut errors);
+        validate_manifest(table, &policy_digests_from_bindings, &mut errors);
     }
 
     // I7: chain-manifest invariants
@@ -191,20 +192,20 @@ fn validate_authority_set(obj: &serde_json::Map<String, Value>, errors: &mut Vec
 fn validate_policy_set(
     obj: &serde_json::Map<String, Value>,
     errors: &mut Vec<String>,
-) -> BTreeSet<String> {
+) -> BTreeMap<String, String> {
     let path = POLICY_SET_PATH;
-    let mut policy_ids = BTreeSet::new();
+    let mut policy_digests: BTreeMap<String, String> = BTreeMap::new();
 
     // I5: bindings array must exist
     let bindings = match obj.get("bindings") {
         Some(Value::Array(arr)) => arr,
         Some(_) => {
             errors.push(format!("I5: {path}: 'bindings' must be an array"));
-            return policy_ids;
+            return policy_digests;
         }
         None => {
             errors.push(format!("I5: {path}: 'bindings' field missing"));
-            return policy_ids;
+            return policy_digests;
         }
     };
 
@@ -237,7 +238,14 @@ fn validate_policy_set(
         };
 
         // I5: no duplicate policy_id
-        if !policy_ids.insert(policy_id.clone()) {
+        let digest_str = binding_obj
+            .get("digest")
+            .and_then(Value::as_str)
+            .map_or_else(String::new, String::from);
+        if policy_digests
+            .insert(policy_id.clone(), digest_str)
+            .is_some()
+        {
             errors.push(format!("I5: {path}: duplicate policy_id '{policy_id}'"));
         }
 
@@ -267,14 +275,14 @@ fn validate_policy_set(
         }
     }
 
-    policy_ids
+    policy_digests
 }
 
 // ── I6: manifest ──────────────────────────────────────────────────────
 
 fn validate_manifest(
     table: &toml::Table,
-    policy_ids_from_bindings: &BTreeSet<String>,
+    policy_digests_from_bindings: &BTreeMap<String, String>,
     errors: &mut Vec<String>,
 ) {
     let path = MANIFEST_PATH;
@@ -306,43 +314,57 @@ fn validate_manifest(
         errors.push(format!("I6: {path}: [stage] section missing"));
     }
 
-    // I6: cross-check manifest policy_bindings against policy-set
+    // I6: cross-check manifest policy_bindings against policy-set (IDs and digests)
     if let Some(pb) = table.get("policy_bindings").and_then(toml::Value::as_table) {
-        let manifest_ids: BTreeSet<String> = pb
+        let binding_ids: BTreeSet<&String> = policy_digests_from_bindings.keys().collect();
+
+        // Build manifest policy map: full_id -> digest
+        let manifest_policies: BTreeMap<String, String> = pb
             .keys()
             .map(|k| {
-                // manifest uses bare name (e.g., "determinism"), policy-set uses
-                // "determinism@0.1".  Reconstruct the full id from manifest.
-                let version = pb
-                    .get(k)
-                    .and_then(toml::Value::as_table)
+                let entry = pb.get(k).and_then(toml::Value::as_table);
+                let version = entry
                     .and_then(|t| t.get("version"))
                     .and_then(toml::Value::as_str)
                     .map_or("?", |v| v);
-                format!("{k}@{version}")
+                let digest = entry
+                    .and_then(|t| t.get("digest"))
+                    .and_then(toml::Value::as_str)
+                    .map_or_else(String::new, String::from);
+                (format!("{k}@{version}"), digest)
             })
             .collect();
 
-        let in_manifest_not_bindings: Vec<_> =
-            manifest_ids.difference(policy_ids_from_bindings).collect();
-        let in_bindings_not_manifest: Vec<_> =
-            policy_ids_from_bindings.difference(&manifest_ids).collect();
+        let manifest_ids: BTreeSet<&String> = manifest_policies.keys().collect();
 
-        for id in &in_manifest_not_bindings {
+        for id in manifest_ids.difference(&binding_ids) {
             errors.push(format!(
                 "I6: {path}: policy '{id}' in manifest [policy_bindings] \
                  but absent from {POLICY_SET_PATH} bindings"
             ));
         }
-        for id in &in_bindings_not_manifest {
+        for id in binding_ids.difference(&manifest_ids) {
             errors.push(format!(
                 "I6: {path}: policy '{id}' in {POLICY_SET_PATH} bindings \
                  but absent from manifest [policy_bindings]"
             ));
         }
 
-        // I6: manifest digest must match policy-set digest where both exist
-        // (We already validated format; now cross-check values)
+        // I6: digest values must match where both files carry the same policy
+        for (id, manifest_digest) in &manifest_policies {
+            if let Some(binding_digest) = policy_digests_from_bindings.get(id) {
+                if !manifest_digest.is_empty()
+                    && !binding_digest.is_empty()
+                    && manifest_digest != binding_digest
+                {
+                    errors.push(format!(
+                        "I6: {path}: policy '{id}' digest mismatch: \
+                         manifest='{manifest_digest}' vs \
+                         {POLICY_SET_PATH}='{binding_digest}'"
+                    ));
+                }
+            }
+        }
     }
 }
 
