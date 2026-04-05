@@ -33,5 +33,8 @@ jobs:
       - name: Determinism tests
         run: cargo test --test determinism_tests
 
+      - name: Governance surface
+        run: cargo run --bin validate-governance-surface --features governance-check
+
       - name: Doc
         run: cargo doc --no-deps

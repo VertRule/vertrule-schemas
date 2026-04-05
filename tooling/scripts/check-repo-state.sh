@@ -53,6 +53,25 @@ for f in .vr/seal.json .vr/change.json; do
 done
 pass "no mutable state at .vr/ root"
 
+# ── 4b. Required governance bindings directory ──
+if [ -d .vr/governance/bindings ]; then
+    pass ".vr/governance/bindings/ exists"
+else
+    fail ".vr/governance/bindings/ missing"
+fi
+
+# ── 4c. Required governance files ──
+for req in .vr/governance/manifest.toml \
+           .vr/governance/bindings/authority-set.json \
+           .vr/governance/bindings/policy-set.json \
+           .vr/receipts/chain-manifest.json; do
+    if [ -f "$req" ]; then
+        pass "$req exists"
+    else
+        fail "$req missing"
+    fi
+done
+
 # ── 5. No receipt files in governance definitions ──
 if find .vr/governance -name 'receipt.json' 2>/dev/null | grep -q .; then
     fail "receipt.json found under .vr/governance/ — receipts belong in .vr/receipts/governance/"
@@ -67,7 +86,7 @@ if [ -d .vr/receipts ]; then
         [ -e "$entry" ] || continue
         name=$(basename "$entry")
         case "$name" in
-            governance|capabilities|runtime|local) ;;
+            governance|capabilities|runtime|local|chain-manifest.json) ;;
             *) if [ -f "$entry" ]; then
                    fail "file .vr/receipts/$name has no provenance folder"
                    mixed=1
