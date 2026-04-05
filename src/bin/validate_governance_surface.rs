@@ -130,10 +130,7 @@ fn validate_json_file(
     }
 }
 
-fn validate_toml_file(
-    path: &str,
-    errors: &mut Vec<String>,
-) -> Option<toml::Table> {
+fn validate_toml_file(path: &str, errors: &mut Vec<String>) -> Option<toml::Table> {
     let content = match std::fs::read_to_string(path) {
         Ok(c) => c,
         Err(e) => {
@@ -152,10 +149,7 @@ fn validate_toml_file(
 
 // ── I3 + I4: authority-set ─────────────────────────────────────────────
 
-fn validate_authority_set(
-    obj: &serde_json::Map<String, Value>,
-    errors: &mut Vec<String>,
-) {
+fn validate_authority_set(obj: &serde_json::Map<String, Value>, errors: &mut Vec<String>) {
     let path = AUTHORITY_SET_PATH;
 
     // I3: no legacy source field
@@ -187,9 +181,7 @@ fn validate_authority_set(
     // I4: epoch must be a non-negative integer
     if let Some(epoch_val) = obj.get("epoch") {
         if epoch_val.as_u64().is_none() {
-            errors.push(format!(
-                "I4: {path}: epoch must be a non-negative integer"
-            ));
+            errors.push(format!("I4: {path}: epoch must be a non-negative integer"));
         }
     }
 }
@@ -218,9 +210,7 @@ fn validate_policy_set(
 
     for (i, binding) in bindings.iter().enumerate() {
         let Some(binding_obj) = binding.as_object() else {
-            errors.push(format!(
-                "I5: {path}: bindings[{i}] is not a JSON object"
-            ));
+            errors.push(format!("I5: {path}: bindings[{i}] is not a JSON object"));
             continue;
         };
 
@@ -235,9 +225,7 @@ fn validate_policy_set(
         let policy_id = match binding_obj.get("policy_id").and_then(Value::as_str) {
             Some(id) if !id.is_empty() => id.to_owned(),
             Some(_) => {
-                errors.push(format!(
-                    "I5: {path}: bindings[{i}].policy_id is empty"
-                ));
+                errors.push(format!("I5: {path}: bindings[{i}].policy_id is empty"));
                 continue;
             }
             None => {
@@ -250,9 +238,7 @@ fn validate_policy_set(
 
         // I5: no duplicate policy_id
         if !policy_ids.insert(policy_id.clone()) {
-            errors.push(format!(
-                "I5: {path}: duplicate policy_id '{policy_id}'"
-            ));
+            errors.push(format!("I5: {path}: duplicate policy_id '{policy_id}'"));
         }
 
         // I5: digest must be valid BLAKE3 hex if present
@@ -263,8 +249,7 @@ fn validate_policy_set(
         // I5: overlay path must exist if declared
         if let Some(Value::String(overlay)) = binding_obj.get("overlay") {
             if !overlay.is_empty() {
-                let overlay_path =
-                    format!(".vr/governance/{overlay}");
+                let overlay_path = format!(".vr/governance/{overlay}");
                 if !Path::new(&overlay_path).is_file() {
                     errors.push(format!(
                         "I5: {path}: bindings[{i}].overlay '{overlay}' \
@@ -278,9 +263,7 @@ fn validate_policy_set(
     // I5: repo_local_policies structure
     if let Some(rlp) = obj.get("repo_local_policies") {
         if !rlp.is_array() {
-            errors.push(format!(
-                "I5: {path}: repo_local_policies must be an array"
-            ));
+            errors.push(format!("I5: {path}: repo_local_policies must be an array"));
         }
     }
 
@@ -324,10 +307,7 @@ fn validate_manifest(
     }
 
     // I6: cross-check manifest policy_bindings against policy-set
-    if let Some(pb) = table
-        .get("policy_bindings")
-        .and_then(toml::Value::as_table)
-    {
+    if let Some(pb) = table.get("policy_bindings").and_then(toml::Value::as_table) {
         let manifest_ids: BTreeSet<String> = pb
             .keys()
             .map(|k| {
@@ -343,12 +323,10 @@ fn validate_manifest(
             })
             .collect();
 
-        let in_manifest_not_bindings: Vec<_> = manifest_ids
-            .difference(policy_ids_from_bindings)
-            .collect();
-        let in_bindings_not_manifest: Vec<_> = policy_ids_from_bindings
-            .difference(&manifest_ids)
-            .collect();
+        let in_manifest_not_bindings: Vec<_> =
+            manifest_ids.difference(policy_ids_from_bindings).collect();
+        let in_bindings_not_manifest: Vec<_> =
+            policy_ids_from_bindings.difference(&manifest_ids).collect();
 
         for id in &in_manifest_not_bindings {
             errors.push(format!(
@@ -381,10 +359,7 @@ fn read_cargo_version() -> Option<String> {
 
 // ── I7: chain-manifest ────────────────────────────────────────────────
 
-fn validate_chain_manifest(
-    obj: &serde_json::Map<String, Value>,
-    errors: &mut Vec<String>,
-) {
+fn validate_chain_manifest(obj: &serde_json::Map<String, Value>, errors: &mut Vec<String>) {
     let path = CHAIN_MANIFEST_PATH;
 
     // I7: chain_status must be one of allowed values
@@ -398,9 +373,7 @@ fn validate_chain_manifest(
             None
         }
         None => {
-            errors.push(format!(
-                "I7: {path}: chain_status missing or not a string"
-            ));
+            errors.push(format!("I7: {path}: chain_status missing or not a string"));
             None
         }
     };
@@ -491,9 +464,7 @@ fn require_non_empty_string(
     match obj.get(field) {
         Some(Value::String(s)) if !s.is_empty() => {}
         Some(Value::String(_)) => {
-            errors.push(format!(
-                "{invariant}: {file_path}: '{field}' is empty"
-            ));
+            errors.push(format!("{invariant}: {file_path}: '{field}' is empty"));
         }
         Some(_) => {
             errors.push(format!(
@@ -501,19 +472,12 @@ fn require_non_empty_string(
             ));
         }
         None => {
-            errors.push(format!(
-                "{invariant}: {file_path}: '{field}' is missing"
-            ));
+            errors.push(format!("{invariant}: {file_path}: '{field}' is missing"));
         }
     }
 }
 
-fn validate_blake3_hex(
-    value: &str,
-    file_path: &str,
-    field_name: &str,
-    errors: &mut Vec<String>,
-) {
+fn validate_blake3_hex(value: &str, file_path: &str, field_name: &str, errors: &mut Vec<String>) {
     if value.len() != BLAKE3_HEX_LEN {
         errors.push(format!(
             "I4: {file_path}: {field_name} length is {} (expected {BLAKE3_HEX_LEN})",
@@ -521,7 +485,10 @@ fn validate_blake3_hex(
         ));
         return;
     }
-    if !value.chars().all(|c| c.is_ascii_hexdigit() && !c.is_ascii_uppercase()) {
+    if !value
+        .chars()
+        .all(|c| c.is_ascii_hexdigit() && !c.is_ascii_uppercase())
+    {
         errors.push(format!(
             "I4: {file_path}: {field_name} is not lowercase hex"
         ));
