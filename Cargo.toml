@@ -18,12 +18,22 @@ exclude = [
     "RELEASE.md",
 ]
 
+[features]
+default = []
+governance-check = ["dep:toml"]
+
+[[bin]]
+name = "validate-governance-surface"
+path = "src/bin/validate_governance_surface.rs"
+required-features = ["governance-check"]
+
 [dependencies]
 blake3 = "1"
 hex = "0.4"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["arbitrary_precision"] }
 thiserror = "2"
+toml = { version = "0.8", optional = true }
 vr-jcs = "0.3"
 
 [dev-dependencies]

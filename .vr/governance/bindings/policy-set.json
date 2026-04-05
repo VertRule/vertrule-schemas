@@ -1,12 +1,19 @@
 {
   "schema": "vr.governance.binding.policy-set/v1",
+  "digest_of": "Each digest is a BLAKE3 hash of the policy definition file (policy.toml) in the VertRule shared governance infrastructure. Policy source material is not bundled in this repository. The digest is the verifiable anchor; the overlay (if any) is bundled locally.",
   "bindings": [
     {
       "policy_id": "determinism@0.1",
-      "source": "governance/policies/determinism@0.1",
+      "digest": "72f890a1caa73c5e87c3a558d0c50bfe43b8a47052bb423697c86c4c27a54487",
       "mode": "bind+overlay",
       "overlay": "overlays/determinism@0.1.toml",
       "notes": "Scope overlay restricts to src/**/*.rs; no allowlist exceptions"
+    },
+    {
+      "policy_id": "repo-boundary@0.1",
+      "digest": "311a7ecdc39526ac13d1a1a900a6edf809e5c3c2879baa3028070d636303c565",
+      "mode": "bind",
+      "notes": "Tier boundary enforcement — no overlay needed"
     }
   ],
   "repo_local_policies": []

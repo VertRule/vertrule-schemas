@@ -21,5 +21,9 @@ test-vectors:
 test-determinism:
     cargo test --test determinism_tests
 
-# Full local verification: lint + unit + vectors + determinism
-verify-local: lint test test-vectors test-determinism
+# Validate .vr/ governance surface (structural + semantic)
+governance-check:
+    cargo run --bin validate-governance-surface --features governance-check
+
+# Full local verification: lint + unit + vectors + determinism + governance
+verify-local: lint test test-vectors test-determinism governance-check
