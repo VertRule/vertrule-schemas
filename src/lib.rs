@@ -75,7 +75,9 @@
 
 pub mod common;
 pub mod context;
+pub mod governance;
 pub(crate) mod jcs;
+pub mod mgs;
 pub mod mri;
 pub mod receipts;
 
@@ -88,5 +90,14 @@ pub use context::RBHInvariant;
 pub use mri::{
     BatchReduction, GradientCouplingPayload, MriBatchPayload, ReductionAxis, ReductionMode,
     ReductionProvenance, TokenReduction,
+};
+pub use governance::{
+    ActionNamespace, AdapterOrigin, AdapterReference, EntityNamespace,
+    GovernancePrincipalId, GovernanceScope, GovernedAction, GovernedDecisionPayload,
+    GovernedSubject, PolicyBindingRef, PolicyTemplate, SurfaceInstanceId, Verdict,
+};
+pub use mgs::{
+    CertificateKind, CertificateSummary, SearchPosture, StatusTransition,
+    TransitionJustification,
 };
 pub use receipts::{BoundaryOrigin, ProjectsToReceiptEnvelope, ReceiptEnvelope, ReceiptType};
