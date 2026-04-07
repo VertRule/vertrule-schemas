@@ -1,0 +1,20 @@
+schema_version: 1
+capability_id: schema.constitutional_types
+capability_version: v1
+domain: schema
+name: Constitutional Schema Types
+aliases: []
+maturity: production
+surface: internal
+owner:
+  kind: crate
+  name: vertrule-schemas
+implementation:
+  primary_module: vertrule-schemas/src/lib.rs
+  entrypoints:
+    - type: module
+      symbol: vertrule-schemas
+evidence:
+  tests: []
+  receipts: []
+supersedes: []
