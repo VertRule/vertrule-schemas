@@ -51,4 +51,12 @@ pub enum DefinitionError {
     /// declared `event_hash`.
     #[error("integrity violation: {0}")]
     IntegrityViolation(String),
+
+    /// A governance identifier failed validation.
+    #[error("invalid governance id: {0}")]
+    InvalidGovernanceId(String),
+
+    /// A governance namespace failed validation.
+    #[error("invalid namespace: {0}")]
+    InvalidNamespace(String),
 }
