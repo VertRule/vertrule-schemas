@@ -121,8 +121,8 @@ impl ProjectsToReceiptEnvelope for GovernedDecisionPayload {
             event_hash: DigestBytes::from_array([0u8; 32]),
             parent_id: self.parent_id,
             boundary_origin: Some(BoundaryOrigin::Governance),
-            digest_algorithm: Some("blake3".to_string()),
-            canonicalization: Some("jcs".to_string()),
+            digest_algorithm: Some(SchemaVersion::V1.digest_algorithm().to_string()),
+            canonicalization: Some(SchemaVersion::V1.canonicalization().to_string()),
             payload,
         };
         envelope.event_hash = compute_event_hash(&envelope)?;
