@@ -1,18 +1,22 @@
 use crate::governance::{ActionNamespace, GovernedAction};
 use crate::DefinitionError;
 
+type R = Result<(), Box<dyn std::error::Error>>;
+
 // ── ActionNamespace construction ───────────────────────────────────
 
 #[test]
-fn namespace_accepts_lowercase() {
-    let ns = ActionNamespace::new("workflow".to_string()).expect("valid");
+fn namespace_accepts_lowercase() -> R {
+    let ns = ActionNamespace::new("workflow".to_string())?;
     assert_eq!(ns.as_str(), "workflow");
+    Ok(())
 }
 
 #[test]
-fn namespace_accepts_digits_and_underscores() {
-    let ns = ActionNamespace::new("tool_v2".to_string()).expect("valid");
+fn namespace_accepts_digits_and_underscores() -> R {
+    let ns = ActionNamespace::new("tool_v2".to_string())?;
     assert_eq!(ns.as_str(), "tool_v2");
+    Ok(())
 }
 
 #[test]
@@ -43,12 +47,13 @@ fn namespace_rejects_exceeds_max_length() {
 // ── ActionNamespace serde ──────────────────────────────────────────
 
 #[test]
-fn namespace_serde_roundtrip() {
-    let ns = ActionNamespace::new("agent".to_string()).expect("valid");
-    let json = serde_json::to_string(&ns).expect("serialize");
+fn namespace_serde_roundtrip() -> R {
+    let ns = ActionNamespace::new("agent".to_string())?;
+    let json = serde_json::to_string(&ns)?;
     assert_eq!(json, r#""agent""#);
-    let back: ActionNamespace = serde_json::from_str(&json).expect("deserialize");
+    let back: ActionNamespace = serde_json::from_str(&json)?;
     assert_eq!(ns, back);
+    Ok(())
 }
 
 #[test]
@@ -60,29 +65,31 @@ fn namespace_deserialize_rejects_invalid() {
 // ── GovernedAction serde ───────────────────────────────────────────
 
 #[test]
-fn action_serde_roundtrip_with_hint() {
+fn action_serde_roundtrip_with_hint() -> R {
     let action = GovernedAction {
-        action_namespace: ActionNamespace::new("workflow".to_string()).expect("valid"),
+        action_namespace: ActionNamespace::new("workflow".to_string())?,
         action_type: "transition".to_string(),
         action_idempotency_hint: Some("open:closed".to_string()),
     };
-    let json = serde_json::to_string(&action).expect("serialize");
-    let back: GovernedAction = serde_json::from_str(&json).expect("deserialize");
+    let json = serde_json::to_string(&action)?;
+    let back: GovernedAction = serde_json::from_str(&json)?;
     assert_eq!(action, back);
+    Ok(())
 }
 
 #[test]
-fn action_serde_roundtrip_without_hint() {
+fn action_serde_roundtrip_without_hint() -> R {
     let action = GovernedAction {
-        action_namespace: ActionNamespace::new("agent".to_string()).expect("valid"),
+        action_namespace: ActionNamespace::new("agent".to_string())?,
         action_type: "invoke_tool".to_string(),
         action_idempotency_hint: None,
     };
-    let json = serde_json::to_string(&action).expect("serialize");
+    let json = serde_json::to_string(&action)?;
     // hint should be absent, not null
     assert!(!json.contains("action_idempotency_hint"));
-    let back: GovernedAction = serde_json::from_str(&json).expect("deserialize");
+    let back: GovernedAction = serde_json::from_str(&json)?;
     assert_eq!(action, back);
+    Ok(())
 }
 
 #[test]
@@ -98,25 +105,27 @@ fn action_deserialize_rejects_invalid_namespace() {
 // ── Surface neutrality ─────────────────────────────────────────────
 
 #[test]
-fn action_works_for_langchain_tool_invocation() {
+fn action_works_for_langchain_tool_invocation() -> R {
     let action = GovernedAction {
-        action_namespace: ActionNamespace::new("agent".to_string()).expect("valid"),
+        action_namespace: ActionNamespace::new("agent".to_string())?,
         action_type: "invoke_tool".to_string(),
         action_idempotency_hint: Some("run-abc:step-7:attempt-1".to_string()),
     };
-    let json = serde_json::to_string(&action).expect("serialize");
-    let back: GovernedAction = serde_json::from_str(&json).expect("deserialize");
+    let json = serde_json::to_string(&action)?;
+    let back: GovernedAction = serde_json::from_str(&json)?;
     assert_eq!(action, back);
+    Ok(())
 }
 
 #[test]
-fn action_works_for_slack_approval() {
+fn action_works_for_slack_approval() -> R {
     let action = GovernedAction {
-        action_namespace: ActionNamespace::new("approval".to_string()).expect("valid"),
+        action_namespace: ActionNamespace::new("approval".to_string())?,
         action_type: "approve".to_string(),
         action_idempotency_hint: None,
     };
-    let json = serde_json::to_string(&action).expect("serialize");
-    let back: GovernedAction = serde_json::from_str(&json).expect("deserialize");
+    let json = serde_json::to_string(&action)?;
+    let back: GovernedAction = serde_json::from_str(&json)?;
     assert_eq!(action, back);
+    Ok(())
 }
