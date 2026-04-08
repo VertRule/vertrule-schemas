@@ -1,56 +1,63 @@
 use crate::governance::{PolicyBindingRef, PolicyTemplate};
 use crate::PolicyId;
 
-fn sample_binding(template: PolicyTemplate) -> PolicyBindingRef {
-    PolicyBindingRef {
+type R = Result<(), Box<dyn std::error::Error>>;
+
+fn sample_binding(
+    template: PolicyTemplate,
+) -> Result<PolicyBindingRef, Box<dyn std::error::Error>> {
+    Ok(PolicyBindingRef {
         binding_id: "bind-1".to_string(),
         workspace_scope: "jira:site-1:PROJ".to_string(),
         entity_namespace: None,
         action_type: None,
-        policy_id: PolicyId::new("vr.surface.gate/require-approval".to_string())
-            .expect("valid policy id"),
+        policy_id: PolicyId::new("vr.surface.gate/require-approval".to_string())?,
         policy_template: template,
-    }
+    })
 }
 
 // ── PolicyTemplate serde ───────────────────────────────────────────
 
 #[test]
-fn template_require_approval_roundtrip() {
+fn template_require_approval_roundtrip() -> R {
     let t = PolicyTemplate::RequireApproval;
-    let json = serde_json::to_string(&t).expect("serialize");
+    let json = serde_json::to_string(&t)?;
     assert_eq!(json, r#""require_approval""#);
-    let back: PolicyTemplate = serde_json::from_str(&json).expect("deserialize");
+    let back: PolicyTemplate = serde_json::from_str(&json)?;
     assert_eq!(t, back);
+    Ok(())
 }
 
 #[test]
-fn template_require_fields_roundtrip() {
+fn template_require_fields_roundtrip() -> R {
     let t = PolicyTemplate::RequireFields {
         fields: vec!["assignee".to_string(), "priority".to_string()],
     };
-    let json = serde_json::to_string(&t).expect("serialize");
-    let back: PolicyTemplate = serde_json::from_str(&json).expect("deserialize");
+    let json = serde_json::to_string(&t)?;
+    let back: PolicyTemplate = serde_json::from_str(&json)?;
     assert_eq!(t, back);
+    Ok(())
 }
 
 #[test]
-fn template_attach_evidence_roundtrip() {
+fn template_attach_evidence_roundtrip() -> R {
     let t = PolicyTemplate::AttachEvidence;
-    let json = serde_json::to_string(&t).expect("serialize");
+    let json = serde_json::to_string(&t)?;
     assert_eq!(json, r#""attach_evidence""#);
-    let back: PolicyTemplate = serde_json::from_str(&json).expect("deserialize");
+    let back: PolicyTemplate = serde_json::from_str(&json)?;
     assert_eq!(t, back);
+    Ok(())
 }
 
 #[test]
-fn template_deny_with_reason_roundtrip() {
+fn template_deny_with_reason_roundtrip() -> R {
     let t = PolicyTemplate::DenyWithReason {
         reason: "frozen for release".to_string(),
     };
-    let json = serde_json::to_string(&t).expect("serialize");
-    let back: PolicyTemplate = serde_json::from_str(&json).expect("deserialize");
+    let json = serde_json::to_string(&t)?;
+    let back: PolicyTemplate = serde_json::from_str(&json)?;
     assert_eq!(t, back);
+    Ok(())
 }
 
 // ── PolicyTemplate display ─────────────────────────────────────────
@@ -81,56 +88,58 @@ fn template_display() {
 // ── PolicyBindingRef serde ─────────────────────────────────────────
 
 #[test]
-fn binding_full_roundtrip() {
+fn binding_full_roundtrip() -> R {
     let binding = PolicyBindingRef {
         binding_id: "bind-2".to_string(),
         workspace_scope: "langchain:ws-9:graph-a".to_string(),
         entity_namespace: Some("tool_call".to_string()),
         action_type: Some("invoke_tool".to_string()),
-        policy_id: PolicyId::new("vr.surface.gate/tool-audit".to_string())
-            .expect("valid policy id"),
+        policy_id: PolicyId::new("vr.surface.gate/tool-audit".to_string())?,
         policy_template: PolicyTemplate::AttachEvidence,
     };
-    let json = serde_json::to_string(&binding).expect("serialize");
-    let back: PolicyBindingRef = serde_json::from_str(&json).expect("deserialize");
+    let json = serde_json::to_string(&binding)?;
+    let back: PolicyBindingRef = serde_json::from_str(&json)?;
     assert_eq!(binding, back);
+    Ok(())
 }
 
 #[test]
-fn binding_wildcard_omits_optional_fields() {
-    let binding = sample_binding(PolicyTemplate::RequireApproval);
-    let json = serde_json::to_string(&binding).expect("serialize");
+fn binding_wildcard_omits_optional_fields() -> R {
+    let binding = sample_binding(PolicyTemplate::RequireApproval)?;
+    let json = serde_json::to_string(&binding)?;
     // None fields should not appear in JSON
     assert!(!json.contains("entity_namespace"));
     assert!(!json.contains("action_type"));
-    let back: PolicyBindingRef = serde_json::from_str(&json).expect("deserialize");
+    let back: PolicyBindingRef = serde_json::from_str(&json)?;
     assert_eq!(binding, back);
+    Ok(())
 }
 
 #[test]
-fn binding_with_filters_includes_optional_fields() {
-    let mut binding = sample_binding(PolicyTemplate::AttachEvidence);
+fn binding_with_filters_includes_optional_fields() -> R {
+    let mut binding = sample_binding(PolicyTemplate::AttachEvidence)?;
     binding.entity_namespace = Some("issue".to_string());
     binding.action_type = Some("transition".to_string());
-    let json = serde_json::to_string(&binding).expect("serialize");
+    let json = serde_json::to_string(&binding)?;
     assert!(json.contains("entity_namespace"));
     assert!(json.contains("action_type"));
+    Ok(())
 }
 
 // ── Surface neutrality ─────────────────────────────────────────────
 
 #[test]
-fn binding_works_for_slack() {
+fn binding_works_for_slack() -> R {
     let binding = PolicyBindingRef {
         binding_id: "bind-slack-1".to_string(),
         workspace_scope: "slack:team-1:channel-general".to_string(),
         entity_namespace: Some("approval_request".to_string()),
         action_type: Some("approve".to_string()),
-        policy_id: PolicyId::new("vr.surface.gate/slack-approval".to_string())
-            .expect("valid policy id"),
+        policy_id: PolicyId::new("vr.surface.gate/slack-approval".to_string())?,
         policy_template: PolicyTemplate::RequireApproval,
     };
-    let json = serde_json::to_string(&binding).expect("serialize");
-    let back: PolicyBindingRef = serde_json::from_str(&json).expect("deserialize");
+    let json = serde_json::to_string(&binding)?;
+    let back: PolicyBindingRef = serde_json::from_str(&json)?;
     assert_eq!(binding, back);
+    Ok(())
 }

@@ -1,12 +1,15 @@
 use crate::governance::{AdapterOrigin, GovernancePrincipalId, GovernanceScope, SurfaceInstanceId};
 use crate::DefinitionError;
 
+type R = Result<(), Box<dyn std::error::Error>>;
+
 // ── GovernancePrincipalId construction ──────────────────────────────
 
 #[test]
-fn principal_id_accepts_alphanumeric() {
-    let id = GovernancePrincipalId::new("org-123".to_string()).expect("valid id");
+fn principal_id_accepts_alphanumeric() -> R {
+    let id = GovernancePrincipalId::new("org-123".to_string())?;
     assert_eq!(id.as_str(), "org-123");
+    Ok(())
 }
 
 #[test]
@@ -68,9 +71,10 @@ fn principal_id_rejects_non_ascii() {
 // ── SurfaceInstanceId construction ─────────────────────────────────
 
 #[test]
-fn surface_id_accepts_colon_separated() {
-    let id = SurfaceInstanceId::new("jira:install-abc".to_string()).expect("valid id");
+fn surface_id_accepts_colon_separated() -> R {
+    let id = SurfaceInstanceId::new("jira:install-abc".to_string())?;
     assert_eq!(id.as_str(), "jira:install-abc");
+    Ok(())
 }
 
 #[test]
@@ -89,35 +93,39 @@ fn surface_id_rejects_exceeds_max_length() {
 // ── Display ────────────────────────────────────────────────────────
 
 #[test]
-fn principal_id_display_matches_inner() {
-    let id = GovernancePrincipalId::new("org-42".to_string()).expect("valid");
+fn principal_id_display_matches_inner() -> R {
+    let id = GovernancePrincipalId::new("org-42".to_string())?;
     assert_eq!(id.to_string(), "org-42");
+    Ok(())
 }
 
 #[test]
-fn surface_id_display_matches_inner() {
-    let id = SurfaceInstanceId::new("jira:site-7".to_string()).expect("valid");
+fn surface_id_display_matches_inner() -> R {
+    let id = SurfaceInstanceId::new("jira:site-7".to_string())?;
     assert_eq!(id.to_string(), "jira:site-7");
+    Ok(())
 }
 
 // ── Serde round-trip: newtypes ─────────────────────────────────────
 
 #[test]
-fn principal_id_serde_roundtrip() {
-    let id = GovernancePrincipalId::new("org-99".to_string()).expect("valid");
-    let json = serde_json::to_string(&id).expect("serialize");
+fn principal_id_serde_roundtrip() -> R {
+    let id = GovernancePrincipalId::new("org-99".to_string())?;
+    let json = serde_json::to_string(&id)?;
     assert_eq!(json, r#""org-99""#);
-    let back: GovernancePrincipalId = serde_json::from_str(&json).expect("deserialize");
+    let back: GovernancePrincipalId = serde_json::from_str(&json)?;
     assert_eq!(id, back);
+    Ok(())
 }
 
 #[test]
-fn surface_id_serde_roundtrip() {
-    let id = SurfaceInstanceId::new("langchain:ws-1".to_string()).expect("valid");
-    let json = serde_json::to_string(&id).expect("serialize");
+fn surface_id_serde_roundtrip() -> R {
+    let id = SurfaceInstanceId::new("langchain:ws-1".to_string())?;
+    let json = serde_json::to_string(&id)?;
     assert_eq!(json, r#""langchain:ws-1""#);
-    let back: SurfaceInstanceId = serde_json::from_str(&json).expect("deserialize");
+    let back: SurfaceInstanceId = serde_json::from_str(&json)?;
     assert_eq!(id, back);
+    Ok(())
 }
 
 #[test]
@@ -141,16 +149,17 @@ fn surface_id_deserialize_rejects_invalid() {
 // ── Serde round-trip: GovernanceScope ──────────────────────────────
 
 #[test]
-fn governance_scope_serde_roundtrip() {
+fn governance_scope_serde_roundtrip() -> R {
     let scope = GovernanceScope {
-        governance_principal_id: GovernancePrincipalId::new("org-1".to_string()).expect("valid"),
-        surface_instance_id: SurfaceInstanceId::new("jira:install-2".to_string()).expect("valid"),
+        governance_principal_id: GovernancePrincipalId::new("org-1".to_string())?,
+        surface_instance_id: SurfaceInstanceId::new("jira:install-2".to_string())?,
         adapter_origin: AdapterOrigin::Jira,
         workspace_scope: "jira:org-1:PROJECT".to_string(),
     };
-    let json = serde_json::to_string(&scope).expect("serialize");
-    let back: GovernanceScope = serde_json::from_str(&json).expect("deserialize");
+    let json = serde_json::to_string(&scope)?;
+    let back: GovernanceScope = serde_json::from_str(&json)?;
     assert_eq!(scope, back);
+    Ok(())
 }
 
 #[test]
@@ -168,45 +177,48 @@ fn governance_scope_deserialize_rejects_invalid_principal() {
 // ── Surface neutrality ─────────────────────────────────────────────
 
 #[test]
-fn scope_works_for_langchain() {
+fn scope_works_for_langchain() -> R {
     let scope = GovernanceScope {
-        governance_principal_id: GovernancePrincipalId::new("org-lc".to_string()).expect("valid"),
-        surface_instance_id: SurfaceInstanceId::new("langchain:ws-9".to_string()).expect("valid"),
+        governance_principal_id: GovernancePrincipalId::new("org-lc".to_string())?,
+        surface_instance_id: SurfaceInstanceId::new("langchain:ws-9".to_string())?,
         adapter_origin: AdapterOrigin::LangChain,
         workspace_scope: "langchain:ws-9:graph-alpha".to_string(),
     };
-    let json = serde_json::to_string(&scope).expect("serialize");
-    let back: GovernanceScope = serde_json::from_str(&json).expect("deserialize");
+    let json = serde_json::to_string(&scope)?;
+    let back: GovernanceScope = serde_json::from_str(&json)?;
     assert_eq!(scope, back);
+    Ok(())
 }
 
 #[test]
-fn scope_works_for_custom_adapter() {
+fn scope_works_for_custom_adapter() -> R {
     let scope = GovernanceScope {
-        governance_principal_id: GovernancePrincipalId::new("tenant-x".to_string()).expect("valid"),
-        surface_instance_id: SurfaceInstanceId::new("custom:inst-1".to_string()).expect("valid"),
+        governance_principal_id: GovernancePrincipalId::new("tenant-x".to_string())?,
+        surface_instance_id: SurfaceInstanceId::new("custom:inst-1".to_string())?,
         adapter_origin: AdapterOrigin::Custom("my_system".to_string()),
         workspace_scope: "custom:inst-1:env-prod".to_string(),
     };
-    let json = serde_json::to_string(&scope).expect("serialize");
-    let back: GovernanceScope = serde_json::from_str(&json).expect("deserialize");
+    let json = serde_json::to_string(&scope)?;
+    let back: GovernanceScope = serde_json::from_str(&json)?;
     assert_eq!(scope, back);
+    Ok(())
 }
 
 // ── No Jira-specific fields in core type ───────────────────────────
 
 /// Compile-time assertion: `GovernanceScope` has exactly the four
 /// surface-neutral fields declared in the spec. Any Jira-specific
-/// field (issue_key, project_id, tenant_id, site_id) would be a
+/// field (`issue_key`, `project_id`, `tenant_id`, `site_id`) would be a
 /// constitutional violation. This test documents the invariant.
 #[test]
-fn scope_has_no_adapter_local_fields() {
+fn scope_has_no_adapter_local_fields() -> R {
     // Constructing with only the four constitutional fields proves
     // no adapter-specific field is required.
     let _scope = GovernanceScope {
-        governance_principal_id: GovernancePrincipalId::new("p".to_string()).expect("valid"),
-        surface_instance_id: SurfaceInstanceId::new("s".to_string()).expect("valid"),
+        governance_principal_id: GovernancePrincipalId::new("p".to_string())?,
+        surface_instance_id: SurfaceInstanceId::new("s".to_string())?,
         adapter_origin: AdapterOrigin::Slack,
         workspace_scope: String::new(),
     };
+    Ok(())
 }

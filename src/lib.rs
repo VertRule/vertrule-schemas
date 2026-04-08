@@ -68,8 +68,7 @@
 //! - [`SchemaVersion::digest_algorithm`] — `"BLAKE3"`
 //! - [`SchemaVersion::canonicalization`] — `"JCS"`
 
-#![deny(clippy::unwrap_used, clippy::panic)]
-#![cfg_attr(not(test), deny(clippy::expect_used))]
+#![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 #![warn(missing_docs)]
 
 // ── Module hierarchy ────────────────────────────────────────────────

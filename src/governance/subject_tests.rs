@@ -1,24 +1,29 @@
 use crate::governance::{EntityNamespace, GovernedSubject};
 use crate::DefinitionError;
 
+type R = Result<(), Box<dyn std::error::Error>>;
+
 // ── EntityNamespace construction ───────────────────────────────────
 
 #[test]
-fn namespace_accepts_lowercase_alpha() {
-    let ns = EntityNamespace::new("issue".to_string()).expect("valid");
+fn namespace_accepts_lowercase_alpha() -> R {
+    let ns = EntityNamespace::new("issue".to_string())?;
     assert_eq!(ns.as_str(), "issue");
+    Ok(())
 }
 
 #[test]
-fn namespace_accepts_lowercase_with_digits_and_underscores() {
-    let ns = EntityNamespace::new("agent_run_2".to_string()).expect("valid");
+fn namespace_accepts_lowercase_with_digits_and_underscores() -> R {
+    let ns = EntityNamespace::new("agent_run_2".to_string())?;
     assert_eq!(ns.as_str(), "agent_run_2");
+    Ok(())
 }
 
 #[test]
-fn namespace_accepts_single_char() {
-    let ns = EntityNamespace::new("a".to_string()).expect("valid");
+fn namespace_accepts_single_char() -> R {
+    let ns = EntityNamespace::new("a".to_string())?;
     assert_eq!(ns.as_str(), "a");
+    Ok(())
 }
 
 #[test]
@@ -88,12 +93,13 @@ fn namespace_rejects_space() {
 // ── EntityNamespace serde ──────────────────────────────────────────
 
 #[test]
-fn namespace_serde_roundtrip() {
-    let ns = EntityNamespace::new("tool_call".to_string()).expect("valid");
-    let json = serde_json::to_string(&ns).expect("serialize");
+fn namespace_serde_roundtrip() -> R {
+    let ns = EntityNamespace::new("tool_call".to_string())?;
+    let json = serde_json::to_string(&ns)?;
     assert_eq!(json, r#""tool_call""#);
-    let back: EntityNamespace = serde_json::from_str(&json).expect("deserialize");
+    let back: EntityNamespace = serde_json::from_str(&json)?;
     assert_eq!(ns, back);
+    Ok(())
 }
 
 #[test]
@@ -103,23 +109,25 @@ fn namespace_deserialize_rejects_invalid() {
 }
 
 #[test]
-fn namespace_display() {
-    let ns = EntityNamespace::new("checkpoint".to_string()).expect("valid");
+fn namespace_display() -> R {
+    let ns = EntityNamespace::new("checkpoint".to_string())?;
     assert_eq!(ns.to_string(), "checkpoint");
+    Ok(())
 }
 
 // ── GovernedSubject serde ──────────────────────────────────────────
 
 #[test]
-fn subject_serde_roundtrip() {
+fn subject_serde_roundtrip() -> R {
     let subject = GovernedSubject {
         subject_key: "jira:issue:PROJ-123".to_string(),
-        entity_namespace: EntityNamespace::new("issue".to_string()).expect("valid"),
+        entity_namespace: EntityNamespace::new("issue".to_string())?,
         entity_id: "PROJ-123".to_string(),
     };
-    let json = serde_json::to_string(&subject).expect("serialize");
-    let back: GovernedSubject = serde_json::from_str(&json).expect("deserialize");
+    let json = serde_json::to_string(&subject)?;
+    let back: GovernedSubject = serde_json::from_str(&json)?;
     assert_eq!(subject, back);
+    Ok(())
 }
 
 #[test]
@@ -136,25 +144,27 @@ fn subject_deserialize_rejects_invalid_namespace() {
 // ── Surface neutrality ─────────────────────────────────────────────
 
 #[test]
-fn subject_works_for_langchain_run() {
+fn subject_works_for_langchain_run() -> R {
     let subject = GovernedSubject {
         subject_key: "langchain:agent_run:run-abc".to_string(),
-        entity_namespace: EntityNamespace::new("agent_run".to_string()).expect("valid"),
+        entity_namespace: EntityNamespace::new("agent_run".to_string())?,
         entity_id: "run-abc".to_string(),
     };
-    let json = serde_json::to_string(&subject).expect("serialize");
-    let back: GovernedSubject = serde_json::from_str(&json).expect("deserialize");
+    let json = serde_json::to_string(&subject)?;
+    let back: GovernedSubject = serde_json::from_str(&json)?;
     assert_eq!(subject, back);
+    Ok(())
 }
 
 #[test]
-fn subject_works_for_slack_message() {
+fn subject_works_for_slack_message() -> R {
     let subject = GovernedSubject {
         subject_key: "slack:message:ts-123".to_string(),
-        entity_namespace: EntityNamespace::new("message".to_string()).expect("valid"),
+        entity_namespace: EntityNamespace::new("message".to_string())?,
         entity_id: "ts-123".to_string(),
     };
-    let json = serde_json::to_string(&subject).expect("serialize");
-    let back: GovernedSubject = serde_json::from_str(&json).expect("deserialize");
+    let json = serde_json::to_string(&subject)?;
+    let back: GovernedSubject = serde_json::from_str(&json)?;
     assert_eq!(subject, back);
+    Ok(())
 }
