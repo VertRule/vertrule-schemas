@@ -24,8 +24,8 @@ fn origin_service_now_serializes_as_snake_case() {
 
 #[test]
 fn origin_custom_serializes_with_value() {
-    let json = serde_json::to_string(&AdapterOrigin::Custom("my_tool".to_string()))
-        .expect("serialize");
+    let json =
+        serde_json::to_string(&AdapterOrigin::Custom("my_tool".to_string())).expect("serialize");
     assert_eq!(json, r#"{"custom":"my_tool"}"#);
 }
 

@@ -88,17 +88,16 @@ pub use common::{
     CanonicalPayload, DefinitionError, DigestBytes, IJsonUInt, PolicyId, SchemaId, SchemaVersion,
 };
 pub use context::RBHInvariant;
+pub use governance::{
+    ActionNamespace, AdapterOrigin, AdapterReference, EntityNamespace, GovernancePrincipalId,
+    GovernanceScope, GovernedAction, GovernedDecisionPayload, GovernedSubject, PolicyBindingRef,
+    PolicyTemplate, SurfaceInstanceId, Verdict,
+};
+pub use mgs::{
+    CertificateKind, CertificateSummary, SearchPosture, StatusTransition, TransitionJustification,
+};
 pub use mri::{
     BatchReduction, GradientCouplingPayload, MriBatchPayload, ReductionAxis, ReductionMode,
     ReductionProvenance, TokenReduction,
-};
-pub use governance::{
-    ActionNamespace, AdapterOrigin, AdapterReference, EntityNamespace,
-    GovernancePrincipalId, GovernanceScope, GovernedAction, GovernedDecisionPayload,
-    GovernedSubject, PolicyBindingRef, PolicyTemplate, SurfaceInstanceId, Verdict,
-};
-pub use mgs::{
-    CertificateKind, CertificateSummary, SearchPosture, StatusTransition,
-    TransitionJustification,
 };
 pub use receipts::{BoundaryOrigin, ProjectsToReceiptEnvelope, ReceiptEnvelope, ReceiptType};
