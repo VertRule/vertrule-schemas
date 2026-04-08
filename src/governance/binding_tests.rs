@@ -57,15 +57,18 @@ fn template_deny_with_reason_roundtrip() {
 
 #[test]
 fn template_display() {
-    assert_eq!(PolicyTemplate::RequireApproval.to_string(), "require_approval");
     assert_eq!(
-        PolicyTemplate::RequireFields {
-            fields: vec![]
-        }
-        .to_string(),
+        PolicyTemplate::RequireApproval.to_string(),
+        "require_approval"
+    );
+    assert_eq!(
+        PolicyTemplate::RequireFields { fields: vec![] }.to_string(),
         "require_fields"
     );
-    assert_eq!(PolicyTemplate::AttachEvidence.to_string(), "attach_evidence");
+    assert_eq!(
+        PolicyTemplate::AttachEvidence.to_string(),
+        "attach_evidence"
+    );
     assert_eq!(
         PolicyTemplate::DenyWithReason {
             reason: String::new()

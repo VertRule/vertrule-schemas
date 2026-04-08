@@ -87,11 +87,8 @@ fn schema_decision_digest() -> DigestBytes {
 }
 
 /// Compute `BLAKE3(JCS(scope))` as the context digest.
-fn compute_scope_digest(
-    scope: &GovernanceScope,
-) -> Result<DigestBytes, crate::DefinitionError> {
-    let scope_bytes = serde_json::to_vec(scope)
-        .map_err(crate::jcs::JcsError::Json)?;
+fn compute_scope_digest(scope: &GovernanceScope) -> Result<DigestBytes, crate::DefinitionError> {
+    let scope_bytes = serde_json::to_vec(scope).map_err(crate::jcs::JcsError::Json)?;
     let canon = crate::jcs::to_canon_bytes_from_slice(&scope_bytes)?;
     Ok(DigestBytes::from_array(*blake3::hash(&canon).as_bytes()))
 }
@@ -107,8 +104,7 @@ impl ProjectsToReceiptEnvelope for GovernedDecisionPayload {
         let schema_digest = schema_decision_digest();
         let policy_digest = compute_policy_digest(&self.policy_binding_id);
 
-        let payload_value = serde_json::to_value(self)
-            .map_err(crate::jcs::JcsError::Json)?;
+        let payload_value = serde_json::to_value(self).map_err(crate::jcs::JcsError::Json)?;
         let payload = CanonicalPayload::new(payload_value)?;
 
         let mut envelope = ReceiptEnvelope {

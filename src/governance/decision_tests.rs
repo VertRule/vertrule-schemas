@@ -1,9 +1,9 @@
 use std::collections::BTreeMap;
 
 use crate::governance::{
-    ActionNamespace, AdapterOrigin, AdapterReference, EntityNamespace,
-    GovernancePrincipalId, GovernanceScope, GovernedAction, GovernedDecisionPayload,
-    GovernedSubject, SurfaceInstanceId, Verdict,
+    ActionNamespace, AdapterOrigin, AdapterReference, EntityNamespace, GovernancePrincipalId,
+    GovernanceScope, GovernedAction, GovernedDecisionPayload, GovernedSubject, SurfaceInstanceId,
+    Verdict,
 };
 use crate::{DigestBytes, IJsonUInt, ProjectsToReceiptEnvelope};
 
@@ -12,8 +12,7 @@ fn sample_decision(verdict: Verdict) -> GovernedDecisionPayload {
         scope: GovernanceScope {
             governance_principal_id: GovernancePrincipalId::new("org-1".to_string())
                 .expect("valid"),
-            surface_instance_id: SurfaceInstanceId::new("jira:inst-1".to_string())
-                .expect("valid"),
+            surface_instance_id: SurfaceInstanceId::new("jira:inst-1".to_string()).expect("valid"),
             adapter_origin: AdapterOrigin::Jira,
             workspace_scope: "jira:org-1:PROJ".to_string(),
         },
@@ -29,9 +28,7 @@ fn sample_decision(verdict: Verdict) -> GovernedDecisionPayload {
         },
         adapter_ref: AdapterReference {
             adapter_origin: AdapterOrigin::Jira,
-            external_keys: BTreeMap::from([
-                ("issue_key".to_string(), "PROJ-42".to_string()),
-            ]),
+            external_keys: BTreeMap::from([("issue_key".to_string(), "PROJ-42".to_string())]),
         },
         verdict,
         reasons: vec![],
@@ -161,7 +158,10 @@ fn project_with_parent_id() {
     let mut decision = sample_decision(Verdict::Allow);
     decision.parent_id = Some(DigestBytes::from_array([99u8; 32]));
     let envelope = decision.project().expect("project");
-    assert_eq!(envelope.parent_id, Some(DigestBytes::from_array([99u8; 32])));
+    assert_eq!(
+        envelope.parent_id,
+        Some(DigestBytes::from_array([99u8; 32]))
+    );
 }
 
 #[test]
