@@ -288,9 +288,7 @@ dependencies = [
 
 [[package]]
 name = "vr-jcs"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "75059fea4aaff7779e74e4c9976985f198b24c9fad3ea474d5072ef46c5baea4"
+version = "0.3.2"
 dependencies = [
  "serde",
  "serde_json",
