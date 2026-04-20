@@ -88,7 +88,7 @@ pub use common::{
 };
 pub use context::RBHInvariant;
 pub use governance::{
-    ActionNamespace, AdapterOrigin, AdapterReference, EntityNamespace, GovernancePrincipalId,
+    ActionNamespace, AdapterOriginId, AdapterReference, EntityNamespace, GovernancePrincipalId,
     GovernanceScope, GovernedAction, GovernedDecisionPayload, GovernedSubject, PolicyBindingRef,
     PolicyTemplate, SurfaceInstanceId, Verdict,
 };

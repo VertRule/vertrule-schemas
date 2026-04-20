@@ -1,72 +1,138 @@
 use std::collections::BTreeMap;
 
-use crate::governance::{AdapterOrigin, AdapterReference};
+use crate::governance::{AdapterOriginId, AdapterReference};
 
 type R = Result<(), Box<dyn std::error::Error>>;
 
-// ── AdapterOrigin serde ────────────────────────────────────────────
+// ── AdapterOriginId serde (transparent: bare string) ────────────────
 
 #[test]
-fn origin_jira_serializes_as_snake_case() -> R {
-    let json = serde_json::to_string(&AdapterOrigin::Jira)?;
+fn origin_jira_serializes_as_bare_string() -> R {
+    let json = serde_json::to_string(&AdapterOriginId::jira()?)?;
     assert_eq!(json, r#""jira""#);
     Ok(())
 }
 
 #[test]
-fn origin_langchain_serializes_as_snake_case() -> R {
-    let json = serde_json::to_string(&AdapterOrigin::LangChain)?;
+fn origin_langchain_serializes_as_bare_string() -> R {
+    let json = serde_json::to_string(&AdapterOriginId::lang_chain()?)?;
     assert_eq!(json, r#""lang_chain""#);
     Ok(())
 }
 
 #[test]
-fn origin_service_now_serializes_as_snake_case() -> R {
-    let json = serde_json::to_string(&AdapterOrigin::ServiceNow)?;
+fn origin_service_now_serializes_as_bare_string() -> R {
+    let json = serde_json::to_string(&AdapterOriginId::service_now()?)?;
     assert_eq!(json, r#""service_now""#);
     Ok(())
 }
 
 #[test]
-fn origin_custom_serializes_with_value() -> R {
-    let json = serde_json::to_string(&AdapterOrigin::Custom("my_tool".to_string()))?;
-    assert_eq!(json, r#"{"custom":"my_tool"}"#);
+fn origin_webhook_serializes_as_bare_string() -> R {
+    let json = serde_json::to_string(&AdapterOriginId::webhook()?)?;
+    assert_eq!(json, r#""webhook""#);
     Ok(())
 }
 
 #[test]
-fn origin_roundtrip_all_known_variants() -> R {
+fn origin_custom_grammar_value_serializes_as_bare_string() -> R {
+    let id = AdapterOriginId::new("my_tool".to_string())?;
+    let json = serde_json::to_string(&id)?;
+    assert_eq!(json, r#""my_tool""#);
+    Ok(())
+}
+
+#[test]
+fn origin_roundtrip_all_known_constructors() -> R {
     let variants = [
-        AdapterOrigin::Jira,
-        AdapterOrigin::LangChain,
-        AdapterOrigin::ServiceNow,
-        AdapterOrigin::Salesforce,
-        AdapterOrigin::Slack,
-        AdapterOrigin::Custom("x".to_string()),
+        AdapterOriginId::jira()?,
+        AdapterOriginId::lang_chain()?,
+        AdapterOriginId::service_now()?,
+        AdapterOriginId::salesforce()?,
+        AdapterOriginId::slack()?,
+        AdapterOriginId::webhook()?,
+        AdapterOriginId::new("gitlab_ci".to_string())?,
     ];
     for v in &variants {
         let json = serde_json::to_string(v)?;
-        let back: AdapterOrigin = serde_json::from_str(&json)?;
+        let back: AdapterOriginId = serde_json::from_str(&json)?;
         assert_eq!(v, &back);
     }
     Ok(())
 }
 
-// ── AdapterOrigin display ──────────────────────────────────────────
+// ── AdapterOriginId grammar enforcement ────────────────────────────
 
 #[test]
-fn origin_display_matches_serde_for_unit_variants() {
-    assert_eq!(AdapterOrigin::Jira.to_string(), "jira");
-    assert_eq!(AdapterOrigin::LangChain.to_string(), "lang_chain");
-    assert_eq!(AdapterOrigin::ServiceNow.to_string(), "service_now");
-    assert_eq!(AdapterOrigin::Salesforce.to_string(), "salesforce");
-    assert_eq!(AdapterOrigin::Slack.to_string(), "slack");
+fn origin_rejects_empty() {
+    let result = AdapterOriginId::new(String::new());
+    assert!(result.is_err());
 }
 
 #[test]
-fn origin_display_custom() {
-    let origin = AdapterOrigin::Custom("gitlab_ci".to_string());
-    assert_eq!(origin.to_string(), "custom(gitlab_ci)");
+fn origin_rejects_uppercase() {
+    let result = AdapterOriginId::new("Jira".to_string());
+    assert!(result.is_err());
+}
+
+#[test]
+fn origin_rejects_leading_digit() {
+    let result = AdapterOriginId::new("1jira".to_string());
+    assert!(result.is_err());
+}
+
+#[test]
+fn origin_rejects_hyphen() {
+    let result = AdapterOriginId::new("lang-chain".to_string());
+    assert!(result.is_err());
+}
+
+#[test]
+fn origin_rejects_dot() {
+    let result = AdapterOriginId::new("lang.chain".to_string());
+    assert!(result.is_err());
+}
+
+#[test]
+fn origin_rejects_exceeds_max_length() {
+    let val = "a".repeat(65);
+    let result = AdapterOriginId::new(val);
+    assert!(result.is_err());
+}
+
+#[test]
+fn origin_accepts_max_length() -> R {
+    let val = "a".repeat(64);
+    let result = AdapterOriginId::new(val)?;
+    assert_eq!(result.as_str().len(), 64);
+    Ok(())
+}
+
+// ── AdapterOriginId deserialize validation ─────────────────────────
+
+#[test]
+fn origin_deserialize_rejects_invalid_grammar() {
+    let result: Result<AdapterOriginId, _> = serde_json::from_str(r#""Has-Uppercase""#);
+    assert!(result.is_err());
+}
+
+#[test]
+fn origin_deserialize_rejects_empty_string() {
+    let result: Result<AdapterOriginId, _> = serde_json::from_str(r#""""#);
+    assert!(result.is_err());
+}
+
+// ── AdapterOriginId display ─────────────────────────────────────────
+
+#[test]
+fn origin_display_matches_inner() -> R {
+    assert_eq!(AdapterOriginId::jira()?.to_string(), "jira");
+    assert_eq!(AdapterOriginId::lang_chain()?.to_string(), "lang_chain");
+    assert_eq!(AdapterOriginId::service_now()?.to_string(), "service_now");
+    assert_eq!(AdapterOriginId::salesforce()?.to_string(), "salesforce");
+    assert_eq!(AdapterOriginId::slack()?.to_string(), "slack");
+    assert_eq!(AdapterOriginId::webhook()?.to_string(), "webhook");
+    Ok(())
 }
 
 // ── AdapterReference serde ─────────────────────────────────────────
@@ -78,7 +144,7 @@ fn reference_serde_roundtrip() -> R {
     keys.insert("site_id".to_string(), "abc".to_string());
 
     let reference = AdapterReference {
-        adapter_origin: AdapterOrigin::Jira,
+        adapter_origin: AdapterOriginId::jira()?,
         external_keys: keys,
     };
     let json = serde_json::to_string(&reference)?;
@@ -90,7 +156,7 @@ fn reference_serde_roundtrip() -> R {
 #[test]
 fn reference_empty_keys_roundtrip() -> R {
     let reference = AdapterReference {
-        adapter_origin: AdapterOrigin::Slack,
+        adapter_origin: AdapterOriginId::slack()?,
         external_keys: BTreeMap::new(),
     };
     let json = serde_json::to_string(&reference)?;
@@ -107,7 +173,7 @@ fn reference_keys_serialize_in_sorted_order() -> R {
     keys.insert("m_key".to_string(), "middle".to_string());
 
     let reference = AdapterReference {
-        adapter_origin: AdapterOrigin::LangChain,
+        adapter_origin: AdapterOriginId::lang_chain()?,
         external_keys: keys,
     };
     let json = serde_json::to_string(&reference)?;
@@ -130,7 +196,7 @@ fn reference_works_for_langchain() -> R {
     keys.insert("tool_name".to_string(), "web_search".to_string());
 
     let reference = AdapterReference {
-        adapter_origin: AdapterOrigin::LangChain,
+        adapter_origin: AdapterOriginId::lang_chain()?,
         external_keys: keys,
     };
     let json = serde_json::to_string(&reference)?;

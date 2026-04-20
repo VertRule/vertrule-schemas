@@ -1,4 +1,4 @@
-use crate::governance::{AdapterOrigin, GovernancePrincipalId, GovernanceScope, SurfaceInstanceId};
+use crate::governance::{AdapterOriginId, GovernancePrincipalId, GovernanceScope, SurfaceInstanceId};
 use crate::DefinitionError;
 
 type R = Result<(), Box<dyn std::error::Error>>;
@@ -153,7 +153,7 @@ fn governance_scope_serde_roundtrip() -> R {
     let scope = GovernanceScope {
         governance_principal_id: GovernancePrincipalId::new("org-1".to_string())?,
         surface_instance_id: SurfaceInstanceId::new("jira:install-2".to_string())?,
-        adapter_origin: AdapterOrigin::Jira,
+        adapter_origin: AdapterOriginId::jira()?,
         workspace_scope: "jira:org-1:PROJECT".to_string(),
     };
     let json = serde_json::to_string(&scope)?;
@@ -181,7 +181,7 @@ fn scope_works_for_langchain() -> R {
     let scope = GovernanceScope {
         governance_principal_id: GovernancePrincipalId::new("org-lc".to_string())?,
         surface_instance_id: SurfaceInstanceId::new("langchain:ws-9".to_string())?,
-        adapter_origin: AdapterOrigin::LangChain,
+        adapter_origin: AdapterOriginId::lang_chain()?,
         workspace_scope: "langchain:ws-9:graph-alpha".to_string(),
     };
     let json = serde_json::to_string(&scope)?;
@@ -195,7 +195,7 @@ fn scope_works_for_custom_adapter() -> R {
     let scope = GovernanceScope {
         governance_principal_id: GovernancePrincipalId::new("tenant-x".to_string())?,
         surface_instance_id: SurfaceInstanceId::new("custom:inst-1".to_string())?,
-        adapter_origin: AdapterOrigin::Custom("my_system".to_string()),
+        adapter_origin: AdapterOriginId::new("my_system".to_string())?,
         workspace_scope: "custom:inst-1:env-prod".to_string(),
     };
     let json = serde_json::to_string(&scope)?;
@@ -217,7 +217,7 @@ fn scope_has_no_adapter_local_fields() -> R {
     let _scope = GovernanceScope {
         governance_principal_id: GovernancePrincipalId::new("p".to_string())?,
         surface_instance_id: SurfaceInstanceId::new("s".to_string())?,
-        adapter_origin: AdapterOrigin::Slack,
+        adapter_origin: AdapterOriginId::slack()?,
         workspace_scope: String::new(),
     };
     Ok(())

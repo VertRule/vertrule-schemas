@@ -43,7 +43,7 @@ pub mod scope;
 pub mod subject;
 
 pub use action::{ActionNamespace, GovernedAction};
-pub use adapter::{AdapterOrigin, AdapterReference};
+pub use adapter::{AdapterOriginId, AdapterReference};
 pub use binding::{PolicyBindingRef, PolicyTemplate};
 pub use decision::{GovernedDecisionPayload, Verdict};
 pub use scope::{GovernancePrincipalId, GovernanceScope, SurfaceInstanceId};

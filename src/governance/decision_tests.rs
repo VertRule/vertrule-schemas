@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 
 use crate::governance::{
-    ActionNamespace, AdapterOrigin, AdapterReference, EntityNamespace, GovernancePrincipalId,
+    ActionNamespace, AdapterOriginId, AdapterReference, EntityNamespace, GovernancePrincipalId,
     GovernanceScope, GovernedAction, GovernedDecisionPayload, GovernedSubject, SurfaceInstanceId,
     Verdict,
 };
@@ -16,7 +16,7 @@ fn sample_decision(
         scope: GovernanceScope {
             governance_principal_id: GovernancePrincipalId::new("org-1".to_string())?,
             surface_instance_id: SurfaceInstanceId::new("jira:inst-1".to_string())?,
-            adapter_origin: AdapterOrigin::Jira,
+            adapter_origin: AdapterOriginId::jira()?,
             workspace_scope: "jira:org-1:PROJ".to_string(),
         },
         subject: GovernedSubject {
@@ -30,7 +30,7 @@ fn sample_decision(
             action_idempotency_hint: None,
         },
         adapter_ref: AdapterReference {
-            adapter_origin: AdapterOrigin::Jira,
+            adapter_origin: AdapterOriginId::jira()?,
             external_keys: BTreeMap::from([("issue_key".to_string(), "PROJ-42".to_string())]),
         },
         verdict,
@@ -196,7 +196,7 @@ fn decision_works_for_langchain() -> R {
         scope: GovernanceScope {
             governance_principal_id: GovernancePrincipalId::new("org-lc".to_string())?,
             surface_instance_id: SurfaceInstanceId::new("langchain:ws-9".to_string())?,
-            adapter_origin: AdapterOrigin::LangChain,
+            adapter_origin: AdapterOriginId::lang_chain()?,
             workspace_scope: "langchain:ws-9:graph-a".to_string(),
         },
         subject: GovernedSubject {
@@ -210,7 +210,7 @@ fn decision_works_for_langchain() -> R {
             action_idempotency_hint: Some("run-abc:step-7:attempt-1".to_string()),
         },
         adapter_ref: AdapterReference {
-            adapter_origin: AdapterOrigin::LangChain,
+            adapter_origin: AdapterOriginId::lang_chain()?,
             external_keys: BTreeMap::from([
                 ("run_id".to_string(), "run-abc".to_string()),
                 ("step_index".to_string(), "7".to_string()),

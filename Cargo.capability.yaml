@@ -1,0 +1,13 @@
+schema_version: 1
+capability_id: schema.Cargo
+capability_version: v1
+domain: schema
+name: "Cargo"
+maturity: experimental
+surface: internal
+implementation:
+  primary_module: vertrule-schemas/Cargo.toml
+  entrypoints:
+    - type: module
+      symbol: Cargo
+supersedes: []

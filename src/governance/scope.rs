@@ -6,7 +6,7 @@
 
 use serde::{Deserialize, Deserializer, Serialize};
 
-use super::AdapterOrigin;
+use super::AdapterOriginId;
 use crate::DefinitionError;
 
 /// Governance-scoped identity.
@@ -20,7 +20,7 @@ pub struct GovernanceScope {
     /// Specific adapter installation or connection.
     pub surface_instance_id: SurfaceInstanceId,
     /// Which adapter produced this scope.
-    pub adapter_origin: AdapterOrigin,
+    pub adapter_origin: AdapterOriginId,
     /// Adapter-defined workspace path (e.g. `"jira:SITE:PROJ"`
     /// or `"langchain:WS:GRAPH"`). Hierarchical by convention,
     /// opaque to storage.
