@@ -11,6 +11,7 @@ mod error;
 mod i_json_uint;
 mod ids;
 mod schema_id;
+mod semantic_digests;
 mod versions;
 
 pub use canonical_payload::CanonicalPayload;
@@ -19,4 +20,7 @@ pub use error::DefinitionError;
 pub use i_json_uint::IJsonUInt;
 pub use ids::PolicyId;
 pub use schema_id::SchemaId;
+pub use semantic_digests::{
+    ContentIdentityDigest, ContextDigest, PayloadDigest, PolicyDigest, ReceiptDigest, SchemaDigest,
+};
 pub use versions::SchemaVersion;

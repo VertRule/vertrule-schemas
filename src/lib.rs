@@ -84,7 +84,9 @@ pub mod receipts;
 // ── Ergonomic re-exports ────────────────────────────────────────────
 
 pub use common::{
-    CanonicalPayload, DefinitionError, DigestBytes, IJsonUInt, PolicyId, SchemaId, SchemaVersion,
+    CanonicalPayload, ContentIdentityDigest, ContextDigest, DefinitionError, DigestBytes,
+    IJsonUInt, PayloadDigest, PolicyDigest, PolicyId, ReceiptDigest, SchemaDigest, SchemaId,
+    SchemaVersion,
 };
 pub use context::RBHInvariant;
 pub use governance::{
