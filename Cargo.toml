@@ -16,6 +16,8 @@ exclude = [
     "justfile",
     "PUBLIC_SURFACE.md",
     "RELEASE.md",
+    "*.capability.yaml",
+    "**/*.capability.yaml",
 ]
 
 [features]
