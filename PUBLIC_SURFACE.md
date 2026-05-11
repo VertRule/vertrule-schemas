@@ -1,4 +1,4 @@
-# vertrule-schemas Public Surface (v0.2)
+# vertrule-schemas Public Surface (v0.4.1)
 
 Canonical schema types for the VertRule receipt system.
 This crate contains wire shapes, validated scalar types, associated
@@ -51,6 +51,16 @@ pub enum ReductionMode { .. }
 pub enum ReductionAxis { .. }
 pub enum TokenReduction { .. }
 pub enum BatchReduction { .. }
+
+// Semantic digest role newtypes — same bytes, distinct trust roles
+// (#[serde(transparent)] over DigestBytes; each provides
+// ::new(DigestBytes), .bytes(), .to_hex(), From<DigestBytes>)
+pub struct PolicyDigest { .. }
+pub struct SchemaDigest { .. }
+pub struct ContextDigest { .. }
+pub struct ReceiptDigest { .. }
+pub struct PayloadDigest { .. }
+pub struct ContentIdentityDigest { .. }
 ```
 
 ## Scoped Exports (not root-exported)

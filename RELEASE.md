@@ -1,3 +1,48 @@
+# vertrule-schemas v0.4.1 Release Notes
+
+Additive release over v0.4.0. Adds semantic digest role newtypes that
+distinguish digest commitments at compile time across adapter,
+runtime-port, verifier, gateway, and receipt-store boundaries.
+
+## What changed in v0.4.1
+
+- **Semantic digest role newtypes** — `PolicyDigest`, `SchemaDigest`,
+  `ContextDigest`, `ReceiptDigest`, `PayloadDigest`, and
+  `ContentIdentityDigest` wrap `DigestBytes` with `#[serde(transparent)]`
+  so wire bytes are identical to a bare digest while compile-time
+  types prevent silent substitution between trust roles. Each
+  exposes `::new(DigestBytes)`, `.bytes()`, `.to_hex()`, a custom
+  prefix-truncated `Debug`, and `From<DigestBytes>`. Live in
+  `src/common/semantic_digests.rs`; re-exported through
+  `vertrule_schemas::*` and `vertrule_schemas::common::*`.
+- **Internal governance metadata excluded from the published crate** —
+  `Cargo.toml [package].exclude` drops `.claude/**`, `.github/**`,
+  `.vr/**`, `operator_private/**`, `tooling/**`, `justfile`,
+  `PUBLIC_SURFACE.md`, `RELEASE.md`, and all `*.capability.yaml`
+  sidecars from the tarball.
+- **Adapter governance internals expanded** — `src/governance/adapter.rs`
+  and its test suite gained implementation/test coverage; public
+  surface (`AdapterOriginId`, `AdapterReference`, and the six
+  convenience constructors) is unchanged from v0.4.0. Additive only;
+  no breaking removals.
+- **`vr-jcs` dependency refreshed to `0.4.1`** — `Cargo.lock` now
+  resolves the freshly-published `vr-jcs 0.4.1` (RFC 8785
+  canonicalization); the `^0.4` constraint is unchanged.
+
+## Public surface change classification
+
+Additive. No `pub` items removed or renamed from v0.4.0. The
+existing v0.4.0 root re-exports continue to compile unchanged.
+
+## Receipt-digest stability
+
+Semantic digest types are wire-transparent: a `ReceiptDigest` and a
+bare `DigestBytes` carrying the same 32 bytes serialize to the same
+canonical hex string, so existing receipts and stored digests remain
+byte-stable across the v0.4.0 → v0.4.1 boundary.
+
+---
+
 # vertrule-schemas v0.3.0 Release Notes
 
 Completes the `AdapterOrigin` → `AdapterOriginId` migration. Adapter
