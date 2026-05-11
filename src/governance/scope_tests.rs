@@ -1,4 +1,6 @@
-use crate::governance::{AdapterOriginId, GovernancePrincipalId, GovernanceScope, SurfaceInstanceId};
+use crate::governance::{
+    AdapterOriginId, GovernancePrincipalId, GovernanceScope, SurfaceInstanceId,
+};
 use crate::DefinitionError;
 
 type R = Result<(), Box<dyn std::error::Error>>;

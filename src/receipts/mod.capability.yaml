@@ -1,0 +1,44 @@
+schema_version: 1
+capability_id: schema.receipts
+capability_version: v1
+domain: schema
+name: "Receipt envelope and chain schemas"
+maturity: production
+surface: repo_public
+owner:
+  kind: crate
+  name: vertrule-schemas
+implementation:
+  primary_module: vertrule-schemas/src/receipts/mod.rs
+  owner_files:
+    - vertrule-schemas/src/receipts/boundary_origin.rs
+    - vertrule-schemas/src/receipts/boundary_origin_tests.rs
+    - vertrule-schemas/src/receipts/commitment.rs
+    - vertrule-schemas/src/receipts/commitment_tests.rs
+    - vertrule-schemas/src/receipts/envelope.rs
+    - vertrule-schemas/src/receipts/envelope_tests.rs
+    - vertrule-schemas/src/receipts/projection.rs
+    - vertrule-schemas/src/receipts/projection_tests.rs
+    - vertrule-schemas/src/receipts/receipt_type.rs
+    - vertrule-schemas/src/receipts/receipt_type_tests.rs
+  entrypoints:
+    - type: struct
+      symbol: ReceiptEnvelope
+    - type: struct
+      symbol: BoundaryOrigin
+    - type: struct
+      symbol: Commitment
+    - type: struct
+      symbol: Projection
+    - type: enum
+      symbol: ReceiptType
+invariants:
+  - id: envelope_jcs
+    description: ReceiptEnvelope serializes via JCS; field order is part of the canonical contract
+  - id: receipt_chain_linkage
+    description: Each receipt carries parent_id; chain integrity is verifiable via BLAKE3 digest links
+notes: >
+  schema::receipts::ReceiptEnvelope is the CANONICAL receipt envelope shape.
+  Other corpus duplicates (vr-openclaw-adapter::envelope::ReceiptEnvelope)
+  should defer to this canonical form.
+supersedes: []

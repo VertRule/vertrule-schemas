@@ -1,0 +1,45 @@
+schema_version: 1
+capability_id: schema.governance
+capability_version: v1
+domain: schema
+name: "Governance schemas — actions, decisions, scopes, subjects"
+maturity: production
+surface: repo_public
+owner:
+  kind: crate
+  name: vertrule-schemas
+implementation:
+  primary_module: vertrule-schemas/src/governance/mod.rs
+  owner_files:
+    - vertrule-schemas/src/governance/action.rs
+    - vertrule-schemas/src/governance/action_tests.rs
+    - vertrule-schemas/src/governance/adapter.rs
+    - vertrule-schemas/src/governance/adapter_tests.rs
+    - vertrule-schemas/src/governance/binding.rs
+    - vertrule-schemas/src/governance/binding_tests.rs
+    - vertrule-schemas/src/governance/decision.rs
+    - vertrule-schemas/src/governance/decision_tests.rs
+    - vertrule-schemas/src/governance/scope.rs
+    - vertrule-schemas/src/governance/scope_tests.rs
+    - vertrule-schemas/src/governance/subject.rs
+    - vertrule-schemas/src/governance/subject_tests.rs
+  entrypoints:
+    - type: struct
+      symbol: Action
+    - type: struct
+      symbol: Decision
+    - type: struct
+      symbol: Scope
+    - type: struct
+      symbol: Subject
+    - type: struct
+      symbol: AuthorityBinding
+invariants:
+  - id: governance_schema_canonical
+    description: All governance records serialize via JCS; field order is part of canonical contract
+notes: >
+  schema::governance::Decision is one of multiple corpus-wide Decision
+  types (vertrule-core::decision, vr-approval-bridge::decision,
+  complexity-gate::decision, vr-zero-copy-observer::Decision).
+  Class 2 corpus debt.
+supersedes: []
