@@ -1,0 +1,13 @@
+schema_version: 1
+capability_id: governance.manifest.schemas
+capability_version: v1
+domain: governance
+name: "Schemas Governance Manifest"
+maturity: experimental
+surface: internal
+implementation:
+  primary_module: vertrule-schemas/.vr/governance/manifest.toml
+  entrypoints:
+    - type: module
+      symbol: manifest
+supersedes: []
