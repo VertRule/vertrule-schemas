@@ -7,12 +7,14 @@
 mod boundary_origin;
 mod commitment;
 mod envelope;
+mod identity;
 mod projection;
 mod receipt_type;
 
 pub use boundary_origin::BoundaryOrigin;
 pub use commitment::compute_event_hash;
 pub use envelope::ReceiptEnvelope;
+pub use identity::ReceiptDigest;
 pub use projection::ProjectsToReceiptEnvelope;
 pub use receipt_type::ReceiptType;
 
@@ -23,3 +25,7 @@ mod boundary_origin_tests;
 #[cfg(test)]
 #[path = "projection_tests.rs"]
 mod projection_tests;
+
+#[cfg(test)]
+#[path = "identity_tests.rs"]
+mod identity_tests;
