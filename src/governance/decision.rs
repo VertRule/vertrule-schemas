@@ -79,23 +79,26 @@ impl std::fmt::Display for Verdict {
 
 /// Fixed schema digest for `vr.surface.decision@0.1`.
 ///
-/// Computed as `BLAKE3(b"vr.surface.decision@0.1")`. In production
-/// this will be derived from the frozen schema JSON; for alpha this
-/// deterministic placeholder is sufficient.
+/// As of Gate 2 (JCS Consumer Hardening Plan), delegates to the sealed
+/// [`SchemaDigest::for_decision_v0_1`] constructor. Byte-stable with
+/// the prior `BLAKE3(b"vr.surface.decision@0.1")` implementation.
 fn schema_decision_digest() -> DigestBytes {
-    DigestBytes::from_array(*blake3::hash(b"vr.surface.decision@0.1").as_bytes())
+    super::identity::SchemaDigest::for_decision_v0_1().as_digest_bytes()
 }
 
 /// Compute `BLAKE3(JCS(scope))` as the context digest.
+///
+/// As of Gate 2, delegates to [`ScopeDigest::from_governance_scope`].
 fn compute_scope_digest(scope: &GovernanceScope) -> Result<DigestBytes, crate::DefinitionError> {
-    let scope_bytes = serde_json::to_vec(scope).map_err(crate::jcs::JcsError::Json)?;
-    let canon = crate::jcs::to_canon_bytes_from_slice(&scope_bytes)?;
-    Ok(DigestBytes::from_array(*blake3::hash(&canon).as_bytes()))
+    super::identity::ScopeDigest::from_governance_scope(scope)?.as_digest_bytes()
 }
 
 /// Compute `BLAKE3(binding_id)` as a placeholder policy digest.
+///
+/// As of Gate 2, delegates to [`PolicyDigest::from_binding_id`]. Raw
+/// label identity — not JCS.
 fn compute_policy_digest(binding_id: &str) -> DigestBytes {
-    DigestBytes::from_array(*blake3::hash(binding_id.as_bytes()).as_bytes())
+    super::identity::PolicyDigest::from_binding_id(binding_id).as_digest_bytes()
 }
 
 impl ProjectsToReceiptEnvelope for GovernedDecisionPayload {

@@ -5,33 +5,38 @@
 //! `BLAKE3(JCS(envelope \ {event_hash}))` — all trust-bearing fields
 //! are committed. Mutating any field without recomputing `event_hash`
 //! fails verification.
+//!
+//! As of Gate 2 (JCS Consumer Hardening Plan), this function is a thin
+//! adapter over [`crate::receipts::identity::ReceiptDigest`]. The
+//! sealed `ReceiptDigest` is the canonical commitment path; this
+//! function exists to preserve the legacy `JcsError`-typed return
+//! signature for existing callers.
 
-use serde_json::Value;
-
-use crate::jcs::{to_canon_bytes_from_slice, JcsError};
-use crate::{DigestBytes, ReceiptEnvelope};
+use crate::jcs::JcsError;
+use crate::receipts::identity::ReceiptDigest;
+use crate::{DefinitionError, DigestBytes, ReceiptEnvelope};
 
 /// Compute the `event_hash` for an envelope.
 ///
 /// Hashes the entire envelope with `event_hash` excluded from the
-/// commitment input, committing every trust-bearing field.
+/// commitment input, committing every trust-bearing field. Delegates
+/// to [`ReceiptDigest::from_envelope_commitment`] — both paths produce
+/// byte-identical output (proved by `identity_tests`).
 ///
 /// # Errors
 ///
-/// Returns [`JcsError`] if JCS canonicalization fails.
+/// Returns [`JcsError`] if JCS canonicalization fails or the envelope
+/// did not serialize to a JSON object.
 pub fn compute_event_hash(envelope: &ReceiptEnvelope) -> Result<DigestBytes, JcsError> {
-    let mut value = serde_json::to_value(envelope)?;
-    let Value::Object(ref mut map) = value else {
-        return Err(JcsError::InvalidString(
-            "envelope did not serialize to a JSON object".to_string(),
-        ));
-    };
-    map.remove("event_hash");
-    let json_bytes = serde_json::to_vec(&value)?;
-    let canon_bytes = to_canon_bytes_from_slice(&json_bytes)?;
-    Ok(DigestBytes::from_array(
-        *blake3::hash(&canon_bytes).as_bytes(),
-    ))
+    let digest = ReceiptDigest::from_envelope_commitment(envelope).map_err(|e| match e {
+        DefinitionError::Jcs(jcs_err) => jcs_err,
+        DefinitionError::InvalidPayload(msg) => JcsError::InvalidString(msg),
+        other => JcsError::InvalidString(other.to_string()),
+    })?;
+    digest.as_digest_bytes().map_err(|e| match e {
+        DefinitionError::Jcs(jcs_err) => jcs_err,
+        other => JcsError::InvalidString(other.to_string()),
+    })
 }
 
 #[cfg(test)]

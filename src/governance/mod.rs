@@ -39,6 +39,7 @@ pub mod action;
 pub mod adapter;
 pub mod binding;
 pub mod decision;
+pub mod identity;
 pub mod scope;
 pub mod subject;
 
@@ -46,8 +47,13 @@ pub use action::{ActionNamespace, GovernedAction};
 pub use adapter::{AdapterOriginId, AdapterReference};
 pub use binding::{PolicyBindingRef, PolicyTemplate};
 pub use decision::{GovernedDecisionPayload, Verdict};
+pub use identity::{PolicyDigest, SchemaDigest, ScopeDigest};
 pub use scope::{GovernancePrincipalId, GovernanceScope, SurfaceInstanceId};
 pub use subject::{EntityNamespace, GovernedSubject};
+
+#[cfg(test)]
+#[path = "identity_tests.rs"]
+mod identity_tests;
 
 use crate::DefinitionError;
 
