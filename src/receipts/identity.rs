@@ -57,9 +57,7 @@ impl ReceiptDigest {
     /// fails to serialize as a JSON object. Returns
     /// [`DefinitionError::Jcs`] for any canonicalization or digest
     /// failure.
-    pub fn from_envelope_commitment(
-        envelope: &ReceiptEnvelope,
-    ) -> Result<Self, DefinitionError> {
+    pub fn from_envelope_commitment(envelope: &ReceiptEnvelope) -> Result<Self, DefinitionError> {
         let mut value = serde_json::to_value(envelope).map_err(crate::jcs::JcsError::from)?;
         let Value::Object(ref mut map) = value else {
             return Err(DefinitionError::InvalidPayload(
@@ -114,4 +112,3 @@ impl ReceiptDigest {
         self.inner
     }
 }
-

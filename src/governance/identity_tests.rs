@@ -11,7 +11,7 @@
 
 use vr_jcs::DigestStrategy;
 
-use super::identity::{PolicyDigest, ScopeDigest, SchemaDigest};
+use super::identity::{PolicyDigest, SchemaDigest, ScopeDigest};
 use crate::canonical_identity::digest_trusted_value;
 use crate::governance::scope::GovernanceScope;
 use crate::{DefinitionError, GovernancePrincipalId, SurfaceInstanceId};

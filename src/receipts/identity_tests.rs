@@ -4,8 +4,8 @@
 use super::commitment::compute_event_hash;
 use super::identity::ReceiptDigest;
 use crate::{
-    BoundaryOrigin, CanonicalPayload, DefinitionError, DigestBytes, IJsonUInt,
-    ReceiptEnvelope, ReceiptType, SchemaVersion,
+    BoundaryOrigin, CanonicalPayload, DefinitionError, DigestBytes, IJsonUInt, ReceiptEnvelope,
+    ReceiptType, SchemaVersion,
 };
 
 fn minimal_envelope_with_zero_event_hash() -> Result<ReceiptEnvelope, DefinitionError> {
@@ -30,8 +30,7 @@ fn minimal_envelope_with_zero_event_hash() -> Result<ReceiptEnvelope, Definition
 }
 
 #[test]
-fn receipt_digest_from_envelope_matches_legacy_compute_event_hash()
--> Result<(), DefinitionError> {
+fn receipt_digest_from_envelope_matches_legacy_compute_event_hash() -> Result<(), DefinitionError> {
     // The legacy `compute_event_hash` and the sealed
     // `ReceiptDigest::from_envelope_commitment` must produce identical
     // bytes for the same envelope input. Proves the sealed wrapper is
@@ -66,8 +65,7 @@ fn receipt_digest_bytes_length_is_32() -> Result<(), DefinitionError> {
 }
 
 #[test]
-fn receipt_digest_into_canonical_digest_preserves_algorithm()
--> Result<(), DefinitionError> {
+fn receipt_digest_into_canonical_digest_preserves_algorithm() -> Result<(), DefinitionError> {
     let envelope = minimal_envelope_with_zero_event_hash()?;
     let sealed = ReceiptDigest::from_envelope_commitment(&envelope)?;
     let alg_name_before = sealed.algorithm_name();

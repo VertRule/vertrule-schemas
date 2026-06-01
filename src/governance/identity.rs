@@ -48,9 +48,7 @@ impl ScopeDigest {
     /// # Errors
     ///
     /// Returns [`DefinitionError::Jcs`] if canonicalization fails.
-    pub fn from_governance_scope(
-        scope: &GovernanceScope,
-    ) -> Result<Self, DefinitionError> {
+    pub fn from_governance_scope(scope: &GovernanceScope) -> Result<Self, DefinitionError> {
         let value = serde_json::to_value(scope).map_err(crate::jcs::JcsError::from)?;
         let inner = digest_trusted_value(&value, &DigestStrategy::blake3_untagged())?;
         Ok(Self { inner })
