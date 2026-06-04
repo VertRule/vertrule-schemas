@@ -104,7 +104,7 @@ fn to_canon_string_preserves_array_order_and_recurses_objects() -> Result<(), Jc
 #[test]
 fn to_canon_bytes_struct() -> Result<(), JcsError> {
     #[derive(Serialize)]
-    struct Receipt {
+    struct SampleRecord {
         id: u64,
         data: BTreeMap<String, i32>,
     }
@@ -114,7 +114,7 @@ fn to_canon_bytes_struct() -> Result<(), JcsError> {
     data.insert("apple".to_string(), 1);
     data.insert("mango".to_string(), 2);
 
-    let receipt = Receipt { id: 42, data };
+    let receipt = SampleRecord { id: 42, data };
     let json = serde_json::to_vec(&receipt)?;
     let bytes = to_canon_bytes_from_slice(&json)?;
     let string = String::from_utf8(bytes)
