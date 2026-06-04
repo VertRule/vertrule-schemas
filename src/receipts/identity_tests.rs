@@ -21,6 +21,7 @@ fn minimal_envelope_with_zero_event_hash() -> Result<ReceiptEnvelope, Definition
         policy_digest: zero,
         logical_time,
         event_hash: zero,
+        event_hash_profile: None,
         parent_id: None,
         boundary_origin: Some(BoundaryOrigin::Engine),
         digest_algorithm: None,

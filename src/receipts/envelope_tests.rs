@@ -25,6 +25,7 @@ fn serde_round_trip_minimal_envelope() -> Result<(), anyhow::Error> {
         parent_id: None,
         boundary_origin: None,
         digest_algorithm: None,
+        event_hash_profile: None,
         canonicalization: None,
         payload: payload(serde_json::json!({"hello": "world"}))?,
     };
@@ -48,6 +49,7 @@ fn optional_fields_serialize_only_when_present() -> Result<(), anyhow::Error> {
         parent_id: None,
         boundary_origin: None,
         digest_algorithm: None,
+        event_hash_profile: None,
         canonicalization: None,
         payload: payload(serde_json::json!({"k": "v"}))?,
     };
@@ -60,6 +62,7 @@ fn optional_fields_serialize_only_when_present() -> Result<(), anyhow::Error> {
     assert!(!object.contains_key("boundary_origin"));
     assert!(!object.contains_key("digest_algorithm"));
     assert!(!object.contains_key("canonicalization"));
+    assert!(!object.contains_key("event_hash_profile"));
     Ok(())
 }
 
@@ -73,6 +76,7 @@ fn algorithm_markers_round_trip_when_present() -> Result<(), anyhow::Error> {
         policy_digest: digest(3),
         logical_time: IJsonUInt::new(9)?,
         event_hash: digest(4),
+        event_hash_profile: None,
         parent_id: Some(digest(5)),
         boundary_origin: Some(crate::BoundaryOrigin::Training),
         digest_algorithm: Some(SchemaVersion::V1.digest_algorithm().to_string()),
@@ -84,6 +88,86 @@ fn algorithm_markers_round_trip_when_present() -> Result<(), anyhow::Error> {
     let parsed: ReceiptEnvelope = serde_json::from_str(&json)?;
     assert_eq!(parsed, envelope);
     Ok(())
+}
+
+#[test]
+fn event_hash_profile_serializes_with_canonical_id() -> Result<(), anyhow::Error> {
+    let envelope = ReceiptEnvelope {
+        envelope_version: SchemaVersion::V1,
+        receipt_type: ReceiptType::Event,
+        context_digest: digest(1),
+        schema_digest: digest(2),
+        policy_digest: digest(3),
+        logical_time: IJsonUInt::new(5)?,
+        event_hash: digest(4),
+        event_hash_profile: Some(crate::EventHashProfileId::RuntimePortEventPreimageV1),
+        parent_id: None,
+        boundary_origin: None,
+        digest_algorithm: None,
+        canonicalization: None,
+        payload: payload(serde_json::json!({"k": "v"}))?,
+    };
+
+    let value = serde_json::to_value(&envelope)?;
+    assert_eq!(
+        value["event_hash_profile"],
+        serde_json::json!("runtime_port_event_preimage_v1")
+    );
+
+    let parsed: ReceiptEnvelope = serde_json::from_str(&serde_json::to_string(&envelope)?)?;
+    assert_eq!(parsed, envelope);
+    Ok(())
+}
+
+#[test]
+fn legacy_envelope_without_profile_deserializes_to_none() -> Result<(), anyhow::Error> {
+    // A receipt minted before the discriminator existed must still parse,
+    // and must not silently acquire a profile.
+    let json = format!(
+        r#"{{
+            "envelope_version":1,
+            "receipt_type":"governance",
+            "context_digest":"{}",
+            "schema_digest":"{}",
+            "policy_digest":"{}",
+            "logical_time":7,
+            "event_hash":"{}",
+            "payload":{{"hello":"world"}}
+        }}"#,
+        digest(1),
+        digest(2),
+        digest(3),
+        digest(4)
+    );
+
+    let parsed: ReceiptEnvelope = serde_json::from_str(&json)?;
+    assert!(parsed.event_hash_profile.is_none());
+    Ok(())
+}
+
+#[test]
+fn rejects_unknown_event_hash_profile() {
+    // The discriminator is a closed enum: an inadmissible profile id fails to
+    // deserialize (fail-closed at the type layer).
+    let json = format!(
+        r#"{{
+            "envelope_version":1,
+            "receipt_type":"event",
+            "context_digest":"{}",
+            "schema_digest":"{}",
+            "policy_digest":"{}",
+            "logical_time":7,
+            "event_hash":"{}",
+            "event_hash_profile":"sek_receipt_digest_v1",
+            "payload":{{"hello":"world"}}
+        }}"#,
+        digest(1),
+        digest(2),
+        digest(3),
+        digest(4)
+    );
+
+    assert!(serde_json::from_str::<ReceiptEnvelope>(&json).is_err());
 }
 
 #[test]

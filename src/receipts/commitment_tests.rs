@@ -19,6 +19,7 @@ fn make_envelope() -> Result<ReceiptEnvelope, DefinitionError> {
         policy_digest: zero_digest(),
         logical_time: IJsonUInt::new(1)?,
         event_hash: zero_digest(), // placeholder
+        event_hash_profile: None,
         parent_id: None,
         boundary_origin: Some(BoundaryOrigin::Engine),
         digest_algorithm: None,
@@ -182,6 +183,7 @@ fn changing_payload_changes_hash() -> Result<(), DefinitionError> {
         policy_digest: zero_digest(),
         logical_time: IJsonUInt::new(1)?,
         event_hash: zero_digest(),
+        event_hash_profile: None,
         parent_id: None,
         boundary_origin: Some(BoundaryOrigin::Engine),
         digest_algorithm: None,

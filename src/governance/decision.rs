@@ -118,6 +118,7 @@ impl ProjectsToReceiptEnvelope for GovernedDecisionPayload {
             policy_digest,
             logical_time: self.logical_time,
             event_hash: DigestBytes::from_array([0u8; 32]),
+            event_hash_profile: None,
             parent_id: self.parent_id,
             boundary_origin: Some(BoundaryOrigin::Governance),
             digest_algorithm: Some(SchemaVersion::V1.digest_algorithm().to_string()),

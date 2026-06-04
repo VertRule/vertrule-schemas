@@ -13,7 +13,7 @@ mod receipt_type;
 
 pub use boundary_origin::BoundaryOrigin;
 pub use commitment::compute_event_hash;
-pub use envelope::ReceiptEnvelope;
+pub use envelope::{EventHashProfileId, ReceiptEnvelope};
 pub use identity::ReceiptDigest;
 pub use projection::ProjectsToReceiptEnvelope;
 pub use receipt_type::ReceiptType;

@@ -19,6 +19,7 @@ fn test_envelope(payload_json: serde_json::Value) -> Result<ReceiptEnvelope, Def
         policy_digest: zero_digest,
         logical_time,
         event_hash: zero_digest, // placeholder
+        event_hash_profile: None,
         parent_id: None,
         boundary_origin: Some(BoundaryOrigin::Engine),
         digest_algorithm: None,
