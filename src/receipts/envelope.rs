@@ -113,7 +113,7 @@ pub enum EventHashProfileId {
     /// `event_hash = BLAKE3(JCS(envelope \ {event_hash}))`.
     #[serde(rename = "constitutional_envelope_v1")]
     ConstitutionalEnvelopeV1,
-    /// `runtime_port_event_preimage_v1` (ADR-016 / DEC-3 Law 1): RuntimePort
+    /// `runtime_port_event_preimage_v1` (ADR-016 / DEC-3 Law 1): `RuntimePort`
     /// typed preimage, `event_hash = BLAKE3(JCS(RuntimePortEventHashPreimageV1))`.
     #[serde(rename = "runtime_port_event_preimage_v1")]
     RuntimePortEventPreimageV1,
