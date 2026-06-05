@@ -141,7 +141,7 @@ fn project_produces_valid_envelope() -> R {
     let decision = sample_decision(Verdict::Allow)?;
     let envelope = decision.project()?;
     assert_eq!(envelope.receipt_type.to_string(), "governance");
-    assert_eq!(envelope.logical_time.get(), 1);
+    assert_eq!(envelope.logical_time, 1);
     assert!(envelope.parent_id.is_none());
     assert_ne!(envelope.event_hash, DigestBytes::from_array([0u8; 32]));
     Ok(())
@@ -184,7 +184,7 @@ fn project_deny_verdict_succeeds() -> R {
     decision.reasons = vec!["release freeze".to_string()];
     decision.logical_time = IJsonUInt::new(42)?;
     let envelope = decision.project()?;
-    assert_eq!(envelope.logical_time.get(), 42);
+    assert_eq!(envelope.logical_time, 42);
     Ok(())
 }
 

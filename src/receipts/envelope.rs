@@ -6,7 +6,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::{BoundaryOrigin, CanonicalPayload, DigestBytes, IJsonUInt};
+use crate::{BoundaryOrigin, CanonicalPayload, DigestBytes};
 use crate::{ReceiptType, SchemaVersion};
 
 /// Public receipt envelope shared by producers and verifiers.
@@ -35,7 +35,13 @@ pub struct ReceiptEnvelope {
     pub policy_digest: DigestBytes,
 
     /// Monotonic logical clock value.
-    pub logical_time: IJsonUInt,
+    ///
+    /// Canonical wire form is a decimal string per
+    /// `VR-CANONICAL-U64-STRING-POLICY-V1` (JCS/I-JSON reject bare integers
+    /// above `2^53 - 1`); deserialization also accepts a bare number for
+    /// backward tolerance.
+    #[serde(with = "canonical_u64")]
+    pub logical_time: u64,
 
     /// Event-identity digest. Its preimage law is selected by the
     /// receipt's law profile (ADR-029 Receipt Law Profile Matrix), not by
@@ -117,6 +123,65 @@ pub enum EventHashProfileId {
     /// typed preimage, `event_hash = BLAKE3(JCS(RuntimePortEventHashPreimageV1))`.
     #[serde(rename = "runtime_port_event_preimage_v1")]
     RuntimePortEventPreimageV1,
+}
+
+/// Canonical decimal-string serde for the digest-critical `logical_time`
+/// field (`VR-CANONICAL-U64-STRING-POLICY-V1`).
+///
+/// Mirrors the byte representation of `vr_identity::canonical_u64_serde`,
+/// kept local so this published crate stays free of runtime-internal
+/// dependencies. Serializes as a decimal string; deserializes from either a
+/// string (canonical) or a bare number (backward-tolerant).
+mod canonical_u64 {
+    use serde::de::{self, Visitor};
+
+    // serde's `serialize_with` mandates the `&T` receiver shape.
+    #[allow(clippy::trivially_copy_pass_by_ref)]
+    pub(super) fn serialize<S: serde::Serializer>(
+        value: &u64,
+        serializer: S,
+    ) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(&value.to_string())
+    }
+
+    pub(super) fn deserialize<'de, D: serde::Deserializer<'de>>(
+        deserializer: D,
+    ) -> Result<u64, D::Error> {
+        struct CanonicalU64Visitor;
+
+        impl Visitor<'_> for CanonicalU64Visitor {
+            type Value = u64;
+
+            fn expecting(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+                f.write_str("a u64 as a decimal string or number")
+            }
+
+            fn visit_u64<E: de::Error>(self, v: u64) -> Result<u64, E> {
+                Ok(v)
+            }
+
+            fn visit_i64<E: de::Error>(self, v: i64) -> Result<u64, E> {
+                u64::try_from(v).map_err(|_| E::custom("negative integers are not valid u64"))
+            }
+
+            fn visit_str<E: de::Error>(self, v: &str) -> Result<u64, E> {
+                v.parse::<u64>().map_err(E::custom)
+            }
+
+            fn visit_string<E: de::Error>(self, v: String) -> Result<u64, E> {
+                self.visit_str(&v)
+            }
+        }
+
+        // Human-readable formats (JSON) accept both string and number via
+        // `deserialize_any`; non-self-describing binary formats use
+        // `deserialize_str`.
+        if deserializer.is_human_readable() {
+            deserializer.deserialize_any(CanonicalU64Visitor)
+        } else {
+            deserializer.deserialize_str(CanonicalU64Visitor)
+        }
+    }
 }
 
 #[cfg(test)]

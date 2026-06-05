@@ -4,14 +4,14 @@
 use super::commitment::compute_event_hash;
 use super::identity::ReceiptDigest;
 use crate::{
-    BoundaryOrigin, CanonicalPayload, DefinitionError, DigestBytes, IJsonUInt, ReceiptEnvelope,
-    ReceiptType, SchemaVersion,
+    BoundaryOrigin, CanonicalPayload, DefinitionError, DigestBytes, ReceiptEnvelope, ReceiptType,
+    SchemaVersion,
 };
 
 fn minimal_envelope_with_zero_event_hash() -> Result<ReceiptEnvelope, DefinitionError> {
     let payload = CanonicalPayload::new(serde_json::json!({"value": 42}))?;
     let zero = DigestBytes::from_array([0u8; 32]);
-    let logical_time = IJsonUInt::new(1)?;
+    let logical_time: u64 = 1;
 
     Ok(ReceiptEnvelope {
         envelope_version: SchemaVersion::V1,

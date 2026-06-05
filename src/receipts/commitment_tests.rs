@@ -1,7 +1,7 @@
 use super::compute_event_hash;
 use crate::{
-    BoundaryOrigin, CanonicalPayload, DefinitionError, DigestBytes, IJsonUInt, ReceiptEnvelope,
-    ReceiptType, SchemaVersion,
+    BoundaryOrigin, CanonicalPayload, DefinitionError, DigestBytes, ReceiptEnvelope, ReceiptType,
+    SchemaVersion,
 };
 
 fn zero_digest() -> DigestBytes {
@@ -17,7 +17,7 @@ fn make_envelope() -> Result<ReceiptEnvelope, DefinitionError> {
         context_digest: zero_digest(),
         schema_digest: zero_digest(),
         policy_digest: zero_digest(),
-        logical_time: IJsonUInt::new(1)?,
+        logical_time: 1,
         event_hash: zero_digest(), // placeholder
         event_hash_profile: None,
         parent_id: None,
@@ -54,7 +54,7 @@ fn deterministic() -> Result<(), DefinitionError> {
 /// as a regression.
 #[test]
 fn known_answer_event_hash() -> Result<(), DefinitionError> {
-    const EXPECTED: &str = "afb004776f6af36416ea0c1f0d5de9bf87b7d54dd02aea40a19fbdfb24967ea7";
+    const EXPECTED: &str = "2b62926780e07ca5117c3befb3bf5064a682a6c8cff6389e4f2aa80fc9939cf2";
     let envelope = make_envelope()?;
     assert_eq!(
         envelope.event_hash.to_hex(),
@@ -122,7 +122,7 @@ fn tamper_policy_digest() -> Result<(), DefinitionError> {
 fn tamper_logical_time() -> Result<(), DefinitionError> {
     let mut envelope = make_envelope()?;
     let original_hash = envelope.event_hash;
-    envelope.logical_time = IJsonUInt::new(9999)?;
+    envelope.logical_time = 9999;
     let recomputed = compute_event_hash(&envelope).map_err(DefinitionError::Jcs)?;
     assert_ne!(
         original_hash, recomputed,
@@ -181,7 +181,7 @@ fn changing_payload_changes_hash() -> Result<(), DefinitionError> {
         context_digest: zero_digest(),
         schema_digest: zero_digest(),
         policy_digest: zero_digest(),
-        logical_time: IJsonUInt::new(1)?,
+        logical_time: 1,
         event_hash: zero_digest(),
         event_hash_profile: None,
         parent_id: None,

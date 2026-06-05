@@ -1,15 +1,15 @@
 use super::commitment::compute_event_hash;
 use super::projection::ProjectsToReceiptEnvelope;
 use crate::{
-    BoundaryOrigin, CanonicalPayload, DefinitionError, DigestBytes, IJsonUInt, ReceiptEnvelope,
-    ReceiptType, SchemaVersion,
+    BoundaryOrigin, CanonicalPayload, DefinitionError, DigestBytes, ReceiptEnvelope, ReceiptType,
+    SchemaVersion,
 };
 
 /// Build a minimal valid envelope for testing.
 fn test_envelope(payload_json: serde_json::Value) -> Result<ReceiptEnvelope, DefinitionError> {
     let payload = CanonicalPayload::new(payload_json)?;
     let zero_digest = DigestBytes::from_array([0u8; 32]);
-    let logical_time = IJsonUInt::new(1)?;
+    let logical_time: u64 = 1;
 
     let mut envelope = ReceiptEnvelope {
         envelope_version: SchemaVersion::V1,

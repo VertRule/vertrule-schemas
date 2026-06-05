@@ -116,7 +116,7 @@ impl ProjectsToReceiptEnvelope for GovernedDecisionPayload {
             context_digest,
             schema_digest,
             policy_digest,
-            logical_time: self.logical_time,
+            logical_time: self.logical_time.into(),
             event_hash: DigestBytes::from_array([0u8; 32]),
             event_hash_profile: None,
             parent_id: self.parent_id,

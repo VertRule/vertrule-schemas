@@ -1,8 +1,6 @@
 //! Tests for `ReceiptEnvelope`.
 
-use crate::{
-    CanonicalPayload, DigestBytes, IJsonUInt, ReceiptEnvelope, ReceiptType, SchemaVersion,
-};
+use crate::{CanonicalPayload, DigestBytes, ReceiptEnvelope, ReceiptType, SchemaVersion};
 
 fn digest(fill: u8) -> DigestBytes {
     DigestBytes::from_array([fill; 32])
@@ -20,7 +18,7 @@ fn serde_round_trip_minimal_envelope() -> Result<(), anyhow::Error> {
         context_digest: digest(1),
         schema_digest: digest(2),
         policy_digest: digest(3),
-        logical_time: IJsonUInt::new(7)?,
+        logical_time: 7,
         event_hash: digest(4),
         parent_id: None,
         boundary_origin: None,
@@ -44,7 +42,7 @@ fn optional_fields_serialize_only_when_present() -> Result<(), anyhow::Error> {
         context_digest: digest(1),
         schema_digest: digest(2),
         policy_digest: digest(3),
-        logical_time: IJsonUInt::new(1)?,
+        logical_time: 1,
         event_hash: digest(4),
         parent_id: None,
         boundary_origin: None,
@@ -74,7 +72,7 @@ fn algorithm_markers_round_trip_when_present() -> Result<(), anyhow::Error> {
         context_digest: digest(1),
         schema_digest: digest(2),
         policy_digest: digest(3),
-        logical_time: IJsonUInt::new(9)?,
+        logical_time: 9,
         event_hash: digest(4),
         event_hash_profile: None,
         parent_id: Some(digest(5)),
@@ -98,7 +96,7 @@ fn event_hash_profile_serializes_with_canonical_id() -> Result<(), anyhow::Error
         context_digest: digest(1),
         schema_digest: digest(2),
         policy_digest: digest(3),
-        logical_time: IJsonUInt::new(5)?,
+        logical_time: 5,
         event_hash: digest(4),
         event_hash_profile: Some(crate::EventHashProfileId::RuntimePortEventPreimageV1),
         parent_id: None,
@@ -171,7 +169,10 @@ fn rejects_unknown_event_hash_profile() {
 }
 
 #[test]
-fn rejects_logical_time_outside_i_json_range() {
+fn logical_time_spans_full_u64_range_as_canonical_string() -> Result<(), anyhow::Error> {
+    // Canonical wire form is a decimal string (VR-CANONICAL-U64-STRING-POLICY-V1),
+    // so logical_time covers the full u64 range — past the I-JSON 2^53 cap that the
+    // prior numeric encoding could not represent. u64::MAX is the upper boundary.
     let json = format!(
         r#"{{
             "envelope_version":1,
@@ -179,7 +180,7 @@ fn rejects_logical_time_outside_i_json_range() {
             "context_digest":"{}",
             "schema_digest":"{}",
             "policy_digest":"{}",
-            "logical_time":9007199254740992,
+            "logical_time":"18446744073709551615",
             "event_hash":"{}",
             "payload":{{"hello":"world"}}
         }}"#,
@@ -189,11 +190,13 @@ fn rejects_logical_time_outside_i_json_range() {
         digest(4)
     );
 
-    let result = serde_json::from_str::<ReceiptEnvelope>(&json);
-    assert!(result.is_err());
-    if let Err(err) = result {
-        assert!(err.to_string().contains("invalid I-JSON number"));
-    }
+    let parsed: ReceiptEnvelope = serde_json::from_str(&json)?;
+    assert_eq!(parsed.logical_time, u64::MAX);
+
+    // Re-serialization emits the canonical decimal-string form.
+    let reserialized = serde_json::to_string(&parsed)?;
+    assert!(reserialized.contains(r#""logical_time":"18446744073709551615""#));
+    Ok(())
 }
 
 #[test]
