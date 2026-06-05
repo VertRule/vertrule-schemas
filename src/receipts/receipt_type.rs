@@ -27,6 +27,12 @@ pub enum ReceiptType {
     Projection,
     /// Training receipt.
     Training,
+    /// SEK-0 lifecycle: a bound operation was applied within a sealed run.
+    Operation,
+    /// SEK-0 lifecycle: a sealed run reached finalization.
+    Finalization,
+    /// SEK-0 lifecycle: a sealed run was aborted.
+    Abort,
 }
 
 impl std::fmt::Display for ReceiptType {
@@ -39,6 +45,9 @@ impl std::fmt::Display for ReceiptType {
             Self::Adapter => f.write_str("adapter"),
             Self::Projection => f.write_str("projection"),
             Self::Training => f.write_str("training"),
+            Self::Operation => f.write_str("operation"),
+            Self::Finalization => f.write_str("finalization"),
+            Self::Abort => f.write_str("abort"),
         }
     }
 }

@@ -12,6 +12,9 @@ fn serde_round_trip_all_variants() -> Result<(), anyhow::Error> {
         (ReceiptType::Adapter, "\"adapter\""),
         (ReceiptType::Projection, "\"projection\""),
         (ReceiptType::Training, "\"training\""),
+        (ReceiptType::Operation, "\"operation\""),
+        (ReceiptType::Finalization, "\"finalization\""),
+        (ReceiptType::Abort, "\"abort\""),
     ];
     for (variant, expected_json) in variants {
         let json = serde_json::to_string(&variant)?;
