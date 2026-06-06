@@ -10,6 +10,7 @@ mod envelope;
 mod identity;
 mod projection;
 mod receipt_type;
+mod training_receipt;
 
 pub use boundary_origin::BoundaryOrigin;
 pub use commitment::compute_event_hash;
@@ -17,6 +18,7 @@ pub use envelope::{EventHashProfileId, ReceiptEnvelope};
 pub use identity::ReceiptDigest;
 pub use projection::ProjectsToReceiptEnvelope;
 pub use receipt_type::ReceiptType;
+pub use training_receipt::TrainingReceipt;
 
 #[cfg(test)]
 #[path = "boundary_origin_tests.rs"]
