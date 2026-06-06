@@ -74,10 +74,12 @@
 // ── Module hierarchy ────────────────────────────────────────────────
 
 pub(crate) mod canonical_identity;
+pub mod bundle;
 pub mod common;
 pub mod context;
 pub mod governance;
 pub(crate) mod jcs;
+pub mod manifest;
 pub mod mgs;
 pub mod mri;
 pub mod pack;
@@ -85,6 +87,7 @@ pub mod receipts;
 
 // ── Ergonomic re-exports ────────────────────────────────────────────
 
+pub use bundle::BundleMode;
 pub use common::{
     CanonicalPayload, ContentIdentityDigest, ContextDigest, DefinitionError, DigestBytes,
     IJsonUInt, PayloadDigest, PolicyDigest, PolicyId, ReceiptDigest, SchemaDigest, SchemaId,

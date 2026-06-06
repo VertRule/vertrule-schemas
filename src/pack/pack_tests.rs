@@ -1,10 +1,10 @@
 //! Golden serde/JCS tests for the pack-index DTO surface.
 
 use crate::pack::{
-    BundleMode, PackBundleId, PackBundleRef, PackIndex, SignedPackIndex, PACK_INDEX_SCHEMA,
+    PackBundleId, PackBundleRef, PackIndex, SignedPackIndex, PACK_INDEX_SCHEMA,
     PACK_INDEX_SIG_DOMAIN, PACK_INDEX_VERSION,
 };
-use crate::{DigestBytes, SchemaKeyId, SchemaPublicKeyHex};
+use crate::{BundleMode, DigestBytes, SchemaKeyId, SchemaPublicKeyHex};
 
 fn digest(fill: u8) -> DigestBytes {
     DigestBytes::from_array([fill; 32])

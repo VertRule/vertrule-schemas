@@ -13,7 +13,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::{DigestBytes, SchemaKeyId, SchemaPublicKeyHex};
+use crate::{BundleMode, DigestBytes, SchemaKeyId, SchemaPublicKeyHex};
 
 /// Schema identifier for pack indexes.
 pub const PACK_INDEX_SCHEMA: &str = "vertrule.pack_index.v1";
@@ -29,23 +29,6 @@ pub const PACK_INDEX_VERSION: &str = "1.0";
 /// break verification of all existing signed pack indexes. This crate performs
 /// no signing; it only publishes the constant.
 pub const PACK_INDEX_SIG_DOMAIN: &str = "VR-PackIndexSig|v1|";
-
-/// How model weights are handled in a bundle, determining verification strategy.
-///
-/// Shared schema enum between pack and manifest surfaces. Wire form is
-/// `snake_case`.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-#[non_exhaustive]
-pub enum BundleMode {
-    /// Weights included in the package; fully replayable.
-    #[default]
-    ReplayableIncluded,
-    /// Weights external; verifier must supply them.
-    ReplayableExternal,
-    /// No replay possible; verify receipts plus provider attestation.
-    AttestedExternal,
-}
 
 /// Bundle identifier within a verification pack.
 ///
