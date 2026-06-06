@@ -11,6 +11,7 @@ mod error;
 mod i_json_uint;
 mod ids;
 mod schema_id;
+mod schema_identity;
 mod semantic_digests;
 mod versions;
 
@@ -20,6 +21,10 @@ pub use error::DefinitionError;
 pub use i_json_uint::IJsonUInt;
 pub use ids::PolicyId;
 pub use schema_id::SchemaId;
+pub use schema_identity::{
+    SchemaKeyId, SchemaModelId, SchemaPolicyPackId, SchemaPublicKeyHex, SchemaReceiptId,
+    SchemaRunId, SchemaSuiteId,
+};
 pub use semantic_digests::{
     ContentIdentityDigest, ContextDigest, PayloadDigest, PolicyDigest, ReceiptDigest, SchemaDigest,
 };

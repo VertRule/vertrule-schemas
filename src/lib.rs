@@ -87,7 +87,8 @@ pub mod receipts;
 pub use common::{
     CanonicalPayload, ContentIdentityDigest, ContextDigest, DefinitionError, DigestBytes,
     IJsonUInt, PayloadDigest, PolicyDigest, PolicyId, ReceiptDigest, SchemaDigest, SchemaId,
-    SchemaVersion,
+    SchemaKeyId, SchemaModelId, SchemaPolicyPackId, SchemaPublicKeyHex, SchemaReceiptId,
+    SchemaRunId, SchemaSuiteId, SchemaVersion,
 };
 pub use context::RBHInvariant;
 pub use governance::{
