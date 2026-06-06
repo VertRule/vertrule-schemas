@@ -80,6 +80,7 @@ pub mod governance;
 pub(crate) mod jcs;
 pub mod mgs;
 pub mod mri;
+pub mod pack;
 pub mod receipts;
 
 // ── Ergonomic re-exports ────────────────────────────────────────────
