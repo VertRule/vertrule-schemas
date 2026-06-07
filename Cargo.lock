@@ -297,6 +297,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "vr-receipt-identity"
+version = "0.1.0"
+dependencies = [
+ "hex",
+ "serde_json",
+ "thiserror",
+ "vertrule-schemas",
+ "vr-jcs",
+]
+
+[[package]]
 name = "winnow"
 version = "0.7.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"

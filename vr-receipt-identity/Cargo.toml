@@ -1,0 +1,35 @@
+[package]
+name = "vr-receipt-identity"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+description = "Receipt-identity law: canonical commitment construction for VertRule receipt envelopes"
+repository = "https://github.com/VertRule/vertrule-schemas"
+keywords = ["receipts", "commitment", "canonical-json", "blake3", "deterministic"]
+categories = ["cryptography", "data-structures"]
+
+[dependencies]
+serde_json = { version = "1", features = ["arbitrary_precision"] }
+thiserror = "2"
+vertrule-schemas = { path = ".." }
+vr-jcs = { version = "0.4", path = "../../vr-jcs" }
+
+[dev-dependencies]
+hex = "0.4"
+
+[lints.rust]
+unsafe_code = "deny"
+unused_extern_crates = "deny"
+unreachable_pub = "deny"
+missing_docs = "warn"
+
+[lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+nursery = { level = "warn", priority = -1 }
+float_arithmetic = "deny"
+unwrap_used = { level = "deny", priority = 1 }
+expect_used = { level = "deny", priority = 1 }
+dbg_macro = "deny"
+todo = "deny"
+use_self = "warn"
+must_use_candidate = "warn"

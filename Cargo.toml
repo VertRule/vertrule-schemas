@@ -1,3 +1,11 @@
+# This repo is a 2-crate workspace: the root package `vertrule-schemas`
+# (shape only) and the member `vr-receipt-identity` (receipt-identity law).
+# Load-bearing invariant: the `vertrule-schemas` crate MUST NOT depend on
+# `vr-receipt-identity` (the dependency direction is one-way).
+[workspace]
+members = ["vr-receipt-identity"]
+resolver = "2"
+
 [package]
 name = "vertrule-schemas"
 version = "0.4.1"
