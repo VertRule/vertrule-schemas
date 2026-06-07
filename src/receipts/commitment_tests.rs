@@ -170,6 +170,62 @@ fn tamper_payload() -> Result<(), DefinitionError> {
     Ok(())
 }
 
+// ── Layer A G2: blake3_untagged helper cross-copy equivalence ──────────
+//
+// The schemas copy of the sealed canonical-identity helper
+// (`canonical_identity::digest_trusted_value`) must produce the committed
+// golden digests. Companion tests in `vertrule-verifier` (SidecarDigest)
+// and `vertrule-crypto` (CanonicalReceiptDigest) pin the same goldens, so
+// all three copies are byte-equivalent. Source of truth:
+// docs/audits/junk-drawer-inventory/fixtures/receipt-identity/goldens.json
+#[test]
+fn g2_blake3_untagged_helper_equivalence() -> Result<(), DefinitionError> {
+    use crate::canonical_identity::digest_trusted_value;
+    use vr_jcs::{to_canon_digest_with, DigestStrategy};
+
+    let strategy = DigestStrategy::blake3_untagged();
+    let cases: [(serde_json::Value, &str); 5] = [
+        (
+            serde_json::json!({"a": 1, "b": 2}),
+            "8e80439b77ac62d4194499edd46684c479da3aa1ac80dd5511468efae049166e",
+        ),
+        (
+            // unsorted keys must equal v_plain — proves JCS key ordering
+            serde_json::json!({"b": 2, "a": 1}),
+            "8e80439b77ac62d4194499edd46684c479da3aa1ac80dd5511468efae049166e",
+        ),
+        (
+            serde_json::json!({"z": [3, 1, 2], "a": {"k": "v"}}),
+            "5ef47de6cdb1c8586547526ee1fb7726321452f65ce50ba1abef1d3bf650a08c",
+        ),
+        (
+            serde_json::json!({"n": 9_007_199_254_740_991_i64}),
+            "6f3adc03614205e4ef7d378c51d584a691c60baa2abcdfea5325018261a28fb6",
+        ),
+        (
+            serde_json::json!({"s": "café\n\"q\""}),
+            "770f998755f9ac91974ea4dc2e23d34144f5cd0ad3238c3403a0a1e797c26a3a",
+        ),
+    ];
+
+    for (value, expected) in &cases {
+        let helper = digest_trusted_value(value, &strategy)?;
+        assert_eq!(
+            hex::encode(&helper.bytes),
+            *expected,
+            "schemas digest_trusted_value drifted from golden"
+        );
+        // The committed golden IS the live vr-jcs reference output.
+        let reference = to_canon_digest_with(value, &strategy).map_err(DefinitionError::Jcs)?;
+        assert_eq!(
+            hex::encode(&reference.bytes),
+            *expected,
+            "vr-jcs reference drifted from golden"
+        );
+    }
+    Ok(())
+}
+
 #[test]
 fn changing_payload_changes_hash() -> Result<(), DefinitionError> {
     let e1 = make_envelope()?;
