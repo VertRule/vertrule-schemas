@@ -34,11 +34,26 @@ fn constants_are_frozen() {
 
 #[test]
 fn enum_wire_forms() -> Result<(), anyhow::Error> {
-    assert_eq!(serde_json::to_string(&RoundingMode::TowardZero)?, "\"toward_zero\"");
-    assert_eq!(serde_json::to_string(&RoundingMode::TowardNegInf)?, "\"toward_neg_inf\"");
-    assert_eq!(serde_json::to_string(&RoundingMode::Nearest)?, "\"nearest\"");
-    assert_eq!(serde_json::to_string(&CaptureMode::DigestsOnly)?, "\"digests_only\"");
-    assert_eq!(serde_json::to_string(&CaptureMode::FullCapture)?, "\"full_capture\"");
+    assert_eq!(
+        serde_json::to_string(&RoundingMode::TowardZero)?,
+        "\"toward_zero\""
+    );
+    assert_eq!(
+        serde_json::to_string(&RoundingMode::TowardNegInf)?,
+        "\"toward_neg_inf\""
+    );
+    assert_eq!(
+        serde_json::to_string(&RoundingMode::Nearest)?,
+        "\"nearest\""
+    );
+    assert_eq!(
+        serde_json::to_string(&CaptureMode::DigestsOnly)?,
+        "\"digests_only\""
+    );
+    assert_eq!(
+        serde_json::to_string(&CaptureMode::FullCapture)?,
+        "\"full_capture\""
+    );
     assert_eq!(RoundingMode::default(), RoundingMode::TowardZero);
     assert_eq!(CaptureMode::default(), CaptureMode::DigestsOnly);
     Ok(())
@@ -61,7 +76,11 @@ fn model_ref_round_trip() -> Result<(), anyhow::Error> {
     let m = ModelRef::new(
         SchemaModelId::new("Qwen2"),
         "huggingface:Qwen/Qwen2@abc".to_string(),
-        vec![ModelFileRef::new("w.safetensors".to_string(), digest(0x44), 1024)],
+        vec![ModelFileRef::new(
+            "w.safetensors".to_string(),
+            digest(0x44),
+            1024,
+        )],
     );
     let back: ModelRef = serde_json::from_str(&serde_json::to_string(&m)?)?;
     assert_eq!(back, m);
@@ -152,7 +171,11 @@ fn run_manifest_entry_golden() -> Result<(), anyhow::Error> {
 
 #[test]
 fn suite_and_policy_entries_round_trip() -> Result<(), anyhow::Error> {
-    let s = SuiteManifestEntry::new(SchemaSuiteId::new("demo"), "suites/demo".to_string(), digest(1));
+    let s = SuiteManifestEntry::new(
+        SchemaSuiteId::new("demo"),
+        "suites/demo".to_string(),
+        digest(1),
+    );
     let sb: SuiteManifestEntry = serde_json::from_str(&serde_json::to_string(&s)?)?;
     assert_eq!(sb, s);
 

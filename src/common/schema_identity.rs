@@ -31,16 +31,7 @@ macro_rules! schema_text_carrier {
         /// Wire form: a transparent JSON string. Pure transport carrier — no
         /// grammar is enforced (see module docs).
         #[derive(
-            Debug,
-            Clone,
-            Default,
-            PartialEq,
-            Eq,
-            Hash,
-            PartialOrd,
-            Ord,
-            Serialize,
-            Deserialize,
+            Debug, Clone, Default, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize,
         )]
         #[serde(transparent)]
         pub struct $name(String);
@@ -73,7 +64,10 @@ schema_text_carrier!(
     SchemaPolicyPackId,
     "Policy-pack identifier (schema wire carrier)."
 );
-schema_text_carrier!(SchemaSuiteId, "Prompt-suite identifier (schema wire carrier).");
+schema_text_carrier!(
+    SchemaSuiteId,
+    "Prompt-suite identifier (schema wire carrier)."
+);
 schema_text_carrier!(
     SchemaPublicKeyHex,
     "Hex-encoded public-key identifier (schema wire carrier)."
@@ -195,8 +189,7 @@ impl<'de> Deserialize<'de> for SchemaRunId {
                         }
                     }
                 }
-                let partition =
-                    partition.ok_or_else(|| de::Error::missing_field("partition"))?;
+                let partition = partition.ok_or_else(|| de::Error::missing_field("partition"))?;
                 let offset = offset.ok_or_else(|| de::Error::missing_field("offset"))?;
                 Ok(SchemaRunId::new(partition, offset))
             }

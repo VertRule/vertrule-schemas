@@ -10,15 +10,30 @@ use crate::{
 
 #[test]
 fn text_carriers_serialize_as_transparent_string() -> Result<(), anyhow::Error> {
-    assert_eq!(serde_json::to_string(&SchemaReceiptId::new("rcpt-1"))?, "\"rcpt-1\"");
-    assert_eq!(serde_json::to_string(&SchemaModelId::new("Qwen2-0.5B"))?, "\"Qwen2-0.5B\"");
+    assert_eq!(
+        serde_json::to_string(&SchemaReceiptId::new("rcpt-1"))?,
+        "\"rcpt-1\""
+    );
+    assert_eq!(
+        serde_json::to_string(&SchemaModelId::new("Qwen2-0.5B"))?,
+        "\"Qwen2-0.5B\""
+    );
     assert_eq!(
         serde_json::to_string(&SchemaPolicyPackId::new("determinism@0.1"))?,
         "\"determinism@0.1\""
     );
-    assert_eq!(serde_json::to_string(&SchemaSuiteId::new("suite-7"))?, "\"suite-7\"");
-    assert_eq!(serde_json::to_string(&SchemaPublicKeyHex::new("ab12"))?, "\"ab12\"");
-    assert_eq!(serde_json::to_string(&SchemaKeyId::new("key-3"))?, "\"key-3\"");
+    assert_eq!(
+        serde_json::to_string(&SchemaSuiteId::new("suite-7"))?,
+        "\"suite-7\""
+    );
+    assert_eq!(
+        serde_json::to_string(&SchemaPublicKeyHex::new("ab12"))?,
+        "\"ab12\""
+    );
+    assert_eq!(
+        serde_json::to_string(&SchemaKeyId::new("key-3"))?,
+        "\"key-3\""
+    );
     Ok(())
 }
 
@@ -56,8 +71,7 @@ fn run_id_accepts_legacy_u64_and_numeric_offset() -> Result<(), anyhow::Error> {
     assert_eq!(numeric, SchemaRunId::new(1, 7));
 
     // Unknown fields are ignored.
-    let extra: SchemaRunId =
-        serde_json::from_str(r#"{"partition":2,"offset":"9","extra":true}"#)?;
+    let extra: SchemaRunId = serde_json::from_str(r#"{"partition":2,"offset":"9","extra":true}"#)?;
     assert_eq!(extra, SchemaRunId::new(2, 9));
     Ok(())
 }

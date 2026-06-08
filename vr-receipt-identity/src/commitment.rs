@@ -10,8 +10,8 @@
 //! byte-for-byte by the Layer A golden vectors and the parity test below.
 
 use serde_json::Value;
-use vr_jcs::DigestStrategy;
 use vertrule_schemas::{DigestBytes, ReceiptEnvelope};
+use vr_jcs::DigestStrategy;
 
 use crate::canonical_identity::digest_trusted_value;
 use crate::error::ReceiptIdentityError;
@@ -32,9 +32,7 @@ use crate::error::ReceiptIdentityError;
 /// canonicalization or digest failure, and
 /// [`ReceiptIdentityError::InvalidDigest`] if the digest is not the wire
 /// length.
-pub fn compute_event_hash(
-    envelope: &ReceiptEnvelope,
-) -> Result<DigestBytes, ReceiptIdentityError> {
+pub fn compute_event_hash(envelope: &ReceiptEnvelope) -> Result<DigestBytes, ReceiptIdentityError> {
     let mut value = serde_json::to_value(envelope).map_err(vr_jcs::JcsError::from)?;
     let Value::Object(ref mut map) = value else {
         return Err(ReceiptIdentityError::InvalidPayload(

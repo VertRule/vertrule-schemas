@@ -73,8 +73,8 @@
 
 // ── Module hierarchy ────────────────────────────────────────────────
 
-pub(crate) mod canonical_identity;
 pub mod bundle;
+pub(crate) mod canonical_identity;
 pub mod common;
 pub mod context;
 pub mod governance;

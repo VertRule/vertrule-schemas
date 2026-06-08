@@ -25,8 +25,7 @@ fn fixture_envelope() -> Result<ReceiptEnvelope, ReceiptIdentityError> {
         "boundary_origin": "engine",
         "payload": {"v": 1}
     });
-    serde_json::from_value(json)
-        .map_err(|e| ReceiptIdentityError::InvalidPayload(e.to_string()))
+    serde_json::from_value(json).map_err(|e| ReceiptIdentityError::InvalidPayload(e.to_string()))
 }
 
 /// G1 known-answer: the new owner reproduces the committed golden.
