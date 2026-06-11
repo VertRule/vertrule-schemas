@@ -6,6 +6,7 @@
 
 mod boundary_origin;
 mod commitment;
+mod decision;
 mod envelope;
 mod identity;
 mod projection;
@@ -14,6 +15,10 @@ mod training_receipt;
 
 pub use boundary_origin::BoundaryOrigin;
 pub use commitment::compute_event_hash;
+pub use decision::{
+    DecisionReceiptPayload, DecisionVerdict, SupportMember, DECISION_PAYLOAD_KIND,
+    DECISION_PAYLOAD_SCHEMA,
+};
 pub use envelope::{EventHashProfileId, ReceiptEnvelope};
 pub use identity::ReceiptDigest;
 pub use projection::ProjectsToReceiptEnvelope;
@@ -23,6 +28,10 @@ pub use training_receipt::TrainingReceipt;
 #[cfg(test)]
 #[path = "boundary_origin_tests.rs"]
 mod boundary_origin_tests;
+
+#[cfg(test)]
+#[path = "decision_tests.rs"]
+mod decision_tests;
 
 #[cfg(test)]
 #[path = "projection_tests.rs"]

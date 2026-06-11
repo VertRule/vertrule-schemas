@@ -108,6 +108,6 @@ pub use mri::{
     ReductionProvenance, TokenReduction,
 };
 pub use receipts::{
-    BoundaryOrigin, EventHashProfileId, ProjectsToReceiptEnvelope, ReceiptEnvelope, ReceiptType,
-    TrainingReceipt,
+    BoundaryOrigin, DecisionReceiptPayload, DecisionVerdict, EventHashProfileId,
+    ProjectsToReceiptEnvelope, ReceiptEnvelope, ReceiptType, SupportMember, TrainingReceipt,
 };
