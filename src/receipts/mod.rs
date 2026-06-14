@@ -12,6 +12,7 @@ mod identity;
 mod projection;
 mod receipt_type;
 mod training_receipt;
+mod verified_metadata;
 
 pub use boundary_origin::BoundaryOrigin;
 pub use commitment::compute_event_hash;
@@ -24,6 +25,7 @@ pub use identity::ReceiptDigest;
 pub use projection::ProjectsToReceiptEnvelope;
 pub use receipt_type::ReceiptType;
 pub use training_receipt::TrainingReceipt;
+pub use verified_metadata::VerifiedReceiptMetadata;
 
 #[cfg(test)]
 #[path = "boundary_origin_tests.rs"]

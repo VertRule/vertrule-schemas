@@ -110,4 +110,5 @@ pub use mri::{
 pub use receipts::{
     BoundaryOrigin, DecisionReceiptPayload, DecisionVerdict, EventHashProfileId,
     ProjectsToReceiptEnvelope, ReceiptEnvelope, ReceiptType, SupportMember, TrainingReceipt,
+    VerifiedReceiptMetadata,
 };
