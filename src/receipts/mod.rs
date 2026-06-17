@@ -24,7 +24,8 @@ pub use decision::{
 pub use envelope::{EventHashProfileId, ReceiptEnvelope};
 pub use identity::ReceiptDigest;
 pub use layered::{
-    ModelReceiptPayload, ProviderReceiptPayload, MODEL_PAYLOAD_KIND, PROVIDER_PAYLOAD_KIND,
+    ClosureManifest, ModelReceiptPayload, PackReceiptPayload, ProviderReceiptPayload,
+    CLOSURE_MANIFEST_SCHEMA, MODEL_PAYLOAD_KIND, PACK_PAYLOAD_KIND, PROVIDER_PAYLOAD_KIND,
 };
 pub use projection::ProjectsToReceiptEnvelope;
 pub use receipt_type::ReceiptType;
