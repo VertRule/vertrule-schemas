@@ -108,7 +108,8 @@ pub use mri::{
     ReductionProvenance, TokenReduction,
 };
 pub use receipts::{
-    BoundaryOrigin, DecisionReceiptPayload, DecisionVerdict, EventHashProfileId,
-    ProjectsToReceiptEnvelope, ReceiptEnvelope, ReceiptType, SupportMember, TrainingReceipt,
-    VerifiedReceiptMetadata,
+    BoundaryOrigin, DecisionReceiptPayload, DecisionVerdict, DependencyRelation, DependencyRole,
+    EventHashProfileId, ModelReceiptPayload, ProjectsToReceiptEnvelope, ProviderReceiptPayload,
+    ReceiptEnvelope, ReceiptType, SupportMember, TrainingReceipt, VerifiedReceiptMetadata,
+    MODEL_PAYLOAD_KIND, PROVIDER_PAYLOAD_KIND,
 };

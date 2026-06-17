@@ -54,10 +54,40 @@ pub enum DecisionVerdict {
     NoMatch,
 }
 
+/// The relation an edge asserts between two receipts (ADR-040).
+///
+/// Closed set: a new relation is a lineage-law delta, so this enum is
+/// deliberately **not** `#[non_exhaustive]`. The first layered-receipt
+/// law traverses `depends_on` only; other active edge classes
+/// (supersession etc.) are introduced by their own successor issue and
+/// are excluded from the active closure.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum DependencyRelation {
+    /// A required, acyclic justification edge. The only relation in the
+    /// first layered-receipt active-closure law.
+    DependsOn,
+}
+
+/// The role a depended-on receipt plays in its parent's supply chain
+/// (ADR-040). Closed set — not `#[non_exhaustive]`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum DependencyRole {
+    /// Originator of the depended-on entity (e.g. the model maker).
+    Maker,
+    /// Operator that hosts/serves the depended-on entity.
+    Host,
+    /// Party that fine-tuned/adapted the depended-on entity.
+    Tuner,
+    /// Party that distributes the depended-on entity.
+    Distributor,
+}
+
 /// One member of the support set a verdict rests on.
 ///
 /// BTree-ordered at construction (variant order is load-bearing for
-/// `event_hash` stability — do not reorder variants).
+/// `event_hash` stability — do not reorder variants; add only at the end).
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(tag = "member_kind", rename_all = "snake_case")]
 pub enum SupportMember {
@@ -87,6 +117,25 @@ pub enum SupportMember {
         key: String,
         /// Rendered value.
         value: String,
+    },
+    /// A **typed** lineage edge to a depended-on receipt (ADR-040).
+    ///
+    /// Distinct from [`SupportMember::DependedOnReceipt`] on purpose: a
+    /// layered-family receipt (provider/model/pack) carries only typed
+    /// edges, so a verifier can reject an untyped legacy dependency in a
+    /// layered receipt. The edge object (relation, role, `target_schema`)
+    /// is committed into the payload, so swapping a role changes the
+    /// receipt `event_hash`.
+    TypedReceiptDependency {
+        /// `event_hash` of the depended-on receipt.
+        event_hash: String,
+        /// The relation this edge asserts.
+        relation: DependencyRelation,
+        /// The role the depended-on receipt plays.
+        role: DependencyRole,
+        /// Expected payload-kind schema id of the depended-on receipt
+        /// (e.g. `provider.v0`). A mismatch is a verifier rejection.
+        target_schema: String,
     },
 }
 

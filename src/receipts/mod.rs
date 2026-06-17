@@ -9,6 +9,7 @@ mod commitment;
 mod decision;
 mod envelope;
 mod identity;
+mod layered;
 mod projection;
 mod receipt_type;
 mod training_receipt;
@@ -17,11 +18,14 @@ mod verified_metadata;
 pub use boundary_origin::BoundaryOrigin;
 pub use commitment::compute_event_hash;
 pub use decision::{
-    DecisionReceiptPayload, DecisionVerdict, SupportMember, DECISION_PAYLOAD_KIND,
-    DECISION_PAYLOAD_SCHEMA,
+    DecisionReceiptPayload, DecisionVerdict, DependencyRelation, DependencyRole, SupportMember,
+    DECISION_PAYLOAD_KIND, DECISION_PAYLOAD_SCHEMA,
 };
 pub use envelope::{EventHashProfileId, ReceiptEnvelope};
 pub use identity::ReceiptDigest;
+pub use layered::{
+    ModelReceiptPayload, ProviderReceiptPayload, MODEL_PAYLOAD_KIND, PROVIDER_PAYLOAD_KIND,
+};
 pub use projection::ProjectsToReceiptEnvelope;
 pub use receipt_type::ReceiptType;
 pub use training_receipt::TrainingReceipt;
