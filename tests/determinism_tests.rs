@@ -3,17 +3,21 @@
 //! Layer coverage:
 //! - L1: shuffled-input canonical equality (determinism contract: `shuffled_field_order`)
 //! - L3: cross-run determinism (same input, repeated invocations → identical bytes)
+//! - L4: receipt commitment contract — the `event_hash` is a reproducible,
+//!   encoding-invariant, tamper-evident commitment via `BLAKE3(JCS(envelope \\ {event_hash}))`
 //!
 //! Determinism matrix axes covered:
 //! - Same input, same process, repeated N times → identical bytes
 //! - Same input, repeated construction → identical bytes
 //! - Same semantic input, shuffled field order → identical canonical bytes
-//! - Parse → serialize → parse round-trip stability
+//! - Same envelope → same event_hash; shuffled key order → same event_hash;
+//!   one mutated trust-bearing field → different event_hash
 
 mod common;
 
 use common::{assert_deterministic, load_vector, need};
 
+use vertrule_schemas::receipts::compute_event_hash;
 use vertrule_schemas::{DigestBytes, ReceiptEnvelope};
 use vr_jcs::to_canon_bytes_from_slice;
 
@@ -119,68 +123,85 @@ fn digest_bytes_repeated_construction_determinism() -> anyhow::Result<()> {
 }
 
 // ---------------------------------------------------------------------------
-// L3: Cross-run determinism — ReceiptEnvelope
-// Determinism axis: parse → serialize → parse round-trip stability
+// L4: Receipt commitment side-channel contract — ReceiptEnvelope + event_hash
+// The three properties that make a receipt a truth channel, in one place,
+// exercised through the real constitutional law
+// `BLAKE3(JCS(envelope \ {event_hash}))` (not a re-implementation):
+//   1. reproducible       — same envelope → same event_hash across invocations
+//   2. encoding-invariant — different JSON key order deserializes to the same
+//                           committed identity (wire layout does not bind)
+//   3. tamper-evident     — one mutated trust-bearing field → different digest
 // ---------------------------------------------------------------------------
 
-/// Determinism axis: parse → serialize → parse produces identical envelope.
-/// Also verifies that JCS canonical bytes are stable across the round-trip.
-#[test]
-fn envelope_parse_serialize_parse_stability() -> anyhow::Result<()> {
-    let vector = load_vector("envelope_roundtrip_001")?;
-    let envelope_json = &vector["input"]["envelope"];
-
-    // First parse
-    let envelope: ReceiptEnvelope = serde_json::from_value(envelope_json.clone())?;
-
-    // Round-trip 5 times
-    assert_deterministic(
-        || {
-            let serialized =
-                serde_json::to_string(&envelope).map_err(|e| anyhow::anyhow!("{e}"))?;
-            let reparsed: ReceiptEnvelope =
-                serde_json::from_str(&serialized).map_err(|e| anyhow::anyhow!("{e}"))?;
-            let json = serde_json::to_vec(&reparsed).map_err(|e| anyhow::anyhow!("{e}"))?;
-            let canon = to_canon_bytes_from_slice(&json).map_err(|e| anyhow::anyhow!("{e}"))?;
-            Ok(canon)
-        },
-        5,
-        "envelope_parse_serialize_parse",
-    )?;
-
-    Ok(())
+/// Deep-copy a JSON value with the key order of every object reversed.
+/// Array element order is preserved (arrays are ordered data, not layout).
+/// With `serde_json`'s `preserve_order` on, this yields a re-serialization
+/// whose bytes differ only in key order — the input for the invariance limb.
+fn reverse_key_order(value: &serde_json::Value) -> serde_json::Value {
+    match value {
+        serde_json::Value::Object(map) => serde_json::Value::Object(
+            map.iter()
+                .rev()
+                .map(|(k, v)| (k.clone(), reverse_key_order(v)))
+                .collect(),
+        ),
+        serde_json::Value::Array(items) => {
+            serde_json::Value::Array(items.iter().map(reverse_key_order).collect())
+        }
+        other => other.clone(),
+    }
 }
 
-// ---------------------------------------------------------------------------
-// L3: Cross-run determinism — BLAKE3 digest stability
-// Determinism axis: same input → same digest across invocations
-// ---------------------------------------------------------------------------
-
-/// Determinism axis: BLAKE3 digest of canonical bytes is stable.
-/// Repeated canonicalization + hashing produces identical hex digests.
+/// Determinism + integrity axis: an `event_hash` is a reproducible,
+/// encoding-invariant, tamper-evident commitment to its envelope.
 #[test]
-fn jcs_blake3_digest_stability() -> anyhow::Result<()> {
-    let input = serde_json::json!({
-        "receipt_type": "governance",
-        "logical_time": 42,
-        "payload": {"domain": "test.v1", "action": "verify"}
-    });
+fn receipt_commitment_side_channel_invariants() -> anyhow::Result<()> {
+    let vector = load_vector("envelope_roundtrip_001")?;
+    let envelope_json = &vector["input"]["envelope"];
+    let envelope: ReceiptEnvelope = serde_json::from_value(envelope_json.clone())?;
 
-    let json = serde_json::to_vec(&input).map_err(|e| anyhow::anyhow!("{e}"))?;
-    let mut digests = Vec::new();
-    for _ in 0..5 {
-        let bytes = to_canon_bytes_from_slice(&json).map_err(|e| anyhow::anyhow!("{e}"))?;
-        let hex = blake3::hash(&bytes).to_hex().to_string();
-        digests.push(hex);
-    }
+    // 1. Reproducible: the commitment is byte-stable across repeated calls.
+    let base = compute_event_hash(&envelope).map_err(|e| anyhow::anyhow!("{e}"))?;
+    assert_deterministic(
+        || {
+            compute_event_hash(&envelope)
+                .map(|d| d.as_bytes().to_vec())
+                .map_err(|e| anyhow::anyhow!("{e}"))
+        },
+        4,
+        "receipt_commitment_reproducible",
+    )?;
 
-    let first = &digests[0];
-    for d in digests.iter().skip(1) {
-        need(
-            (d == first).then_some(()),
-            "BLAKE3 digest diverged across invocations",
-        )?;
-    }
+    // 2. Encoding-invariant: reversing every object's key order changes the
+    //    wire bytes but not the committed identity.
+    let shuffled_json = reverse_key_order(envelope_json);
+    // Value equality is key-order-insensitive under `preserve_order`; compare
+    // the object's key sequence directly (deterministic IndexMap iteration) to
+    // confirm the shuffle actually reordered keys — no serialization needed.
+    let key_order = |v: &serde_json::Value| -> Vec<String> {
+        v.as_object()
+            .map(|m| m.keys().cloned().collect())
+            .unwrap_or_default()
+    };
+    need(
+        (key_order(&shuffled_json) != key_order(envelope_json)).then_some(()),
+        "shuffle fixture did not change key order (invariance not under test)",
+    )?;
+    let shuffled: ReceiptEnvelope = serde_json::from_value(shuffled_json)?;
+    let shuffled_hash = compute_event_hash(&shuffled).map_err(|e| anyhow::anyhow!("{e}"))?;
+    need(
+        (shuffled_hash == base).then_some(()),
+        "shuffled key order produced a different event_hash",
+    )?;
+
+    // 3. Tamper-evident: mutating one trust-bearing field flips the digest.
+    let mut tampered = envelope.clone();
+    tampered.logical_time = tampered.logical_time.wrapping_add(1);
+    let tampered_hash = compute_event_hash(&tampered).map_err(|e| anyhow::anyhow!("{e}"))?;
+    need(
+        (tampered_hash != base).then_some(()),
+        "a mutated trust-bearing field left event_hash unchanged",
+    )?;
 
     Ok(())
 }
