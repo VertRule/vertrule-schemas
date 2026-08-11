@@ -38,7 +38,7 @@ path = "src/bin/validate_governance_surface.rs"
 required-features = ["governance-check"]
 
 [dependencies]
-blake3 = "1"
+vertrule-crypto = { path = "../vertrule-runtime/crates/vertrule-crypto" }
 hex = "0.4"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["arbitrary_precision"] }
@@ -47,6 +47,9 @@ toml = { version = "0.8", optional = true }
 vr-jcs = { version = "0.4", path = "../vr-jcs" }
 
 [dev-dependencies]
+# Test-only: byte-law oracles reproduce digests with the raw primitive,
+# deliberately not through the sealed constructor under test.
+blake3 = "1"
 anyhow = "1"
 
 [lints.rust]

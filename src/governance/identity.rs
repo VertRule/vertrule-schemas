@@ -123,9 +123,10 @@ impl PolicyDigest {
     /// non-JCS digest contract.
     #[must_use]
     pub fn from_binding_id(binding_id: &str) -> Self {
-        // ALLOW-JCS-BYPASS: raw label identity, not canonical JSON identity
+        // ALLOW-JCS-BYPASS: raw label identity, not canonical JSON identity.
+        // Derivation authority sealed 2026-08-11; law unchanged.
         Self {
-            bytes: *blake3::hash(binding_id.as_bytes()).as_bytes(),
+            bytes: *vertrule_crypto::identity::OpaqueBytesDigest::compute(binding_id.as_bytes()).bytes(),
         }
     }
 
@@ -172,9 +173,10 @@ impl SchemaDigest {
     /// Raw label identity, not canonical JSON identity.
     #[must_use]
     pub fn for_decision_v0_1() -> Self {
-        // ALLOW-JCS-BYPASS: raw label identity, not canonical JSON identity
+        // ALLOW-JCS-BYPASS: raw label identity, not canonical JSON identity.
+        // Derivation authority sealed 2026-08-11; law unchanged.
         Self {
-            bytes: *blake3::hash(b"vr.surface.decision@0.1").as_bytes(),
+            bytes: *vertrule_crypto::identity::OpaqueBytesDigest::compute(b"vr.surface.decision@0.1").bytes(),
         }
     }
 
