@@ -10,8 +10,8 @@
 //! - Same input, same process, repeated N times → identical bytes
 //! - Same input, repeated construction → identical bytes
 //! - Same semantic input, shuffled field order → identical canonical bytes
-//! - Same envelope → same event_hash; shuffled key order → same event_hash;
-//!   one mutated trust-bearing field → different event_hash
+//! - Same envelope → same `event_hash`; shuffled key order → same `event_hash`;
+//!   one mutated trust-bearing field → different `event_hash`
 
 mod common;
 
@@ -195,7 +195,7 @@ fn receipt_commitment_side_channel_invariants() -> anyhow::Result<()> {
     )?;
 
     // 3. Tamper-evident: mutating one trust-bearing field flips the digest.
-    let mut tampered = envelope.clone();
+    let mut tampered = envelope;
     tampered.logical_time = tampered.logical_time.wrapping_add(1);
     let tampered_hash = compute_event_hash(&tampered).map_err(|e| anyhow::anyhow!("{e}"))?;
     need(
