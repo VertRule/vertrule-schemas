@@ -83,6 +83,7 @@ pub mod manifest;
 pub mod mgs;
 pub mod mri;
 pub mod pack;
+pub mod policy;
 pub mod receipts;
 
 // ── Ergonomic re-exports ────────────────────────────────────────────
@@ -107,6 +108,7 @@ pub use mri::{
     BatchReduction, GradientCouplingPayload, MriBatchPayload, ReductionAxis, ReductionMode,
     ReductionProvenance, TokenReduction,
 };
+pub use policy::{ClaimEvidence, EvaluationInput, InputCanonicalizationError, INPUT_FORMAT};
 pub use receipts::{
     BoundaryOrigin, ClosureManifest, DecisionReceiptPayload, DecisionVerdict, DependencyRelation,
     DependencyRole, EventHashProfileId, ModelReceiptPayload, PackReceiptPayload,
