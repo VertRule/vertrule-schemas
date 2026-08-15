@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 
 use crate::governance::{
     ActionNamespace, AdapterOriginId, AdapterReference, EntityNamespace, GovernancePrincipalId,
-    GovernanceScope, GovernedAction, GovernedDecisionPayload, GovernedSubject, SurfaceInstanceId,
+    GovernanceScope, GovernedAction, DecisionPayload, GovernedSubject, SurfaceInstanceId,
     Verdict,
 };
 use crate::{DigestBytes, IJsonUInt, ProjectsToReceiptEnvelope};
@@ -11,8 +11,8 @@ type R = Result<(), Box<dyn std::error::Error>>;
 
 fn sample_decision(
     verdict: Verdict,
-) -> Result<GovernedDecisionPayload, Box<dyn std::error::Error>> {
-    Ok(GovernedDecisionPayload {
+) -> Result<DecisionPayload, Box<dyn std::error::Error>> {
+    Ok(DecisionPayload {
         scope: GovernanceScope {
             governance_principal_id: GovernancePrincipalId::new("org-1".to_string())?,
             surface_instance_id: SurfaceInstanceId::new("jira:inst-1".to_string())?,
@@ -102,13 +102,13 @@ fn verdict_display() {
     );
 }
 
-// ── GovernedDecisionPayload serde ──────────────────────────────────
+// ── DecisionPayload serde ──────────────────────────────────
 
 #[test]
 fn decision_allow_serde_roundtrip() -> R {
     let decision = sample_decision(Verdict::Allow)?;
     let json = serde_json::to_string(&decision)?;
-    let back: GovernedDecisionPayload = serde_json::from_str(&json)?;
+    let back: DecisionPayload = serde_json::from_str(&json)?;
     assert_eq!(decision, back);
     Ok(())
 }
@@ -118,7 +118,7 @@ fn decision_deny_serde_roundtrip() -> R {
     let mut decision = sample_decision(Verdict::Deny)?;
     decision.reasons = vec!["missing approval".to_string()];
     let json = serde_json::to_string(&decision)?;
-    let back: GovernedDecisionPayload = serde_json::from_str(&json)?;
+    let back: DecisionPayload = serde_json::from_str(&json)?;
     assert_eq!(decision, back);
     Ok(())
 }
@@ -129,7 +129,7 @@ fn decision_conditional_serde_roundtrip() -> R {
         requirements: vec!["approval_token".to_string()],
     })?;
     let json = serde_json::to_string(&decision)?;
-    let back: GovernedDecisionPayload = serde_json::from_str(&json)?;
+    let back: DecisionPayload = serde_json::from_str(&json)?;
     assert_eq!(decision, back);
     Ok(())
 }
@@ -192,7 +192,7 @@ fn project_deny_verdict_succeeds() -> R {
 
 #[test]
 fn decision_works_for_langchain() -> R {
-    let decision = GovernedDecisionPayload {
+    let decision = DecisionPayload {
         scope: GovernanceScope {
             governance_principal_id: GovernancePrincipalId::new("org-lc".to_string())?,
             surface_instance_id: SurfaceInstanceId::new("langchain:ws-9".to_string())?,
@@ -227,7 +227,7 @@ fn decision_works_for_langchain() -> R {
     };
     // Serde round-trip
     let json = serde_json::to_string(&decision)?;
-    let back: GovernedDecisionPayload = serde_json::from_str(&json)?;
+    let back: DecisionPayload = serde_json::from_str(&json)?;
     assert_eq!(decision, back);
 
     // Projection works for non-Jira surface

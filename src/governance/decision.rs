@@ -1,6 +1,6 @@
 //! Governed decision payload — the receipt-facing representation.
 //!
-//! [`GovernedDecisionPayload`] is the `CanonicalPayload` content for
+//! [`DecisionPayload`] is the `CanonicalPayload` content for
 //! `vr.surface.decision@0.1` receipts. Pure data. Minting, projection,
 //! and persistence logic live outside `vertrule-schemas`.
 
@@ -13,17 +13,42 @@ use crate::{
     ReceiptEnvelope, ReceiptType, SchemaVersion,
 };
 
-/// Governed decision payload.
+/// What a decision *says* — scope, subject, action, verdict, policy
+/// reference, and the canonical input digest that was evaluated.
 ///
-/// Contains everything needed to reconstruct and verify a governance
-/// decision: scope, subject, action, verdict, policy reference, and
-/// the canonical input digest that was evaluated.
+/// # This type carries no authority
+///
+/// ```text
+/// Shape  ≠  Authority
+/// ```
+///
+/// It is passive, public wire data: freely serializable **and freely
+/// deserializable**, which means it can be constructed from any caller-supplied
+/// bytes. Possession of one proves nothing about how it was produced.
+///
+/// It was previously named `GovernedDecisionPayload`, which asserted the
+/// opposite — a name claiming governance on an object with no governance
+/// construction law behind it (gremlin#207). Renamed rather than sealed:
+/// private fields could not have made the claim true, because `Deserialize`
+/// constructs the value regardless of field visibility. Sealing it would have
+/// produced constructor privacy while still permitting arbitrary construction
+/// through the wire interface — a type that looks sealed and is not.
+///
+/// # What makes a decision governed
+///
+/// ```text
+/// GovernedDecision  ⇒  SanctionedEvaluationResult ∧ SealedRun ∧ OperationReceipt
+/// ```
+///
+/// The evidence is the receipt minted by `SealedRun`, not this struct. The
+/// same split `OperationReceipt` already uses: public payload shape,
+/// runtime-only sanctioned minting.
 ///
 /// Implements [`ProjectsToReceiptEnvelope`] to mint a canonical
 /// [`ReceiptEnvelope`] directly, using `compute_event_hash()` from
 /// the commitment module.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct GovernedDecisionPayload {
+pub struct DecisionPayload {
     /// Governance scope that was evaluated.
     pub scope: GovernanceScope,
     /// Subject of the decision.
@@ -101,7 +126,7 @@ fn compute_policy_digest(binding_id: &str) -> DigestBytes {
     super::identity::PolicyDigest::from_binding_id(binding_id).as_digest_bytes()
 }
 
-impl ProjectsToReceiptEnvelope for GovernedDecisionPayload {
+impl ProjectsToReceiptEnvelope for DecisionPayload {
     fn project(&self) -> Result<ReceiptEnvelope, crate::DefinitionError> {
         let context_digest = compute_scope_digest(&self.scope)?;
         let schema_digest = schema_decision_digest();

@@ -98,7 +98,7 @@ pub use common::{
 pub use context::RBHInvariant;
 pub use governance::{
     ActionNamespace, AdapterOriginId, AdapterReference, EntityNamespace, GovernancePrincipalId,
-    GovernanceScope, GovernedAction, GovernedDecisionPayload, GovernedSubject, PolicyBindingRef,
+    GovernanceScope, GovernedAction, DecisionPayload, GovernedSubject, PolicyBindingRef,
     PolicyTemplate, SurfaceInstanceId, Verdict,
 };
 pub use mgs::{
@@ -110,9 +110,19 @@ pub use mri::{
 };
 pub use policy::{ClaimEvidence, EvaluationInput, InputCanonicalizationError, INPUT_FORMAT};
 pub use receipts::{
-    BoundaryOrigin, ClosureManifest, DecisionReceiptPayload, DecisionVerdict, DependencyRelation,
-    DependencyRole, EventHashProfileId, ModelReceiptPayload, PackReceiptPayload,
-    ProjectsToReceiptEnvelope, ProviderReceiptPayload, ReceiptEnvelope, ReceiptType, SupportMember,
-    TrainingReceipt, VerifiedReceiptMetadata, CLOSURE_MANIFEST_SCHEMA, MODEL_PAYLOAD_KIND,
-    PACK_PAYLOAD_KIND, PROVIDER_PAYLOAD_KIND,
+    AdmissionReceiptPayload, AdmittedClaim, AdmittedClaimOperation, AdmittedProposal,
+    AgentProposalReceiptPayload, AttestationPurpose, BoundaryOrigin, CapturedRequest,
+    CapturedResponse, ClaimAdmissionDecision, ClaimRejectionReason, ClosureManifest,
+    DecisionReceiptPayload, DecisionVerdict, DependencyRelation, DependencyRole,
+    EventHashProfileId, ExternalAdmissionSignal, ModelReceiptPayload, PackReceiptPayload,
+    ProjectsToReceiptEnvelope, ProposalAdmissionBundle, ProposedTextClaim,
+    ProviderInteractionPayload, ProviderReceiptPayload, ReceiptEnvelope, ReceiptType,
+    RejectedClaim, SupportMember, TextClaimAgentProposal, TrainingReceipt,
+    VerifiableAiRecordArtifact, VerifiableAiRecordArtifactV1, VerifiableAiRecordPayload,
+    VerifiableAiRecordProposalAdmission, VerifiedReceiptMetadata, AGENT_PROPOSAL_PAYLOAD_KIND,
+    AGENT_PROPOSAL_SCHEMA, CLOSURE_MANIFEST_SCHEMA, MODEL_PAYLOAD_KIND, PACK_PAYLOAD_KIND,
+    PROPOSAL_ADMISSION_BUNDLE_FORMAT, PROPOSAL_ADMISSION_PAYLOAD_KIND, PROPOSAL_ADMISSION_SCHEMA,
+    PROVIDER_INTERACTION_PAYLOAD_KIND, PROVIDER_INTERACTION_SCHEMA, PROVIDER_PAYLOAD_KIND,
+    VERIFIABLE_AI_RECORD_FORMAT, VERIFIABLE_AI_RECORD_FORMAT_V1, VERIFIABLE_AI_RECORD_FORMAT_V2,
+    VERIFIABLE_AI_RECORD_PAYLOAD_KIND, VERIFIABLE_AI_RECORD_POLICY, VERIFIABLE_AI_RECORD_SCHEMA,
 };
