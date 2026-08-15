@@ -72,6 +72,37 @@ pub struct DecisionPayload {
     /// Previous receipt `event_hash`, when this decision is chained.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub parent_id: Option<DigestBytes>,
+
+    /// Commitment to the `SealedRun`-minted `OperationReceipt` that produced
+    /// this decision.
+    ///
+    /// This is what makes the persisted artifact able to prove its own
+    /// provenance:
+    ///
+    /// ```text
+    /// PersistedGovernedDecision ⇒ PublicCommitmentTo(OperationReceipt)
+    /// ```
+    ///
+    /// It rides in the payload, so `event_hash` commits to it — a verifier that
+    /// recomputes the envelope hash necessarily commits to the sealed-run
+    /// receipt too.
+    ///
+    /// `None` is meaningful, not merely absent: it says no sealed run backs this
+    /// decision. Optional so that pre-existing artifacts canonicalize to
+    /// identical bytes and deployed verifiers keep parsing.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub operation_receipt_digest: Option<DigestBytes>,
+
+    /// Digest of the policy that actually decided, as re-asserted by the
+    /// sealed run.
+    ///
+    /// When present this replaces the `policy_binding_id` placeholder in the
+    /// projected envelope's `policy_digest`. The binding id is a *label* chosen
+    /// by whoever wrote the binding; this is the policy the runtime was sealed
+    /// against. Presenting the former as policy provenance while the latter is
+    /// the real authority is over-labelling.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sealed_policy_digest: Option<DigestBytes>,
 }
 
 /// Policy outcome.
@@ -130,7 +161,11 @@ impl ProjectsToReceiptEnvelope for DecisionPayload {
     fn project(&self) -> Result<ReceiptEnvelope, crate::DefinitionError> {
         let context_digest = compute_scope_digest(&self.scope)?;
         let schema_digest = schema_decision_digest();
-        let policy_digest = compute_policy_digest(&self.policy_binding_id);
+        // Prefer the policy the sealed run was bound to; fall back to the
+        // binding-label placeholder only when no sealed run produced this.
+        let policy_digest = self
+            .sealed_policy_digest
+            .unwrap_or_else(|| compute_policy_digest(&self.policy_binding_id));
 
         let payload_value = serde_json::to_value(self).map_err(crate::jcs::JcsError::Json)?;
         let payload = CanonicalPayload::new(payload_value)?;

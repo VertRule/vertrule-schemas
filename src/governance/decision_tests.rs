@@ -40,6 +40,8 @@ fn sample_decision(
         canonical_input_digest: DigestBytes::from_array([1u8; 32]),
         logical_time: IJsonUInt::new(1)?,
         parent_id: None,
+        operation_receipt_digest: None,
+        sealed_policy_digest: None,
     })
 }
 
@@ -224,6 +226,8 @@ fn decision_works_for_langchain() -> R {
         canonical_input_digest: DigestBytes::from_array([3u8; 32]),
         logical_time: IJsonUInt::new(1)?,
         parent_id: None,
+        operation_receipt_digest: None,
+        sealed_policy_digest: None,
     };
     // Serde round-trip
     let json = serde_json::to_string(&decision)?;
