@@ -1,9 +1,10 @@
-# This repo is a 2-crate workspace: the root package `vertrule-schemas`
-# (shape only) and the member `vr-receipt-identity` (receipt-identity law).
+# This repo is a 3-crate workspace: the root package `vertrule-schemas`
+# (shape only), `vr-receipt-identity` (receipt-identity law), and the narrow
+# `vr-proposal-admission` transition law.
 # Load-bearing invariant: the `vertrule-schemas` crate MUST NOT depend on
 # `vr-receipt-identity` (the dependency direction is one-way).
 [workspace]
-members = ["vr-receipt-identity"]
+members = ["vr-proposal-admission", "vr-receipt-identity", "vr-verifiable-ai-record"]
 resolver = "2"
 
 [package]
@@ -38,7 +39,7 @@ path = "src/bin/validate_governance_surface.rs"
 required-features = ["governance-check"]
 
 [dependencies]
-vertrule-crypto = { path = "../vertrule-runtime/crates/vertrule-crypto" }
+vr-identity = { version = "0.1", path = "../vertrule-runtime/crates/vr-identity" }
 hex = "0.4"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["arbitrary_precision"] }
