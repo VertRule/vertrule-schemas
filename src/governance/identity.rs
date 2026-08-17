@@ -126,8 +126,7 @@ impl PolicyDigest {
         // ALLOW-JCS-BYPASS: raw label identity, not canonical JSON identity.
         // Derivation authority sealed 2026-08-11; law unchanged.
         Self {
-            bytes: *vertrule_crypto::identity::OpaqueBytesDigest::compute(binding_id.as_bytes())
-                .bytes(),
+            bytes: *vr_identity::digest::OpaqueBytesDigest::compute(binding_id.as_bytes()).bytes(),
         }
     }
 
@@ -177,10 +176,8 @@ impl SchemaDigest {
         // ALLOW-JCS-BYPASS: raw label identity, not canonical JSON identity.
         // Derivation authority sealed 2026-08-11; law unchanged.
         Self {
-            bytes: *vertrule_crypto::identity::OpaqueBytesDigest::compute(
-                b"vr.surface.decision@0.1",
-            )
-            .bytes(),
+            bytes: *vr_identity::digest::OpaqueBytesDigest::compute(b"vr.surface.decision@0.1")
+                .bytes(),
         }
     }
 
