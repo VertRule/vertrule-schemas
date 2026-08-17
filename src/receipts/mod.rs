@@ -11,8 +11,10 @@ mod envelope;
 mod identity;
 mod layered;
 mod projection;
+mod proposal_admission;
 mod receipt_type;
 mod training_receipt;
+mod verifiable_ai_record;
 mod verified_metadata;
 
 pub use boundary_origin::BoundaryOrigin;
@@ -28,8 +30,22 @@ pub use layered::{
     CLOSURE_MANIFEST_SCHEMA, MODEL_PAYLOAD_KIND, PACK_PAYLOAD_KIND, PROVIDER_PAYLOAD_KIND,
 };
 pub use projection::ProjectsToReceiptEnvelope;
+pub use proposal_admission::{
+    AdmissionReceiptPayload, AdmittedClaim, AdmittedClaimOperation, AdmittedProposal,
+    AgentProposalReceiptPayload, AttestationPurpose, ClaimAdmissionDecision, ClaimRejectionReason,
+    ExternalAdmissionSignal, ProposalAdmissionBundle, ProposedTextClaim, RejectedClaim,
+    TextClaimAgentProposal, AGENT_PROPOSAL_PAYLOAD_KIND, AGENT_PROPOSAL_SCHEMA,
+    PROPOSAL_ADMISSION_BUNDLE_FORMAT, PROPOSAL_ADMISSION_PAYLOAD_KIND, PROPOSAL_ADMISSION_SCHEMA,
+};
 pub use receipt_type::ReceiptType;
 pub use training_receipt::TrainingReceipt;
+pub use verifiable_ai_record::{
+    CapturedRequest, CapturedResponse, ProviderInteractionPayload, VerifiableAiRecordArtifact,
+    VerifiableAiRecordArtifactV1, VerifiableAiRecordPayload, VerifiableAiRecordProposalAdmission,
+    PROVIDER_INTERACTION_PAYLOAD_KIND, PROVIDER_INTERACTION_SCHEMA, VERIFIABLE_AI_RECORD_FORMAT,
+    VERIFIABLE_AI_RECORD_FORMAT_V1, VERIFIABLE_AI_RECORD_FORMAT_V2,
+    VERIFIABLE_AI_RECORD_PAYLOAD_KIND, VERIFIABLE_AI_RECORD_POLICY, VERIFIABLE_AI_RECORD_SCHEMA,
+};
 pub use verified_metadata::VerifiedReceiptMetadata;
 
 #[cfg(test)]
