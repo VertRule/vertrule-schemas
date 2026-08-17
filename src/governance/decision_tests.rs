@@ -1,17 +1,15 @@
 use std::collections::BTreeMap;
 
 use crate::governance::{
-    ActionNamespace, AdapterOriginId, AdapterReference, EntityNamespace, GovernancePrincipalId,
-    GovernanceScope, GovernedAction, DecisionPayload, GovernedSubject, SurfaceInstanceId,
+    ActionNamespace, AdapterOriginId, AdapterReference, DecisionPayload, EntityNamespace,
+    GovernancePrincipalId, GovernanceScope, GovernedAction, GovernedSubject, SurfaceInstanceId,
     Verdict,
 };
 use crate::{DigestBytes, IJsonUInt, ProjectsToReceiptEnvelope};
 
 type R = Result<(), Box<dyn std::error::Error>>;
 
-fn sample_decision(
-    verdict: Verdict,
-) -> Result<DecisionPayload, Box<dyn std::error::Error>> {
+fn sample_decision(verdict: Verdict) -> Result<DecisionPayload, Box<dyn std::error::Error>> {
     Ok(DecisionPayload {
         scope: GovernanceScope {
             governance_principal_id: GovernancePrincipalId::new("org-1".to_string())?,

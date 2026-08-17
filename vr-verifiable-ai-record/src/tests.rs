@@ -115,7 +115,10 @@ fn record_is_stable_structured_and_frozen() -> Result<()> {
     let package: VerifiableAiRecordArtifact = serde_json::from_str(first.artifact())?;
     assert_eq!(package.format, VERIFIABLE_AI_RECORD_FORMAT);
     assert_eq!(package.record.event_hash, first.envelope().event_hash);
-    assert_eq!(package.source_interaction.event_hash, source_envelope(&source)?);
+    assert_eq!(
+        package.source_interaction.event_hash,
+        source_envelope(&source)?
+    );
     assert_eq!(
         first.envelope().event_hash.to_string(),
         "569b1a02e277ac7542a88ca76cafd400e62cdaef4ce671d30cd3526f3eb3f740"

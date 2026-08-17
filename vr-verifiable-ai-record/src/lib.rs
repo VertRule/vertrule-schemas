@@ -9,14 +9,13 @@
 #![warn(missing_docs)]
 
 use vertrule_schemas::{
-    AdmissionReceiptPayload, AdmittedProposal, AgentProposalReceiptPayload, BoundaryOrigin, DigestBytes,
-    ProposalAdmissionBundle, ProviderInteractionPayload, ReceiptEnvelope, ReceiptType,
+    AdmissionReceiptPayload, AdmittedProposal, AgentProposalReceiptPayload, BoundaryOrigin,
+    DigestBytes, ProposalAdmissionBundle, ProviderInteractionPayload, ReceiptEnvelope, ReceiptType,
     SchemaVersion, VerifiableAiRecordArtifact, VerifiableAiRecordPayload,
-    VerifiableAiRecordProposalAdmission,
-    AGENT_PROPOSAL_PAYLOAD_KIND, AGENT_PROPOSAL_SCHEMA, PROPOSAL_ADMISSION_BUNDLE_FORMAT,
-    PROPOSAL_ADMISSION_PAYLOAD_KIND, PROPOSAL_ADMISSION_SCHEMA, PROVIDER_INTERACTION_PAYLOAD_KIND,
-    PROVIDER_INTERACTION_SCHEMA, VERIFIABLE_AI_RECORD_FORMAT, VERIFIABLE_AI_RECORD_PAYLOAD_KIND,
-    VERIFIABLE_AI_RECORD_POLICY, VERIFIABLE_AI_RECORD_SCHEMA,
+    VerifiableAiRecordProposalAdmission, AGENT_PROPOSAL_PAYLOAD_KIND, AGENT_PROPOSAL_SCHEMA,
+    PROPOSAL_ADMISSION_BUNDLE_FORMAT, PROPOSAL_ADMISSION_PAYLOAD_KIND, PROPOSAL_ADMISSION_SCHEMA,
+    PROVIDER_INTERACTION_PAYLOAD_KIND, PROVIDER_INTERACTION_SCHEMA, VERIFIABLE_AI_RECORD_FORMAT,
+    VERIFIABLE_AI_RECORD_PAYLOAD_KIND, VERIFIABLE_AI_RECORD_POLICY, VERIFIABLE_AI_RECORD_SCHEMA,
 };
 
 /// Frozen prompt leaf-digest domain, promoted byte-neutrally from Slice 2.
@@ -291,7 +290,12 @@ fn validate_interaction(
 fn validate_proposal_admission(
     canonical: &str,
 ) -> Result<
-    (ReceiptEnvelope, ReceiptEnvelope, DigestBytes, AdmittedProposal),
+    (
+        ReceiptEnvelope,
+        ReceiptEnvelope,
+        DigestBytes,
+        AdmittedProposal,
+    ),
     VerifiableAiRecordError,
 > {
     require_canonical(canonical)?;

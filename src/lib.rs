@@ -97,8 +97,8 @@ pub use common::{
 };
 pub use context::RBHInvariant;
 pub use governance::{
-    ActionNamespace, AdapterOriginId, AdapterReference, EntityNamespace, GovernancePrincipalId,
-    GovernanceScope, GovernedAction, DecisionPayload, GovernedSubject, PolicyBindingRef,
+    ActionNamespace, AdapterOriginId, AdapterReference, DecisionPayload, EntityNamespace,
+    GovernancePrincipalId, GovernanceScope, GovernedAction, GovernedSubject, PolicyBindingRef,
     PolicyTemplate, SurfaceInstanceId, Verdict,
 };
 pub use mgs::{
