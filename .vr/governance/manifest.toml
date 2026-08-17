@@ -3,7 +3,7 @@
 
 [crate]
 name = "vertrule-schemas"
-version = "0.4.1"
+version = "0.6.0"
 publish = true
 extraction_ready = true
 
