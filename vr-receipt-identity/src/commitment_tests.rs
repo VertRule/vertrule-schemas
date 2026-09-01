@@ -1,7 +1,4 @@
-//! Layer A G1 + extraction-equivalence: the new owner's commitment law
-//! must (a) agree byte-for-byte with `vertrule-schemas`'s live law over a
-//! real envelope (parity — "move ownership, do not change bytes"), and
-//! (b) reproduce the committed G1 golden for the canonical fixture.
+//! Constitutional receipt-law known-answer and invariant tests.
 
 use super::compute_event_hash;
 use crate::error::ReceiptIdentityError;
@@ -42,18 +39,20 @@ fn g1_commitment_matches_golden() -> Result<(), ReceiptIdentityError> {
     Ok(())
 }
 
-/// Extraction parity: the new owner agrees byte-for-byte with the live
-/// `vertrule-schemas` law over the same envelope. This is the
-/// "move ownership, do not change bytes" guarantee.
 #[test]
-fn commitment_parity_with_schemas() -> Result<(), ReceiptIdentityError> {
-    let envelope = fixture_envelope()?;
-    let new_owner = compute_event_hash(&envelope)?;
-    let schemas = vertrule_schemas::receipts::compute_event_hash(&envelope)
-        .map_err(ReceiptIdentityError::Jcs)?;
-    assert_eq!(
-        new_owner, schemas,
-        "vr-receipt-identity and vertrule-schemas commitment laws diverged"
-    );
+fn event_hash_placeholder_is_excluded_from_preimage() -> Result<(), ReceiptIdentityError> {
+    let mut envelope = fixture_envelope()?;
+    let base = compute_event_hash(&envelope)?;
+    envelope.event_hash = vertrule_schemas::DigestBytes::from_array([0xAA; 32]);
+    assert_eq!(base, compute_event_hash(&envelope)?);
+    Ok(())
+}
+
+#[test]
+fn trust_bearing_mutation_changes_identity() -> Result<(), ReceiptIdentityError> {
+    let mut envelope = fixture_envelope()?;
+    let base = compute_event_hash(&envelope)?;
+    envelope.logical_time += 1;
+    assert_ne!(base, compute_event_hash(&envelope)?);
     Ok(())
 }

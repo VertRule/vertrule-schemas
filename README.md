@@ -8,7 +8,8 @@ any verifier implementation must understand.
 
 ## Design Constraints
 
-- Single `vr-*` dependency: [`vr-jcs`](https://crates.io/crates/vr-jcs) (JCS canonicalization primitive)
+- Narrow `vr-*` dependencies: `vr-jcs` for JCS canonicalization and
+  `vr-identity` for governed raw-label identities
 - Zero unsafe code
 - No floating-point values in trust-critical payloads
 - RFC 8785 canonical JSON for digest / signature inputs
@@ -32,7 +33,7 @@ any verifier implementation must understand.
 | Type | Purpose |
 |------|---------|
 | `ReceiptEnvelope` | Constitutional public receipt envelope |
-| `ReceiptType` | Receipt classification discriminator (7 variants) |
+| `ReceiptType` | Receipt classification discriminator (10 variants) |
 | `BoundaryOrigin` | Boundary provenance discriminator (6 variants) |
 | `ProjectsToReceiptEnvelope` | Canonical projection trait |
 

@@ -11,7 +11,7 @@
 //!
 //! | Property | Preserved | How |
 //! |----------|-----------|-----|
-//! | Identity | `event_hash` commits all trust-bearing fields | Via [`compute_event_hash`](crate::receipts::compute_event_hash) |
+//! | Identity | `event_hash` commits all trust-bearing fields | Via the `vr-receipt-identity` law owner |
 //! | Provenance | `boundary_origin` maps to correct origin | Direct field mapping |
 //! | Schema binding | `schema_digest` matches the schema governing payload | Emitter responsibility |
 //! | Payload commitment | `payload` contains trust-bearing content | Domain-specific serialization |
@@ -38,7 +38,7 @@ use crate::DefinitionError;
 /// Canonical projection from a proof-bearing receipt to the public envelope.
 ///
 /// Implementors must ensure:
-/// - `event_hash` is computed via [`compute_event_hash`](crate::receipts::compute_event_hash)
+/// - `event_hash` is computed via `vr_receipt_identity::compute_event_hash`
 /// - `schema_digest` matches the schema governing `payload`
 /// - `boundary_origin` reflects the producing boundary
 /// - projection is deterministic: same input produces same envelope

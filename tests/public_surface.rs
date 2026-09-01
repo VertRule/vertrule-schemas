@@ -6,7 +6,7 @@
 //!
 //! Notably absent (by design):
 //! - JCS functions (live in vr-jcs)
-//! - `compute_event_hash` (not root-exported; available via `receipts::`)
+//! - `compute_event_hash` (lives in `vr-receipt-identity`)
 //! - `ReceiptEnvelope` methods (nouns only, no construction or judgment)
 
 #![deny(unused_imports)]
@@ -43,9 +43,6 @@ use vertrule_schemas::ReductionAxis;
 use vertrule_schemas::ReductionMode;
 use vertrule_schemas::ReductionProvenance;
 use vertrule_schemas::TokenReduction;
-
-// Scoped export (not root)
-use vertrule_schemas::receipts::compute_event_hash;
 
 #[test]
 fn public_surface_nouns_are_usable() -> Result<(), anyhow::Error> {
@@ -85,9 +82,6 @@ fn public_surface_nouns_are_usable() -> Result<(), anyhow::Error> {
     });
     let envelope: ReceiptEnvelope = serde_json::from_value(envelope_json)?;
     let _json = serde_json::to_string(&envelope)?;
-
-    // Scoped: compute_event_hash is accessible via receipts::
-    let _hash = compute_event_hash(&envelope).map_err(|e| anyhow::anyhow!("{e}"))?;
 
     // Suppress unused-import warnings for types used only as existence checks
     let _ = std::any::type_name::<PolicyId>();

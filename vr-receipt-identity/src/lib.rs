@@ -18,15 +18,8 @@
 //! crate (the dependency direction is one-way), so the graph stays
 //! acyclic.
 //!
-//! ## Extraction status (Stage 1)
-//!
-//! During the transition this crate is an **independent reimplementation**
-//! of the law that still lives in `vertrule-schemas`. The two are pinned
-//! byte-for-byte to the committed Layer A golden vectors
-//! (`docs/audits/junk-drawer-inventory/fixtures/receipt-identity/`). The
-//! rule for the move is: *move ownership, do not change bytes.* Consumers
-//! are repointed in later stages; the `vertrule-schemas` copy is removed
-//! only once nothing depends on it.
+//! `vertrule-schemas` contains no receipt-identity constructor. This crate is
+//! the sole shared owner used by producers and verifiers.
 //!
 //! [`ReceiptEnvelope`]: vertrule_schemas::ReceiptEnvelope
 
@@ -34,7 +27,9 @@
 
 mod canonical_identity;
 mod commitment;
+mod decision_projection;
 mod error;
 
 pub use commitment::compute_event_hash;
+pub use decision_projection::project_decision_payload;
 pub use error::ReceiptIdentityError;

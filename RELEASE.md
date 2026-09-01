@@ -1,3 +1,24 @@
+# Unreleased
+
+Receipt identity construction has moved to its dedicated owner,
+`vr-receipt-identity`. This is a compile-time breaking boundary cleanup with no
+wire-format or commitment-byte change.
+
+## Breaking API changes
+
+- Removed `vertrule_schemas::receipts::compute_event_hash`; use
+  `vr_receipt_identity::compute_event_hash` and add a direct dependency on
+  `vr-receipt-identity`.
+- Removed schemas-owned receipt commitment/identity implementation types.
+- `DecisionPayload` no longer implements receipt projection. Use
+  `vr_receipt_identity::project_decision_payload(&payload)`.
+
+`ReceiptEnvelope`, `EventHashProfileId`, and the passive
+`ProjectsToReceiptEnvelope` interface remain schema-owned wire contracts.
+Known-answer tests pin the constitutional envelope commitment across the move.
+
+---
+
 # vertrule-schemas v0.4.1 Release Notes
 
 Additive release over v0.4.0. Adds semantic digest role newtypes that

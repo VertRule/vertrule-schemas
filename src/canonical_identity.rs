@@ -17,7 +17,7 @@
 //! Both helpers always go through `vr_jcs::to_canon_digest_with`, which
 //! returns a `CanonicalDigest` carrying the algorithm-with-output
 //! binding (ADR-002 Decision item 3). Domain newtypes (e.g.
-//! `ReceiptDigest`) wrap that `CanonicalDigest` and project to wire
+//! `ScopeDigest`) wrap that `CanonicalDigest` and project to wire
 //! formats only at boundary methods.
 //!
 //! # Sealed-helper invariant (JCS Consumer Hardening Plan § Gate 2)

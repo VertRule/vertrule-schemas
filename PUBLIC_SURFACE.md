@@ -1,10 +1,9 @@
-# vertrule-schemas Public Surface (v0.4.1)
+# vertrule-schemas Public Surface (current)
 
 Canonical schema types for the VertRule receipt system.
-This crate contains wire shapes, validated scalar types, associated
-constants, and protocol-scoped commitment support
-(`compute_event_hash`). Verification judgments live in
-`vertrule-verifier`.
+This crate contains wire shapes, validated scalar types, and associated
+constants. Receipt commitment construction lives in
+`vr-receipt-identity`; verification judgments live in `vertrule-verifier`.
 
 ## Governing Rule
 
@@ -12,6 +11,7 @@ constants, and protocol-scoped commitment support
 |-------|-------------|
 | `vr-jcs` | Canonicalization primitive |
 | `vertrule-schemas` | Nouns / wire shapes / validated scalar types |
+| `vr-receipt-identity` | Receipt projection and commitment construction |
 | `vertrule-verifier` | Judgment over public artifacts |
 
 ## Stable Root Exports
@@ -61,15 +61,18 @@ pub struct ContextDigest { .. }
 pub struct ReceiptDigest { .. }
 pub struct PayloadDigest { .. }
 pub struct ContentIdentityDigest { .. }
-```
 
-## Scoped Exports (not root-exported)
-
-Available via submodule path for sibling crates:
-
-```rust
-// Receipt commitment (behavior tied to schema contract)
-vertrule_schemas::receipts::compute_event_hash(&ReceiptEnvelope) -> Result<DigestBytes, JcsError>
+// Passive policy-evaluation input carriers. Commitment producers remain
+// downstream in vr-policy-substrate.
+pub const GOVERNANCE_INPUT_FORMAT: &str;
+pub enum EvaluationInputKindV1 { .. }
+pub enum GovernanceOperationV1 { .. }
+pub enum GovernanceSystemStatusV1 { .. }
+pub enum GovernancePolicyStatusV1 { .. }
+pub struct LinkedPolicyStateV1 { .. }
+pub struct GovernanceSystemSubjectV1 { .. }
+pub struct GovernanceEvaluationInputV1 { .. }
+pub enum GovernanceInputError { .. }
 ```
 
 ## Not Exported from This Crate
@@ -79,5 +82,7 @@ The following live in their respective crates, not here:
 | Symbol | Home | Rationale |
 |--------|------|-----------|
 | JCS functions (`to_canon_bytes`, etc.) | `vr-jcs` | Canonicalization execution |
+| Receipt commitment (`compute_event_hash`) | `vr-receipt-identity` | Receipt-identity law |
+| Governance evaluation-input commitment | `vr-policy-substrate` | ADR-052 named digest law |
 | Receipt construction | Producer crate | Construction is a procedure |
 | Envelope integrity validation | `vertrule-verifier` | Judgment over nouns |

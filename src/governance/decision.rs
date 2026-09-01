@@ -7,11 +7,7 @@
 use serde::{Deserialize, Serialize};
 
 use super::{AdapterReference, GovernanceScope, GovernedAction, GovernedSubject};
-use crate::receipts::compute_event_hash;
-use crate::{
-    BoundaryOrigin, CanonicalPayload, DigestBytes, IJsonUInt, ProjectsToReceiptEnvelope,
-    ReceiptEnvelope, ReceiptType, SchemaVersion,
-};
+use crate::{DigestBytes, IJsonUInt};
 
 /// What a decision *says* — scope, subject, action, verdict, policy
 /// reference, and the canonical input digest that was evaluated.
@@ -44,9 +40,6 @@ use crate::{
 /// same split `OperationReceipt` already uses: public payload shape,
 /// runtime-only sanctioned minting.
 ///
-/// Implements [`ProjectsToReceiptEnvelope`] to mint a canonical
-/// [`ReceiptEnvelope`] directly, using `compute_event_hash()` from
-/// the commitment module.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct DecisionPayload {
     /// Governance scope that was evaluated.
@@ -128,65 +121,6 @@ impl std::fmt::Display for Verdict {
             Self::Deny => f.write_str("deny"),
             Self::Conditional { .. } => f.write_str("conditional"),
         }
-    }
-}
-
-// ── ProjectsToReceiptEnvelope ──────────────────────────────────────
-
-/// Fixed schema digest for `vr.surface.decision@0.1`.
-///
-/// As of Gate 2 (JCS Consumer Hardening Plan), delegates to the sealed
-/// [`SchemaDigest::for_decision_v0_1`] constructor. Byte-stable with
-/// the prior `BLAKE3(b"vr.surface.decision@0.1")` implementation.
-fn schema_decision_digest() -> DigestBytes {
-    super::identity::SchemaDigest::for_decision_v0_1().as_digest_bytes()
-}
-
-/// Compute `BLAKE3(JCS(scope))` as the context digest.
-///
-/// As of Gate 2, delegates to [`ScopeDigest::from_governance_scope`].
-fn compute_scope_digest(scope: &GovernanceScope) -> Result<DigestBytes, crate::DefinitionError> {
-    super::identity::ScopeDigest::from_governance_scope(scope)?.as_digest_bytes()
-}
-
-/// Compute `BLAKE3(binding_id)` as a placeholder policy digest.
-///
-/// As of Gate 2, delegates to [`PolicyDigest::from_binding_id`]. Raw
-/// label identity — not JCS.
-fn compute_policy_digest(binding_id: &str) -> DigestBytes {
-    super::identity::PolicyDigest::from_binding_id(binding_id).as_digest_bytes()
-}
-
-impl ProjectsToReceiptEnvelope for DecisionPayload {
-    fn project(&self) -> Result<ReceiptEnvelope, crate::DefinitionError> {
-        let context_digest = compute_scope_digest(&self.scope)?;
-        let schema_digest = schema_decision_digest();
-        // Prefer the policy the sealed run was bound to; fall back to the
-        // binding-label placeholder only when no sealed run produced this.
-        let policy_digest = self
-            .sealed_policy_digest
-            .unwrap_or_else(|| compute_policy_digest(&self.policy_binding_id));
-
-        let payload_value = serde_json::to_value(self).map_err(crate::jcs::JcsError::Json)?;
-        let payload = CanonicalPayload::new(payload_value)?;
-
-        let mut envelope = ReceiptEnvelope {
-            envelope_version: SchemaVersion::V1,
-            receipt_type: ReceiptType::Governance,
-            context_digest,
-            schema_digest,
-            policy_digest,
-            logical_time: self.logical_time.into(),
-            event_hash: DigestBytes::from_array([0u8; 32]),
-            event_hash_profile: None,
-            parent_id: self.parent_id,
-            boundary_origin: Some(BoundaryOrigin::Governance),
-            digest_algorithm: Some(SchemaVersion::V1.digest_algorithm().to_string()),
-            canonicalization: Some(SchemaVersion::V1.canonicalization().to_string()),
-            payload,
-        };
-        envelope.event_hash = compute_event_hash(&envelope)?;
-        Ok(envelope)
     }
 }
 

@@ -1,8 +1,8 @@
 //! # `vertrule-schemas` — Canonical schema types for `VertRule`
 //!
-//! Constitutional definitions and protocol-scoped commitment support.
-//! The only `vr-*` dependency is [`vr-jcs`] (JCS canonicalization
-//! primitive).
+//! Constitutional definitions and passive wire-format support.
+//! Canonical JSON mechanics come from [`vr-jcs`]; receipt commitment
+//! construction lives downstream in `vr-receipt-identity`.
 //!
 //! Each specification version defines an identity triple of
 //! `(spec_version, canonicalization, commitment_primitive)`.
@@ -108,7 +108,12 @@ pub use mri::{
     BatchReduction, GradientCouplingPayload, MriBatchPayload, ReductionAxis, ReductionMode,
     ReductionProvenance, TokenReduction,
 };
-pub use policy::{ClaimEvidence, EvaluationInput, InputCanonicalizationError, INPUT_FORMAT};
+pub use policy::{
+    ClaimEvidence, EvaluationInput, EvaluationInputKindV1, GovernanceEvaluationInputV1,
+    GovernanceInputError, GovernanceOperationV1, GovernancePolicyStatusV1,
+    GovernanceSystemStatusV1, GovernanceSystemSubjectV1, InputCanonicalizationError,
+    LinkedPolicyStateV1, GOVERNANCE_INPUT_FORMAT, INPUT_FORMAT,
+};
 pub use receipts::{
     AdmissionReceiptPayload, AdmittedClaim, AdmittedClaimOperation, AdmittedProposal,
     AgentProposalReceiptPayload, AttestationPurpose, BoundaryOrigin, CapturedRequest,

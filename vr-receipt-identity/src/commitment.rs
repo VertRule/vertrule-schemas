@@ -5,9 +5,7 @@
 //! excluded from its own preimage. This is the `constitutional_envelope_v1`
 //! law (ADR-028R).
 //!
-//! This is an independent reimplementation of the law currently in
-//! `vertrule-schemas::receipts::compute_event_hash`; the two are pinned
-//! byte-for-byte by the Layer A golden vectors and the parity test below.
+//! The law is pinned byte-for-byte by committed golden vectors.
 
 use serde_json::Value;
 use vertrule_schemas::{DigestBytes, ReceiptEnvelope};

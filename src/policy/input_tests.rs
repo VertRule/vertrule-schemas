@@ -33,6 +33,17 @@ fn unknown_input_fields_are_rejected() {
 }
 
 #[test]
+fn canonical_parser_rejects_wrong_format_and_noncanonical_bytes() {
+    let wrong_format =
+        br#"{"claims":{},"input_format":"vr.policy.input@9.9","operation_date":"2026-06-12"}"#;
+    assert!(EvaluationInput::from_canonical_bytes(wrong_format).is_err());
+
+    let noncanonical =
+        br#"{ "claims": {}, "input_format": "vr.policy.input@0.1", "operation_date": "2026-06-12" }"#;
+    assert!(EvaluationInput::from_canonical_bytes(noncanonical).is_err());
+}
+
+#[test]
 fn float_claim_values_are_rejected() {
     let json = format!(
         "{{\"input_format\":\"{INPUT_FORMAT}\",\"operation_date\":\"2026-06-12\",\

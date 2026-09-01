@@ -1,4 +1,3 @@
-use super::commitment::compute_event_hash;
 use super::projection::ProjectsToReceiptEnvelope;
 use crate::{
     BoundaryOrigin, CanonicalPayload, DefinitionError, DigestBytes, ReceiptEnvelope, ReceiptType,
@@ -11,7 +10,7 @@ fn test_envelope(payload_json: serde_json::Value) -> Result<ReceiptEnvelope, Def
     let zero_digest = DigestBytes::from_array([0u8; 32]);
     let logical_time: u64 = 1;
 
-    let mut envelope = ReceiptEnvelope {
+    let envelope = ReceiptEnvelope {
         envelope_version: SchemaVersion::V1,
         receipt_type: ReceiptType::Event,
         context_digest: zero_digest,
@@ -26,7 +25,6 @@ fn test_envelope(payload_json: serde_json::Value) -> Result<ReceiptEnvelope, Def
         canonicalization: None,
         payload,
     };
-    envelope.event_hash = compute_event_hash(&envelope).map_err(DefinitionError::Jcs)?;
     Ok(envelope)
 }
 
@@ -53,29 +51,11 @@ fn projection_produces_valid_envelope() -> Result<(), DefinitionError> {
 }
 
 #[test]
-fn projected_event_hash_matches_recomputed() -> Result<(), DefinitionError> {
-    let receipt = TestReceipt { value: 42 };
-    let envelope = receipt.project()?;
-
-    let recomputed = compute_event_hash(&envelope).map_err(DefinitionError::Jcs)?;
-
-    assert_eq!(
-        envelope.event_hash, recomputed,
-        "event_hash must equal recomputed commitment"
-    );
-    Ok(())
-}
-
-#[test]
 fn projection_is_deterministic() -> Result<(), DefinitionError> {
     let receipt = TestReceipt { value: 99 };
     let e1 = receipt.project()?;
     let e2 = receipt.project()?;
 
-    assert_eq!(
-        e1.event_hash, e2.event_hash,
-        "same input must produce same event_hash"
-    );
     let e1_json =
         serde_json::to_vec(&e1).map_err(|e| DefinitionError::Jcs(crate::jcs::JcsError::from(e)))?;
     let e2_json =
@@ -84,18 +64,6 @@ fn projection_is_deterministic() -> Result<(), DefinitionError> {
         crate::jcs::to_canon_bytes_from_slice(&e1_json).map_err(DefinitionError::Jcs)?,
         crate::jcs::to_canon_bytes_from_slice(&e2_json).map_err(DefinitionError::Jcs)?,
         "same input must produce identical canonical bytes"
-    );
-    Ok(())
-}
-
-#[test]
-fn different_inputs_produce_different_hashes() -> Result<(), DefinitionError> {
-    let e1 = TestReceipt { value: 1 }.project()?;
-    let e2 = TestReceipt { value: 2 }.project()?;
-
-    assert_ne!(
-        e1.event_hash, e2.event_hash,
-        "different inputs must produce different event_hash"
     );
     Ok(())
 }

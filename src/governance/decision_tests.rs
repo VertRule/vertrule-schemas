@@ -5,7 +5,7 @@ use crate::governance::{
     GovernancePrincipalId, GovernanceScope, GovernedAction, GovernedSubject, SurfaceInstanceId,
     Verdict,
 };
-use crate::{DigestBytes, IJsonUInt, ProjectsToReceiptEnvelope};
+use crate::{DigestBytes, IJsonUInt};
 
 type R = Result<(), Box<dyn std::error::Error>>;
 
@@ -134,60 +134,6 @@ fn decision_conditional_serde_roundtrip() -> R {
     Ok(())
 }
 
-// ── ProjectsToReceiptEnvelope ──────────────────────────────────────
-
-#[test]
-fn project_produces_valid_envelope() -> R {
-    let decision = sample_decision(Verdict::Allow)?;
-    let envelope = decision.project()?;
-    assert_eq!(envelope.receipt_type.to_string(), "governance");
-    assert_eq!(envelope.logical_time, 1);
-    assert!(envelope.parent_id.is_none());
-    assert_ne!(envelope.event_hash, DigestBytes::from_array([0u8; 32]));
-    Ok(())
-}
-
-#[test]
-fn project_is_deterministic() -> R {
-    let decision = sample_decision(Verdict::Allow)?;
-    let a = decision.project()?;
-    let b = decision.project()?;
-    assert_eq!(a.event_hash, b.event_hash);
-    Ok(())
-}
-
-#[test]
-fn project_different_verdicts_different_hashes() -> R {
-    let d1 = sample_decision(Verdict::Allow)?;
-    let d2 = sample_decision(Verdict::Deny)?;
-    let e1 = d1.project()?;
-    let e2 = d2.project()?;
-    assert_ne!(e1.event_hash, e2.event_hash);
-    Ok(())
-}
-
-#[test]
-fn project_with_parent_id() -> R {
-    let mut decision = sample_decision(Verdict::Allow)?;
-    decision.parent_id = Some(DigestBytes::from_array([99u8; 32]));
-    let envelope = decision.project()?;
-    assert_eq!(
-        envelope.parent_id,
-        Some(DigestBytes::from_array([99u8; 32]))
-    );
-    Ok(())
-}
-
-#[test]
-fn project_deny_verdict_succeeds() -> R {
-    let mut decision = sample_decision(Verdict::Deny)?;
-    decision.reasons = vec!["release freeze".to_string()];
-    decision.logical_time = IJsonUInt::new(42)?;
-    let envelope = decision.project()?;
-    assert_eq!(envelope.logical_time, 42);
-    Ok(())
-}
-
 // ── Surface neutrality ─────────────────────────────────────────────
 
 #[test]
@@ -232,9 +178,5 @@ fn decision_works_for_langchain() -> R {
     let back: DecisionPayload = serde_json::from_str(&json)?;
     assert_eq!(decision, back);
 
-    // Projection works for non-Jira surface
-    let envelope = decision.project()?;
-    assert_eq!(envelope.receipt_type.to_string(), "governance");
-    assert_ne!(envelope.event_hash, DigestBytes::from_array([0u8; 32]));
     Ok(())
 }

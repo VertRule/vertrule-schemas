@@ -11,6 +11,12 @@
 //! carrier stay in `vertrule-policy-wasm`: no pre-policy consumer needs
 //! them, so relocating them would widen this crate's surface for nothing.
 
+pub mod governance_input;
 pub mod input;
 
+pub use governance_input::{
+    EvaluationInputKindV1, GovernanceEvaluationInputV1, GovernanceInputError,
+    GovernanceOperationV1, GovernancePolicyStatusV1, GovernanceSystemStatusV1,
+    GovernanceSystemSubjectV1, LinkedPolicyStateV1, GOVERNANCE_INPUT_FORMAT,
+};
 pub use input::{ClaimEvidence, EvaluationInput, InputCanonicalizationError, INPUT_FORMAT};

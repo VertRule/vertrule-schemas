@@ -1,5 +1,6 @@
 //! Error type for receipt-identity construction.
 
+use vertrule_schemas::DefinitionError;
 use vr_jcs::JcsError;
 
 /// Failure during receipt-identity commitment construction.
@@ -16,4 +17,8 @@ pub enum ReceiptIdentityError {
     /// The computed digest was not the expected length for the wire shape.
     #[error("invalid digest: {0}")]
     InvalidDigest(String),
+
+    /// A schema shape could not be projected into a canonical receipt.
+    #[error("receipt projection failed: {0}")]
+    Definition(#[from] DefinitionError),
 }

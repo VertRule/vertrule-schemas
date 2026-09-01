@@ -99,10 +99,23 @@ impl EvaluationInput {
     /// malformed or unknown-field documents deterministically.
     ///
     /// # Errors
-    /// Returns [`InputCanonicalizationError`] if `bytes` is not a valid
-    /// `EvaluationInput` document.
+    /// Returns [`InputCanonicalizationError`] if `bytes` is not the exact
+    /// canonical encoding of a supported `EvaluationInput` document.
     pub fn from_canonical_bytes(bytes: &[u8]) -> Result<Self, InputCanonicalizationError> {
-        serde_json::from_slice(bytes).map_err(|e| InputCanonicalizationError(e.to_string()))
+        let parsed: Self =
+            serde_json::from_slice(bytes).map_err(|e| InputCanonicalizationError(e.to_string()))?;
+        if parsed.input_format != INPUT_FORMAT {
+            return Err(InputCanonicalizationError(format!(
+                "input_format must equal `{INPUT_FORMAT}`"
+            )));
+        }
+        let canonical = parsed.to_canonical_bytes()?;
+        if canonical != bytes {
+            return Err(InputCanonicalizationError(
+                "input bytes are not the canonical encoding".to_string(),
+            ));
+        }
+        Ok(parsed)
     }
 }
 
