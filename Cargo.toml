@@ -79,3 +79,8 @@ cast_lossless = "warn"
 cast_possible_truncation = "warn"
 cast_possible_wrap = "warn"
 must_use_candidate = "warn"
+
+# Keep dev/test object files out of the suite-shared build dir (ADR-035):
+# macOS defaults to "unpacked", which leaves one .o per codegen unit in deps/.
+[profile.dev]
+split-debuginfo = "packed"
