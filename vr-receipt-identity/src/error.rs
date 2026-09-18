@@ -1,6 +1,6 @@
 //! Error type for receipt-identity construction.
 
-use vertrule_schemas::DefinitionError;
+use vertrule_schemas::{DefinitionError, ReceiptTypeV2};
 use vr_identity::IdentityError;
 use vr_jcs::JcsError;
 
@@ -26,4 +26,15 @@ pub enum ReceiptIdentityError {
     /// A declared digest-domain formation law rejected its input.
     #[error("identity formation failed: {0}")]
     Identity(#[from] IdentityError),
+
+    /// The producer refused to mint a receipt of `receipt_type` (ADR-056
+    /// R12): the facts presented cannot satisfy the type's registry law, and
+    /// no fallback value, re-typing or placeholder is ever substituted.
+    #[error("mint denied for {receipt_type}: {reason}")]
+    MintDenied {
+        /// The V2 receipt type whose mint was refused.
+        receipt_type: ReceiptTypeV2,
+        /// Which fact was missing or inadmissible.
+        reason: String,
+    },
 }

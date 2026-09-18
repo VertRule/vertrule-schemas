@@ -434,9 +434,16 @@ fn envelope_version_one_in_v2_shape_is_digested_not_judged() -> Result<(), anyho
 #[test]
 fn v1_event_hash_of_the_same_decision_differs_from_v2_receipt_digest() -> Result<(), anyhow::Error>
 {
-    let v1 = crate::project_decision_payload(&golden_decision()?)?;
+    // The V1 twin is the frozen BEFORE fixture (ADR-056 §9): the V1 mint is
+    // denied (R12), so its `event_hash` is read from the committed file and
+    // never re-minted here.
+    let before_path = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("test-vectors")
+        .join("receipt_v1_governance_decision_before_001.json");
+    let before: Value = serde_json::from_slice(&std::fs::read(before_path)?)?;
+    let v1_event_hash = field(&before, "event_hash")?;
     let v2 = seal_receipt_v2(golden_draft()?)?;
-    assert_ne!(v1.event_hash, v2.receipt_digest);
+    assert_ne!(v1_event_hash, v2.receipt_digest.to_hex());
     Ok(())
 }
 

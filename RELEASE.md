@@ -11,7 +11,11 @@ wire-format or commitment-byte change.
   `vr-receipt-identity`.
 - Removed schemas-owned receipt commitment/identity implementation types.
 - `DecisionPayload` no longer implements receipt projection. Use
-  `vr_receipt_identity::project_decision_payload(&payload)`.
+  `vr_receipt_identity::project_decision_payload_v2(&payload)`, which seals a
+  `ReceiptEnvelopeV2` of type `vr.governance.decision` (ADR-056). The V1
+  governance-decision mint (`project_decision_payload`, receipt type
+  `governance`, `event_hash`) is `MintDenied` and removed (ADR-056 R12, C11);
+  V1 artifacts remain verifiable through `vr_receipt_identity::compute_event_hash`.
 
 `ReceiptEnvelope`, `EventHashProfileId`, and the passive
 `ProjectsToReceiptEnvelope` interface remain schema-owned wire contracts.

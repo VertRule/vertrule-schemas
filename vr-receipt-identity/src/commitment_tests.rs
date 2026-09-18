@@ -56,3 +56,58 @@ fn trust_bearing_mutation_changes_identity() -> Result<(), ReceiptIdentityError>
     assert_ne!(base, compute_event_hash(&envelope)?);
     Ok(())
 }
+
+// ── Frozen BEFORE fixture (ADR-056 §9, C11) ─────────────────────────
+
+/// The committed V1 twin of the C4 golden `DecisionPayload`, minted once
+/// through the V1 constructor before that constructor was removed (R12).
+/// This test only *reads* the file: it never mints. It deserialises the
+/// canonical bytes as the frozen V1 [`ReceiptEnvelope`], recomputes the
+/// `event_hash` through the verifier-only path (K7) and asserts the pinned
+/// bytes byte-for-byte.
+#[test]
+fn before_fixture_v1_governance_decision_is_frozen() -> Result<(), Box<dyn std::error::Error>> {
+    const PINNED_EVENT_HASH: &str =
+        "eca50079364b87be8f69f4ff9c4cb435a2db51ca2aa71c17e2a725f94e5a4ad3";
+    const PINNED_SCHEMA_DIGEST: &str =
+        "4c5d6d82fe9df544090a072dfbfe28a292d3c2315bd6d0045203856ddb157852";
+
+    let path = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("test-vectors")
+        .join("receipt_v1_governance_decision_before_001.json");
+    let fixture: serde_json::Value = serde_json::from_slice(&std::fs::read(path)?)?;
+    let field = |key: &str| -> Result<String, Box<dyn std::error::Error>> {
+        fixture[key]
+            .as_str()
+            .map(str::to_string)
+            .ok_or_else(|| format!("fixture field {key:?} missing or not a string").into())
+    };
+
+    assert_eq!(
+        field("case_id")?,
+        "receipt_v1_governance_decision_before_001"
+    );
+    assert_eq!(field("event_hash")?, PINNED_EVENT_HASH);
+    assert_eq!(field("schema_digest")?, PINNED_SCHEMA_DIGEST);
+
+    let canonical_bytes = field("canonical_bytes")?;
+    let envelope: ReceiptEnvelope = serde_json::from_str(&canonical_bytes)?;
+    assert_eq!(envelope.envelope_version.get(), 1);
+    assert_eq!(envelope.event_hash.to_hex(), PINNED_EVENT_HASH);
+    assert_eq!(envelope.schema_digest.to_hex(), PINNED_SCHEMA_DIGEST);
+
+    // Verifier-only recompute reproduces the pinned identity.
+    assert_eq!(
+        compute_event_hash(&envelope)?.to_hex(),
+        PINNED_EVENT_HASH,
+        "V1 event_hash of the BEFORE fixture drifted"
+    );
+
+    // The pinned bytes are exactly the JCS of the frozen envelope.
+    let reserialised = vr_jcs::to_canon_string_from_str(&serde_json::to_string(&envelope)?)?;
+    assert_eq!(
+        reserialised, canonical_bytes,
+        "BEFORE fixture canonical bytes drifted"
+    );
+    Ok(())
+}
