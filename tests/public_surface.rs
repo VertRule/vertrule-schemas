@@ -13,10 +13,18 @@
 
 // Wire shapes
 use vertrule_schemas::ReceiptEnvelope;
+use vertrule_schemas::ReceiptEnvelopeV2;
 
 // Discriminators
 use vertrule_schemas::BoundaryOrigin;
 use vertrule_schemas::ReceiptType;
+use vertrule_schemas::ReceiptTypeV2;
+
+// V2 payload-schema identities and passive payload shapes (ADR-056)
+use vertrule_schemas::PayloadSchemaV2;
+use vertrule_schemas::RuntimePortCommandKind;
+use vertrule_schemas::RuntimePortSubmitOutcomePayload;
+use vertrule_schemas::TransitionCommitment;
 
 // Validated scalars
 use vertrule_schemas::CanonicalPayload;
@@ -82,6 +90,32 @@ fn public_surface_nouns_are_usable() -> Result<(), anyhow::Error> {
     });
     let envelope: ReceiptEnvelope = serde_json::from_value(envelope_json)?;
     let _json = serde_json::to_string(&envelope)?;
+
+    // V2 surface (ADR-056): closed type vocabulary, frozen schema identities,
+    // and the #[non_exhaustive] envelope constructed via deserialization.
+    assert_eq!(SchemaVersion::V2.get(), 2);
+    assert_eq!(
+        ReceiptTypeV2::GovernanceDecision.label(),
+        "vr.governance.decision"
+    );
+    assert_eq!(ReceiptTypeV2::ADMITTED.len(), 2);
+    assert_eq!(
+        PayloadSchemaV2::VR_SURFACE_DECISION_0_1.label(),
+        "vr.surface.decision@0.1"
+    );
+    let envelope_v2_json = serde_json::json!({
+        "envelope_version": 2,
+        "receipt_type": ReceiptTypeV2::GovernanceDecision.label(),
+        "schema_digest": PayloadSchemaV2::VR_SURFACE_DECISION_0_1.identity().to_hex(),
+        "logical_time": "1",
+        "payload": payload.as_value(),
+        "receipt_digest": d.to_hex(),
+    });
+    let envelope_v2: ReceiptEnvelopeV2 = serde_json::from_value(envelope_v2_json)?;
+    assert_eq!(envelope_v2.context_digest, None);
+    let _ = RuntimePortCommandKind::Submit;
+    let _ = std::any::type_name::<RuntimePortSubmitOutcomePayload>();
+    let _ = std::any::type_name::<TransitionCommitment>();
 
     // Suppress unused-import warnings for types used only as existence checks
     let _ = std::any::type_name::<PolicyId>();

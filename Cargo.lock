@@ -326,10 +326,12 @@ dependencies = [
 name = "vr-receipt-identity"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "hex",
  "serde_json",
  "thiserror",
  "vertrule-schemas",
+ "vr-identity",
  "vr-jcs",
 ]
 

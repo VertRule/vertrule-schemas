@@ -18,8 +18,22 @@ fn new_v1() -> Result<(), anyhow::Error> {
 }
 
 #[test]
+fn v2_constant() {
+    assert_eq!(SchemaVersion::V2.get(), 2);
+}
+
+#[test]
+fn new_v2() -> Result<(), anyhow::Error> {
+    let v = SchemaVersion::new(2)?;
+    assert_eq!(v, SchemaVersion::V2);
+    assert_eq!(v.get(), 2);
+    Ok(())
+}
+
+#[test]
 fn display() {
     assert_eq!(format!("{}", SchemaVersion::V1), "1");
+    assert_eq!(format!("{}", SchemaVersion::V2), "2");
 }
 
 #[test]
@@ -45,6 +59,7 @@ fn v1_canonicalization() {
 #[test]
 fn ord() {
     assert_eq!(SchemaVersion::V1, SchemaVersion::V1);
+    assert!(SchemaVersion::V1 < SchemaVersion::V2);
 }
 
 // ── Serde ───────────────────────────────────────────────────────────
@@ -67,8 +82,8 @@ fn rejects_zero() {
 }
 
 #[test]
-fn rejects_two() {
-    assert!(SchemaVersion::new(2).is_err());
+fn rejects_three() {
+    assert!(SchemaVersion::new(3).is_err());
 }
 
 #[test]
@@ -94,7 +109,14 @@ fn deserialize_rejects_zero() {
 }
 
 #[test]
-fn deserialize_rejects_two() {
-    let result: Result<SchemaVersion, _> = serde_json::from_str("2");
+fn deserialize_accepts_two() -> Result<(), anyhow::Error> {
+    let parsed: SchemaVersion = serde_json::from_str("2")?;
+    assert_eq!(parsed, SchemaVersion::V2);
+    Ok(())
+}
+
+#[test]
+fn deserialize_rejects_three() {
+    let result: Result<SchemaVersion, _> = serde_json::from_str("3");
     assert!(result.is_err());
 }

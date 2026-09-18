@@ -12,10 +12,12 @@ categories = ["cryptography", "data-structures"]
 serde_json = { version = "1", features = ["arbitrary_precision"] }
 thiserror = "2"
 vertrule-schemas = { path = ".." }
+vr-identity = { version = "0.1", path = "../../vertrule-runtime/crates/vr-identity" }
 vr-jcs = { version = "0.4", path = "../../vr-jcs" }
 
 [dev-dependencies]
 hex = "0.4"
+anyhow = "1"
 
 [lints.rust]
 unsafe_code = "deny"

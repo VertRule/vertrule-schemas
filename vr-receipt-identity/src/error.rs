@@ -1,6 +1,7 @@
 //! Error type for receipt-identity construction.
 
 use vertrule_schemas::DefinitionError;
+use vr_identity::IdentityError;
 use vr_jcs::JcsError;
 
 /// Failure during receipt-identity commitment construction.
@@ -21,4 +22,8 @@ pub enum ReceiptIdentityError {
     /// A schema shape could not be projected into a canonical receipt.
     #[error("receipt projection failed: {0}")]
     Definition(#[from] DefinitionError),
+
+    /// A declared digest-domain formation law rejected its input.
+    #[error("identity formation failed: {0}")]
+    Identity(#[from] IdentityError),
 }

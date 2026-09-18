@@ -3,14 +3,25 @@
 //! Types in this module define the structural discriminators and shape
 //! types for the receipt layer. Constitutional envelope/header nouns live
 //! here. Verification behavior does not.
+//!
+//! Two envelope versions coexist: the frozen V1 [`ReceiptEnvelope`] and
+//! the V2 [`ReceiptEnvelopeV2`] (ADR-056), whose closed
+//! [`ReceiptTypeV2`] vocabulary, admitted [`PayloadSchemaV2`] identities
+//! and passive payload shapes also live here.
 
 mod boundary_origin;
+mod canonical_u64;
 mod decision;
 mod envelope;
+mod envelope_v2;
 mod layered;
+mod payload_schema_v2;
+mod present_slot;
 mod projection;
 mod proposal_admission;
 mod receipt_type;
+mod receipt_type_v2;
+mod runtime_port_submit_outcome;
 mod training_receipt;
 mod verifiable_ai_record;
 mod verified_metadata;
@@ -21,10 +32,12 @@ pub use decision::{
     DECISION_PAYLOAD_KIND, DECISION_PAYLOAD_SCHEMA,
 };
 pub use envelope::{EventHashProfileId, ReceiptEnvelope};
+pub use envelope_v2::ReceiptEnvelopeV2;
 pub use layered::{
     ClosureManifest, ModelReceiptPayload, PackReceiptPayload, ProviderReceiptPayload,
     CLOSURE_MANIFEST_SCHEMA, MODEL_PAYLOAD_KIND, PACK_PAYLOAD_KIND, PROVIDER_PAYLOAD_KIND,
 };
+pub use payload_schema_v2::PayloadSchemaV2;
 pub use projection::ProjectsToReceiptEnvelope;
 pub use proposal_admission::{
     AdmissionReceiptPayload, AdmittedClaim, AdmittedClaimOperation, AdmittedProposal,
@@ -34,6 +47,10 @@ pub use proposal_admission::{
     PROPOSAL_ADMISSION_BUNDLE_FORMAT, PROPOSAL_ADMISSION_PAYLOAD_KIND, PROPOSAL_ADMISSION_SCHEMA,
 };
 pub use receipt_type::ReceiptType;
+pub use receipt_type_v2::ReceiptTypeV2;
+pub use runtime_port_submit_outcome::{
+    RuntimePortCommandKind, RuntimePortSubmitOutcomePayload, TransitionCommitment,
+};
 pub use training_receipt::TrainingReceipt;
 pub use verifiable_ai_record::{
     CapturedRequest, CapturedResponse, ProviderInteractionPayload, VerifiableAiRecordArtifact,

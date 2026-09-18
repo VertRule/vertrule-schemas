@@ -13,10 +13,13 @@ use crate::DefinitionError;
 ///
 /// Each version binds a schema identity triple of
 /// `(spec_version, canonicalization, commitment_primitive)` and a
-/// commitment scope that defines which fields `event_hash` commits.
+/// commitment scope that defines which fields the receipt's identity
+/// digest commits.
 ///
-/// `event_hash` = `BLAKE3(JCS(envelope \ {event_hash}))` — all trust-bearing
-/// fields are committed.
+/// - V1: `event_hash` = `BLAKE3(JCS(envelope \ {event_hash}))` — all
+///   trust-bearing fields are committed (untagged).
+/// - V2: `receipt_digest` = `BLAKE3(D_RECEIPT_V2 ‖ JCS(envelope \ {receipt_digest}))`
+///   under the tagged `receipt.envelope-v2` digest domain (ADR-056 §3.2).
 ///
 /// Construction rejects unsupported version numbers. Only versions
 /// with defined identity bindings can be represented.
@@ -25,12 +28,22 @@ use crate::DefinitionError;
 pub struct SchemaVersion(u32);
 
 impl SchemaVersion {
-    /// The current and only supported schema version.
+    /// The V1 schema version (`ReceiptEnvelope`).
     ///
-    /// Identity triple: BLAKE3 + JCS.
+    /// Identity triple: `(1, JCS, BLAKE3)`.
     /// Commitment scope: full envelope (`event_hash` commits every
-    /// trust-bearing field).
+    /// trust-bearing field); untagged preimage.
     pub const V1: Self = Self(1);
+
+    /// The V2 schema version (`ReceiptEnvelopeV2`, ADR-056).
+    ///
+    /// Identity triple: `(2, JCS, BLAKE3)`.
+    /// Commitment scope: the full V2 envelope minus `receipt_digest`,
+    /// digested under the tagged `receipt.envelope-v2` domain
+    /// (`D_RECEIPT_V2 = "vertrule.receipt.v2" ‖ 0x00`). V1 and V2 identity
+    /// domains are disjoint by the version key inside the preimage and by
+    /// the domain tag. The V1 verifier still refuses version 2.
+    pub const V2: Self = Self(2);
 
     /// Create a validated [`SchemaVersion`].
     ///
@@ -40,7 +53,7 @@ impl SchemaVersion {
     /// number does not have a defined identity binding.
     pub const fn new(version: u32) -> Result<Self, DefinitionError> {
         match version {
-            1 => Ok(Self(version)),
+            1 | 2 => Ok(Self(version)),
             _ => Err(DefinitionError::UnsupportedVersion(version)),
         }
     }

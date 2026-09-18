@@ -61,7 +61,8 @@ any verifier implementation must understand.
 |----------|-------|
 | `DigestBytes::BYTE_LEN` | 32 |
 | `DigestBytes::HEX_LEN` | 64 |
-| `SchemaVersion::V1` | The current schema version (full-envelope commitment) |
+| `SchemaVersion::V1` | The V1 schema version (full-envelope `event_hash` commitment) |
+| `SchemaVersion::V2` | The V2 schema version (tagged `receipt_digest` commitment, ADR-056) |
 | `SchemaVersion::digest_algorithm()` | `"BLAKE3"` |
 | `SchemaVersion::canonicalization()` | `"JCS"` |
 
