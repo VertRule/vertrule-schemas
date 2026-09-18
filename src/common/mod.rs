@@ -4,13 +4,16 @@
 //! (receipts, context, policy) but are used structurally throughout the
 //! constitutional layer: digest newtypes, identifiers, version tags,
 //! canonical payload guards, and validation errors.
+//!
+//! The admitted schema-identifier grammar (`SchemaId`) is identity-layer
+//! syntax owned by `vr-identity` (ADR-057); this crate consumes
+//! `vr_identity::SchemaId` and does not re-export it.
 
 mod canonical_payload;
 mod digest_bytes;
 mod error;
 mod i_json_uint;
 mod ids;
-mod schema_id;
 mod schema_identity;
 mod semantic_digests;
 mod versions;
@@ -20,7 +23,6 @@ pub use digest_bytes::DigestBytes;
 pub use error::DefinitionError;
 pub use i_json_uint::IJsonUInt;
 pub use ids::PolicyId;
-pub use schema_id::SchemaId;
 pub use schema_identity::{
     SchemaKeyId, SchemaModelId, SchemaPolicyPackId, SchemaPublicKeyHex, SchemaReceiptId,
     SchemaRunId, SchemaSuiteId,

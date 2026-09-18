@@ -9,7 +9,10 @@ any verifier implementation must understand.
 ## Design Constraints
 
 - Narrow `vr-*` dependencies: `vr-jcs` for JCS canonicalization and
-  `vr-identity` for governed raw-label identities
+  `vr-identity` for governed raw-label identities and the admitted
+  `SchemaId` grammar (identity syntax is `vr-identity`'s, ADR-057; this
+  crate consumes `vr_identity::SchemaId` and assigns schema meaning —
+  `PayloadSchemaV2`, receipt types, versions, envelopes — on top of it)
 - Zero unsafe code
 - No floating-point values in trust-critical payloads
 - RFC 8785 canonical JSON for digest / signature inputs
@@ -24,7 +27,6 @@ any verifier implementation must understand.
 | `IJsonUInt` | Non-negative integer guaranteed to round-trip in I-JSON |
 | `CanonicalPayload` | Float-guarded JSON payload |
 | `PolicyId` | Opaque policy identifier |
-| `SchemaId` | Validated schema identifier (`vr.<domain>.<name>@<major>.<minor>`) |
 | `SchemaVersion` | Schema version tag (carries identity triple) |
 | `DefinitionError` | Validation error type |
 

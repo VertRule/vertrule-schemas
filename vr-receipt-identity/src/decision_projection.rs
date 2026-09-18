@@ -43,7 +43,9 @@ use crate::{seal_receipt_v2, ReceiptIdentityError, ReceiptV2Draft};
 /// to bind and no operation commitment to carry, and the row admits no
 /// fallback (there is no `BLAKE3(binding_id)` arm and no re-typing).
 /// Returns the other [`ReceiptIdentityError`] variants when the scope or
-/// payload cannot be represented canonically or sealing fails.
+/// payload cannot be represented canonically, the row's payload-schema
+/// identity cannot be formed ([`ReceiptIdentityError::Identity`]), or
+/// sealing fails.
 pub fn project_decision_payload_v2(
     decision: &DecisionPayload,
 ) -> Result<ReceiptEnvelopeV2, ReceiptIdentityError> {
@@ -69,7 +71,7 @@ pub fn project_decision_payload_v2(
 
     seal_receipt_v2(ReceiptV2Draft {
         receipt_type,
-        schema_digest: PayloadSchemaV2::VR_SURFACE_DECISION_0_1.identity(),
+        schema_digest: PayloadSchemaV2::VR_SURFACE_DECISION_0_1.identity()?,
         context_digest: Some(context_digest),
         policy_digest: Some(sealed_policy_digest),
         logical_time: decision.logical_time.get(),

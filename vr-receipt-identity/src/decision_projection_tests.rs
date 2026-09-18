@@ -84,7 +84,7 @@ fn projection_places_every_row_p1_fact() -> Result<(), ReceiptIdentityError> {
     assert_eq!(sealed.receipt_type, ReceiptTypeV2::GovernanceDecision);
     assert_eq!(
         sealed.schema_digest,
-        PayloadSchemaV2::VR_SURFACE_DECISION_0_1.identity()
+        PayloadSchemaV2::VR_SURFACE_DECISION_0_1.identity()?
     );
     assert_eq!(
         sealed.context_digest,

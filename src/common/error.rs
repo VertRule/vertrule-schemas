@@ -20,10 +20,6 @@ pub enum DefinitionError {
     #[error("invalid I-JSON number: {0}")]
     InvalidIJsonNumber(String),
 
-    /// A schema identifier failed grammar validation.
-    #[error("invalid schema id: {0}")]
-    InvalidSchemaId(String),
-
     /// A schema version number has no defined identity binding.
     #[error("unsupported schema version: {0}")]
     UnsupportedVersion(u32),

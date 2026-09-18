@@ -84,7 +84,7 @@ fn golden_draft() -> Result<ReceiptV2Draft, anyhow::Error> {
     let payload = CanonicalPayload::new(serde_json::to_value(&decision)?)?;
     Ok(ReceiptV2Draft {
         receipt_type: ReceiptTypeV2::GovernanceDecision,
-        schema_digest: PayloadSchemaV2::VR_SURFACE_DECISION_0_1.identity(),
+        schema_digest: PayloadSchemaV2::VR_SURFACE_DECISION_0_1.identity()?,
         context_digest: Some(context_digest),
         policy_digest: Some(sealed_policy_digest()),
         logical_time: 1,

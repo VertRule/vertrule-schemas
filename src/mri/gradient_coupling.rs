@@ -12,7 +12,7 @@
 use serde::{Deserialize, Serialize};
 
 use super::reduction::ReductionProvenance;
-use crate::SchemaId;
+use vr_identity::SchemaId;
 
 /// Per-layer gradient coupling diagnostic payload.
 ///

@@ -6,7 +6,7 @@
 use serde::{Deserialize, Serialize};
 
 use super::reduction::ReductionProvenance;
-use crate::SchemaId;
+use vr_identity::SchemaId;
 
 /// Batch-aware MRI invariant payload.
 ///

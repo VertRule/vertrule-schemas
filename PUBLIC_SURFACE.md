@@ -29,7 +29,9 @@ pub struct DigestBytes { .. }       // BYTE_LEN = 32, HEX_LEN = 64
 pub struct IJsonUInt { .. }
 pub struct CanonicalPayload { .. }
 pub struct PolicyId { .. }
-pub struct SchemaId { .. }
+// `SchemaId` (`vr.<domain>.<name>@<major>.<minor>`) is identity-layer syntax
+// owned by `vr-identity` (ADR-057); consume `vr_identity::SchemaId`. It is
+// not re-exported here.
 
 // Version tag (carries identity triple)
 pub struct SchemaVersion { .. }     // V1, V2, digest_algorithm(), canonicalization()
@@ -101,10 +103,15 @@ pub enum ReceiptTypeV2 { GovernanceDecision /* vr.governance.decision */,
                          RuntimePortSubmitOutcome /* vr.runtime_port.submit_outcome */ }
 impl ReceiptTypeV2 { pub const ADMITTED: [Self; 2]; pub const fn label(self) -> &'static str; }
 
-// Admitted payload-schema identities (ADR-054 SchemaLabel class, frozen hex)
-pub struct PayloadSchemaV2 { .. }                 // label(), identity() -> DigestBytes
-//   PayloadSchemaV2::VR_SURFACE_DECISION_0_1             48b92179…f460
-//   PayloadSchemaV2::VR_RUNTIME_PORT_SUBMIT_OUTCOME_0_1  ffc6e9a7…4b49
+// Admitted payload-schema labels (ADR-054 SchemaLabel class; ADR-057 D5).
+// The struct carries the label only; identity() derives
+// derive_key("vertrule.identity.schema-label.v1", UTF8(label)) through
+// vr_identity::digest::SchemaLabelIdentity. The former hex pins are KATs in
+// tests, not surface.
+pub struct PayloadSchemaV2 { .. }                 // label() -> &'static str,
+                                                  // identity() -> Result<DigestBytes, vr_identity::IdentityError>
+//   PayloadSchemaV2::VR_SURFACE_DECISION_0_1             vr.surface.decision@0.1
+//   PayloadSchemaV2::VR_RUNTIME_PORT_SUBMIT_OUTCOME_0_1  vr.runtime_port.submit_outcome@0.1
 
 // Passive payload shapes
 pub struct RuntimePortSubmitOutcomePayload { .. } // closed; vr.runtime_port.submit_outcome@0.1

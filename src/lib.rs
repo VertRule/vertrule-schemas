@@ -35,7 +35,6 @@
 //! - [`IJsonUInt`] — non-negative integer guaranteed to round-trip in I-JSON
 //! - [`CanonicalPayload`] — float-guarded JSON payload
 //! - [`PolicyId`] — opaque policy identifier
-//! - [`SchemaId`] — validated schema identifier (`vr.<domain>.<name>@<major>.<minor>`)
 //! - [`SchemaVersion`] — schema version tag (carries identity triple)
 //! - [`DefinitionError`] — validation error types
 //!
@@ -50,7 +49,8 @@
 //!
 //! - [`ReceiptEnvelopeV2`] — canonical V2 receipt envelope (`receipt_digest`)
 //! - [`ReceiptTypeV2`] — closed semantic receipt-type vocabulary
-//! - [`PayloadSchemaV2`] — admitted payload-schema identities (frozen hex)
+//! - [`PayloadSchemaV2`] — admitted payload-schema labels; identities derive
+//!   through `vr_identity::digest::SchemaLabelIdentity`
 //! - [`RuntimePortSubmitOutcomePayload`], [`RuntimePortCommandKind`],
 //!   [`TransitionCommitment`] — passive `vr.runtime_port.submit_outcome` payload
 //!
@@ -67,6 +67,13 @@
 //! - [`ReductionAxis`] — tensor axis discriminator
 //! - [`TokenReduction`] — token aggregation method
 //! - [`BatchReduction`] — batch aggregation method
+//!
+//! ## Identity / schema separation (ADR-057)
+//!
+//! The `SchemaId` grammar (`vr.<domain>.<name>@<major>.<minor>`) is identity
+//! admission and lives in `vr-identity` as `vr_identity::SchemaId`; it is not
+//! re-exported here. Schema *meaning* — which label governs which payload,
+//! receipt types, versions and envelopes — stays in this crate.
 //!
 //! ## Associated Constants
 //!
@@ -100,9 +107,9 @@ pub mod receipts;
 pub use bundle::BundleMode;
 pub use common::{
     CanonicalPayload, ContentIdentityDigest, ContextDigest, DefinitionError, DigestBytes,
-    IJsonUInt, PayloadDigest, PolicyDigest, PolicyId, ReceiptDigest, SchemaDigest, SchemaId,
-    SchemaKeyId, SchemaModelId, SchemaPolicyPackId, SchemaPublicKeyHex, SchemaReceiptId,
-    SchemaRunId, SchemaSuiteId, SchemaVersion,
+    IJsonUInt, PayloadDigest, PolicyDigest, PolicyId, ReceiptDigest, SchemaDigest, SchemaKeyId,
+    SchemaModelId, SchemaPolicyPackId, SchemaPublicKeyHex, SchemaReceiptId, SchemaRunId,
+    SchemaSuiteId, SchemaVersion,
 };
 pub use context::RBHInvariant;
 pub use governance::{

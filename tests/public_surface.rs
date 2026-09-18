@@ -31,7 +31,6 @@ use vertrule_schemas::CanonicalPayload;
 use vertrule_schemas::DigestBytes;
 use vertrule_schemas::IJsonUInt;
 use vertrule_schemas::PolicyId;
-use vertrule_schemas::SchemaId;
 use vertrule_schemas::SchemaVersion;
 
 // Context
@@ -106,7 +105,7 @@ fn public_surface_nouns_are_usable() -> Result<(), anyhow::Error> {
     let envelope_v2_json = serde_json::json!({
         "envelope_version": 2,
         "receipt_type": ReceiptTypeV2::GovernanceDecision.label(),
-        "schema_digest": PayloadSchemaV2::VR_SURFACE_DECISION_0_1.identity().to_hex(),
+        "schema_digest": PayloadSchemaV2::VR_SURFACE_DECISION_0_1.identity()?.to_hex(),
         "logical_time": "1",
         "payload": payload.as_value(),
         "receipt_digest": d.to_hex(),
@@ -119,7 +118,6 @@ fn public_surface_nouns_are_usable() -> Result<(), anyhow::Error> {
 
     // Suppress unused-import warnings for types used only as existence checks
     let _ = std::any::type_name::<PolicyId>();
-    let _ = std::any::type_name::<SchemaId>();
     let _ = std::any::type_name::<RBHInvariant>();
     let _ = std::any::type_name::<DefinitionError>();
     let _ = std::any::type_name::<dyn ProjectsToReceiptEnvelope>();
