@@ -1,17 +1,17 @@
-//! Byte-stability tests for the sealed governance-identity newtypes.
+//! Byte-stability tests for the sealed governance-identity newtype.
 //!
-//! Each test computes the digest two ways:
-//! 1. via the new sealed type's constructor
-//! 2. via the legacy direct-BLAKE3 path inline (mirroring
-//!    `governance/decision.rs`'s pre-Gate-2 implementations)
+//! The scope digest is computed two ways:
+//! 1. via the sealed type's constructor
+//! 2. via the legacy `BLAKE3(JCS(scope))` path inline (mirroring
+//!    `governance/decision.rs`'s pre-Gate-2 implementation)
 //!
-//! Assertion: byte-for-byte identical. The migration of
-//! `decision.rs`'s private helpers to delegate through the sealed
-//! types is therefore behavior-preserving.
+//! Assertion: byte-for-byte identical. The raw-label byte-stability
+//! tests that once lived here left with `PolicyDigest` / `SchemaDigest`
+//! (ADR-054 G1-5); the legacy L1 known-answer is pinned in ADR-054 §7.
 
 use vr_jcs::DigestStrategy;
 
-use super::identity::{PolicyDigest, SchemaDigest, ScopeDigest};
+use super::identity::ScopeDigest;
 use crate::canonical_identity::digest_trusted_value;
 use crate::governance::scope::GovernanceScope;
 use crate::{DefinitionError, GovernancePrincipalId, SurfaceInstanceId};
@@ -56,56 +56,4 @@ fn scope_digest_algorithm_name_is_blake3_untagged() -> Result<(), DefinitionErro
     let sealed = ScopeDigest::from_governance_scope(&scope)?;
     assert_eq!(sealed.algorithm_name(), "blake3-untagged");
     Ok(())
-}
-
-#[test]
-fn policy_digest_byte_stable_with_legacy_raw_label_hash() {
-    let binding_id = "binding-alpha-beta";
-
-    // Sealed path.
-    let sealed = PolicyDigest::from_binding_id(binding_id);
-    let sealed_bytes = sealed.as_digest_bytes();
-
-    // Legacy-equivalent path:
-    // `decision.rs::compute_policy_digest` computes
-    // `BLAKE3(binding_id.as_bytes())`. Inline here for byte-stability
-    // proof.
-    // ALLOW-JCS-SPEC: byte-stability assertion against raw label digest
-    let legacy_raw = *blake3::hash(binding_id.as_bytes()).as_bytes();
-    let legacy_bytes = crate::DigestBytes::from_array(legacy_raw);
-
-    assert_eq!(
-        sealed_bytes, legacy_bytes,
-        "PolicyDigest::from_binding_id must byte-equal BLAKE3(binding_id.as_bytes())",
-    );
-}
-
-#[test]
-fn schema_digest_for_decision_v0_1_byte_stable_with_legacy_constant_label() {
-    // Sealed path.
-    let sealed = SchemaDigest::for_decision_v0_1();
-    let sealed_bytes = sealed.as_digest_bytes();
-
-    // Legacy-equivalent path:
-    // `decision.rs::schema_decision_digest` computes
-    // `BLAKE3(b"vr.surface.decision@0.1")`.
-    // ALLOW-JCS-SPEC: byte-stability assertion against raw label digest
-    let legacy_raw = *blake3::hash(b"vr.surface.decision@0.1").as_bytes();
-    let legacy_bytes = crate::DigestBytes::from_array(legacy_raw);
-
-    assert_eq!(
-        sealed_bytes, legacy_bytes,
-        "SchemaDigest::for_decision_v0_1 must byte-equal BLAKE3(label)",
-    );
-}
-
-#[test]
-fn policy_digest_differs_for_distinct_binding_ids() {
-    let a = PolicyDigest::from_binding_id("binding-alpha");
-    let b = PolicyDigest::from_binding_id("binding-beta");
-    assert_ne!(
-        a.bytes(),
-        b.bytes(),
-        "PolicyDigest must differ for distinct binding IDs",
-    );
 }

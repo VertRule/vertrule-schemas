@@ -6,6 +6,16 @@ wire-format or commitment-byte change.
 
 ## Breaking API changes
 
+- Removed `vertrule_schemas::governance::identity::{PolicyDigest, SchemaDigest}` and
+  their `governance::` re-exports (ADR-057 G1-5, ADR-054 erratum E5): the L1 raw-label
+  constructors `SchemaDigest::for_decision_v0_1` / `PolicyDigest::from_binding_id` had no
+  caller after the V2 decision mint and no verifier recompute. `ScopeDigest` is unchanged.
+  Payload-schema identity is `vr_identity::digest::SchemaLabelIdentity` over
+  `vr_identity::SchemaId` (`PayloadSchemaV2::identity()`).
+- `SchemaId` now lives in `vr-identity` (ADR-057); `vertrule-schemas` does not re-export it.
+  `DefinitionError::InvalidSchemaId` is removed; `vr_identity::IdentityError::InvalidSchemaId`
+  is the grammar refusal.
+
 - Removed `vertrule_schemas::receipts::compute_event_hash`; use
   `vr_receipt_identity::compute_event_hash` and add a direct dependency on
   `vr-receipt-identity`.

@@ -1,24 +1,23 @@
 //! Sealed governance-identity newtypes.
 //!
-//! Three domain-specific digest types covering the three identity
-//! classes the Hardening Plan distinguishes:
+//! One canonical-JSON identity type survives here:
 //!
 //! | Class | Type | Strategy |
 //! |---|---|---|
 //! | Canonical JSON identity | [`ScopeDigest`] | `vr-jcs` strategy-bearing digest |
-//! | Raw label identity (binding ID) | [`PolicyDigest`] | `BLAKE3(label_bytes)` directly |
-//! | Raw label identity (schema constant) | [`SchemaDigest`] | `BLAKE3(constant_bytes)` directly |
 //!
-//! The two raw-label types do **NOT** route through `vr-jcs`. Their
-//! input IS the canonical representation — there is no JSON shape to
-//! canonicalize. A future format-change ADR may migrate them to
-//! `DigestStrategy::blake3_domain_separated` for spec-conformant
-//! domain separation, but that would change the bytes and is out of
-//! scope for Gate 2 (which preserves byte-stability with the legacy
-//! `decision.rs` implementations).
+//! The two raw-label types that once shared this module (`PolicyDigest`
+//! over a binding id and `SchemaDigest::for_decision_v0_1`, both
+//! `BLAKE3(label_bytes)` — the ADR-054 L1 law) were removed by the ADR-054
+//! G1-5 census: no production or verifier path called them (L1 is
+//! `DeclarationOnly`; no verifier recomputes it), and the raw-label class
+//! law now lives in the sealed `vr-identity` slot
+//! (`vr_identity::digest::SchemaLabelIdentity`, ADR-057 §2.4–2.7). The
+//! legacy L1 known-answer for `vr.surface.decision@0.1` is documented in
+//! ADR-054 §7 and the G1 BEFORE fixture only.
 //!
-//! All three types have private fields and only domain-specific
-//! constructors. No `From<[u8; 32]>` is provided.
+//! The type has a private field and one domain-specific constructor. No
+//! `From<[u8; 32]>` is provided.
 
 use vr_jcs::{CanonicalDigest, DigestAlgorithm, DigestStrategy};
 
@@ -87,109 +86,5 @@ impl ScopeDigest {
     #[must_use]
     pub fn into_canonical_digest(self) -> CanonicalDigest {
         self.inner
-    }
-}
-
-// ── PolicyDigest ──────────────────────────────────────────────────
-// Raw label identity: BLAKE3 over the binding ID bytes, NOT JCS.
-
-/// Sealed policy-binding identity digest.
-///
-/// Raw label identity: derived from `BLAKE3(binding_id.as_bytes())`.
-/// This is **not** a JCS digest — the binding ID string is its own
-/// canonical representation; there is no JSON shape involved.
-///
-/// Byte-stable with the legacy `compute_policy_digest` function in
-/// `governance/decision.rs`.
-///
-/// A future format-change ADR may migrate to
-/// `DigestStrategy::blake3_domain_separated("vr.policy.binding")` for
-/// BLAKE3-spec domain separation, but that would change the bytes and
-/// is out of scope for Gate 2.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct PolicyDigest {
-    bytes: [u8; 32],
-}
-
-impl PolicyDigest {
-    /// Compute the policy digest for a binding ID:
-    /// `BLAKE3(binding_id.as_bytes())`.
-    ///
-    /// # ALLOW-JCS-BYPASS
-    ///
-    /// Raw label identity, not canonical JSON identity. The binding ID
-    /// is the canonical form; no JCS round-trip applies. Per the
-    /// Hardening Plan's three-class identity model, this is a legitimate
-    /// non-JCS digest contract.
-    #[must_use]
-    pub fn from_binding_id(binding_id: &str) -> Self {
-        // ALLOW-JCS-BYPASS: raw label identity, not canonical JSON identity.
-        // Derivation authority sealed 2026-08-11; law unchanged.
-        Self {
-            bytes: *vr_identity::digest::OpaqueBytesDigest::compute(binding_id.as_bytes()).bytes(),
-        }
-    }
-
-    /// Borrow the raw digest bytes.
-    #[must_use]
-    pub const fn bytes(&self) -> &[u8; 32] {
-        &self.bytes
-    }
-
-    /// Project to the wire-format [`DigestBytes`] shape.
-    #[must_use]
-    pub const fn as_digest_bytes(&self) -> DigestBytes {
-        DigestBytes::from_array(self.bytes)
-    }
-}
-
-// ── SchemaDigest ──────────────────────────────────────────────────
-// Raw label identity: BLAKE3 over a constant schema label, NOT JCS.
-
-/// Sealed schema-identity digest for `VertRule` constitutional schemas.
-///
-/// Raw label identity: each constructor uses `BLAKE3` over a constant
-/// byte label. **Not** a JCS digest — the label is the identity.
-///
-/// Byte-stable with the legacy `schema_decision_digest` function in
-/// `governance/decision.rs`.
-///
-/// A future format-change ADR may migrate to
-/// `DigestStrategy::blake3_domain_separated(label)` for BLAKE3-spec
-/// domain separation, but that would change the bytes and is out of
-/// scope for Gate 2.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct SchemaDigest {
-    bytes: [u8; 32],
-}
-
-impl SchemaDigest {
-    /// Schema digest for `vr.surface.decision@0.1`.
-    ///
-    /// Bytes: `BLAKE3(b"vr.surface.decision@0.1")`.
-    ///
-    /// # ALLOW-JCS-BYPASS
-    ///
-    /// Raw label identity, not canonical JSON identity.
-    #[must_use]
-    pub fn for_decision_v0_1() -> Self {
-        // ALLOW-JCS-BYPASS: raw label identity, not canonical JSON identity.
-        // Derivation authority sealed 2026-08-11; law unchanged.
-        Self {
-            bytes: *vr_identity::digest::OpaqueBytesDigest::compute(b"vr.surface.decision@0.1")
-                .bytes(),
-        }
-    }
-
-    /// Borrow the raw digest bytes.
-    #[must_use]
-    pub const fn bytes(&self) -> &[u8; 32] {
-        &self.bytes
-    }
-
-    /// Project to the wire-format [`DigestBytes`] shape.
-    #[must_use]
-    pub const fn as_digest_bytes(&self) -> DigestBytes {
-        DigestBytes::from_array(self.bytes)
     }
 }

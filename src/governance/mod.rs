@@ -47,7 +47,7 @@ pub use action::{ActionNamespace, GovernedAction};
 pub use adapter::{AdapterOriginId, AdapterReference};
 pub use binding::{PolicyBindingRef, PolicyTemplate};
 pub use decision::{DecisionPayload, Verdict};
-pub use identity::{PolicyDigest, SchemaDigest, ScopeDigest};
+pub use identity::ScopeDigest;
 pub use scope::{GovernancePrincipalId, GovernanceScope, SurfaceInstanceId};
 pub use subject::{EntityNamespace, GovernedSubject};
 
