@@ -37,6 +37,12 @@ fn sealed_policy_digest() -> DigestBytes {
     DigestBytes::from_array([0x77; 32])
 }
 
+/// The fixed SEK-0 `OperationReceipt` digest the golden decision commits to
+/// (`operation_receipt_digest`): registry row P1 requires it present.
+fn operation_receipt_digest() -> DigestBytes {
+    DigestBytes::from_array([0x5e; 32])
+}
+
 /// The fixed `DecisionPayload` (shape shared with `decision_projection_tests`).
 fn golden_decision() -> Result<DecisionPayload, anyhow::Error> {
     Ok(DecisionPayload {
@@ -67,7 +73,7 @@ fn golden_decision() -> Result<DecisionPayload, anyhow::Error> {
         canonical_input_digest: DigestBytes::from_array([1; 32]),
         logical_time: IJsonUInt::new(1)?,
         parent_id: None,
-        operation_receipt_digest: None,
+        operation_receipt_digest: Some(operation_receipt_digest()),
         sealed_policy_digest: Some(sealed_policy_digest()),
     })
 }
