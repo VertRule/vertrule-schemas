@@ -321,6 +321,43 @@ pub fn derive_outcome(
     Ok((admitted, rejected))
 }
 
+/// Validate an external approval signal against the V2 proposal receipt it
+/// names, without a V1 envelope (ADR-056; registry row P3).
+///
+/// The signal's subject must be `proposal_receipt_digest` (the V2
+/// `receipt_digest` of the proposal receipt), its context the proposal's
+/// `source_interaction_digest` (the one authoritative representation of the
+/// review context, M2-0 D3), its purpose `proposal_approval`, its actor
+/// assertion non-blank and bounded, and its decisions must derive a
+/// complete outcome over `proposal`. Shared by the V2 producer and the
+/// verifier's `outcome_reconstruction` relation; it confers no authority.
+///
+/// # Errors
+///
+/// Returns the typed denial for purpose/subject/context substitution, an
+/// invalid actor assertion, or an incomplete/duplicate/invalid decision set.
+pub fn validate_signal_v2(
+    proposal_receipt_digest: DigestBytes,
+    proposal: &TextClaimAgentProposal,
+    signal: &ExternalAdmissionSignal,
+) -> Result<(), ProposalAdmissionError> {
+    if !purpose_matches(signal.purpose, AttestationPurpose::ProposalApproval) {
+        return Err(ProposalAdmissionError::AttestationPurposeMismatch);
+    }
+    if signal.subject_proposal_receipt_digest != proposal_receipt_digest {
+        return Err(ProposalAdmissionError::ProposalSubjectMismatch);
+    }
+    if signal.context_digest != proposal.source_interaction_digest {
+        return Err(ProposalAdmissionError::AdmissionContextMismatch);
+    }
+    if signal.actor_assertion.trim().is_empty()
+        || signal.actor_assertion.len() > MAX_ACTOR_ASSERTION_BYTES
+    {
+        return Err(ProposalAdmissionError::AdmissionSignalInvalid);
+    }
+    derive_outcome(proposal, signal).map(|_| ())
+}
+
 fn validate_signal(
     proposal_receipt: &ReceiptEnvelope,
     proposal: &TextClaimAgentProposal,
@@ -376,7 +413,15 @@ fn validate_proposal_receipt(
     Ok(payload)
 }
 
-fn validate_proposal(proposal: &TextClaimAgentProposal) -> Result<(), ProposalAdmissionError> {
+/// Validate the closed proposal shape: at most 16 claims, ordinals
+/// contiguous from 1 in order, each text non-blank and at most 4096 bytes.
+/// Shared by the producers and the verifier's `proposal_shape` relation.
+///
+/// # Errors
+///
+/// Returns the typed denial for too many claims, an out-of-order ordinal,
+/// or invalid claim text.
+pub fn validate_proposal(proposal: &TextClaimAgentProposal) -> Result<(), ProposalAdmissionError> {
     if proposal.claims.len() > MAX_CLAIMS {
         return Err(ProposalAdmissionError::TooManyClaims);
     }
