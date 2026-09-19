@@ -345,7 +345,6 @@ dependencies = [
  "serde_json",
  "thiserror",
  "vertrule-schemas",
- "vr-jcs",
  "vr-proposal-admission",
  "vr-receipt-identity",
 ]
