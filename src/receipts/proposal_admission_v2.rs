@@ -22,8 +22,8 @@
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    AdmittedClaim, AdmittedProposal, DigestBytes, ExternalAdmissionSignal, ReceiptEnvelopeV2,
-    RejectedClaim, TextClaimAgentProposal,
+    AdmittedClaim, DigestBytes, ExternalAdmissionSignal, ReceiptEnvelopeV2, RejectedClaim,
+    TextClaimAgentProposal,
 };
 
 /// Portable V2 bundle format.
@@ -72,12 +72,15 @@ pub struct ProposalAdmissionPayloadV2 {
 /// Portable V2 closure for one proposal/admission transition.
 ///
 /// A presentation of the evidence set, not a receipt: it carries the two
-/// V2 receipts verbatim plus the re-derivable [`AdmittedProposal`]
-/// projection and its domain identity. Whitespace and object formatting
-/// may change; each receipt is independently verified by its own
-/// `receipt_digest`. The envelopes are obtained from
-/// `vr_receipt_identity::seal_receipt_v2` or deserialised from verified
-/// bytes, never assembled field by field.
+/// V2 receipts verbatim and nothing else. The [`AdmittedProposal`]
+/// projection and its domain identity are re-derived from the verified
+/// admission receipt (registry P5 `admitted_proposal_digest_matches`), so
+/// the bundle carries no fact a verifier would have to take on trust
+/// (M2-2 review; the same rule D1 applied to the F4 leaf digests).
+/// Whitespace and object formatting may change; each receipt is
+/// independently verified by its own `receipt_digest`. The envelopes are
+/// obtained from `vr_receipt_identity::seal_receipt_v2` or deserialised
+/// from verified bytes, never assembled field by field.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ProposalAdmissionBundleV2 {
@@ -88,12 +91,6 @@ pub struct ProposalAdmissionBundleV2 {
     pub proposal: ReceiptEnvelopeV2,
     /// The `vr.workflow.proposal_admission` receipt.
     pub admission: ReceiptEnvelopeV2,
-    /// Admitted proposal wire projection; its two receipt references are
-    /// V2 `receipt_digest` values.
-    pub admitted_proposal: AdmittedProposal,
-    /// Domain-separated identity of `admitted_proposal`
-    /// (`vertrule.admitted-proposal.v1` over the JCS object).
-    pub admitted_proposal_digest: DigestBytes,
 }
 
 #[cfg(test)]

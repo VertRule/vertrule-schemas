@@ -23,7 +23,8 @@ wire-format or commitment-byte change.
   (M2-0 D1); the admission payload drops its outer `context_digest` (D3);
   `capture_policy_version` / `record_policy` remain payload facts (G2-2).
 - New evidence-set presentations `ProposalAdmissionBundleV2`
-  (`vr-proposal-admission/v2`) and `VerifiableAiRecordArtifactV3`
+  (`vr-proposal-admission/v2`: the two receipts and nothing else — the admitted-proposal
+  projection is re-derived from the verified admission) and `VerifiableAiRecordArtifactV3`
   (`vr-verifiable-ai-record/v3`, record + digest-keyed evidence map). The V1 shapes
   and containers are unchanged and frozen.
 

@@ -137,8 +137,7 @@ pub struct VerifiableAiRecordPayloadV2 { schema, record_policy, source_interacti
 
 // Evidence-set presentations (not receipts, not identity-bearing)
 pub const PROPOSAL_ADMISSION_BUNDLE_FORMAT_V2: &str = "vr-proposal-admission/v2";
-pub struct ProposalAdmissionBundleV2 { _format, proposal: ReceiptEnvelopeV2, admission: ReceiptEnvelopeV2,
-                                       admitted_proposal: AdmittedProposal, admitted_proposal_digest }
+pub struct ProposalAdmissionBundleV2 { _format, proposal: ReceiptEnvelopeV2, admission: ReceiptEnvelopeV2 }  // no carried projection
 pub const VERIFIABLE_AI_RECORD_FORMAT_V3: &str = "vr-verifiable-ai-record/v3";
 pub struct VerifiableAiRecordArtifactV3 { _format, record: ReceiptEnvelopeV2, evidence: BTreeMap<DigestBytes, ReceiptEnvelopeV2> }
 ```

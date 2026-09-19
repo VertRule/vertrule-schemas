@@ -38,13 +38,6 @@ fn bundle() -> Result<ProposalAdmissionBundleV2, anyhow::Error> {
         format: PROPOSAL_ADMISSION_BUNDLE_FORMAT_V2.to_string(),
         proposal: envelope("vr.workflow.agent_proposal", 4)?,
         admission: envelope("vr.workflow.proposal_admission", 8)?,
-        admitted_proposal: AdmittedProposal {
-            proposal_receipt_digest: digest(4),
-            admission_receipt_digest: digest(8),
-            claims: admission_payload()?.admitted_claims,
-            rejected_claims: admission_payload()?.rejected_claims,
-        },
-        admitted_proposal_digest: digest(9),
     })
 }
 
@@ -167,6 +160,10 @@ fn bundle_v2_round_trips_under_the_format_key() -> Result<(), anyhow::Error> {
     assert_eq!(map["_format"], "vr-proposal-admission/v2");
     assert!(!map.contains_key("format"));
     assert!(!map.contains_key("proposal_canonical"));
+    // A presentation carries no fact beyond the two receipts.
+    assert!(!map.contains_key("admitted_proposal"));
+    assert!(!map.contains_key("admitted_proposal_digest"));
+    assert_eq!(map.len(), 3);
     assert_eq!(value["proposal"]["receipt_digest"], digest(4).to_hex());
     assert_eq!(
         value["admission"]["receipt_type"],
@@ -181,6 +178,15 @@ fn bundle_v2_round_trips_under_the_format_key() -> Result<(), anyhow::Error> {
 fn bundle_v2_rejects_v1_canonical_string_shape() -> Result<(), anyhow::Error> {
     let mut value = serde_json::to_value(bundle()?)?;
     value["proposal_canonical"] = serde_json::json!("{}");
+    let result: Result<ProposalAdmissionBundleV2, _> = serde_json::from_value(value);
+    assert!(result.is_err());
+    Ok(())
+}
+
+#[test]
+fn bundle_v2_rejects_a_carried_projection() -> Result<(), anyhow::Error> {
+    let mut value = serde_json::to_value(bundle()?)?;
+    value["admitted_proposal_digest"] = serde_json::json!(digest(9).to_hex());
     let result: Result<ProposalAdmissionBundleV2, _> = serde_json::from_value(value);
     assert!(result.is_err());
     Ok(())
