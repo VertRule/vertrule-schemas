@@ -4,6 +4,29 @@ Receipt identity construction has moved to its dedicated owner,
 `vr-receipt-identity`. This is a compile-time breaking boundary cleanup with no
 wire-format or commitment-byte change.
 
+## Additive: group-2 V2 receipt types (ADR-056 M2-1)
+
+- `ReceiptTypeV2` gains `AiProviderInteraction` (`vr.ai.provider_interaction`),
+  `WorkflowAgentProposal` (`vr.workflow.agent_proposal`), `WorkflowProposalAdmission`
+  (`vr.workflow.proposal_admission`) and `RecordVerifiableAiRecord`
+  (`vr.record.verifiable_ai_record`); `ADMITTED` is now `[Self; 6]`. The enum is closed:
+  every exhaustive `match` downstream (the `vertrule-verifier` registry) must add the
+  four arms in lockstep (ADR-056 §6).
+- `PayloadSchemaV2` gains the four `@0.2` labels; their `SchemaLabel` identities are
+  pinned as known-answer vectors in the sibling tests (derived once through
+  `vr_identity::SchemaLabelIdentity`). The `@0.1` labels stay frozen under the legacy
+  L4/L5 laws and are never minted in V2.
+- New passive `@0.2` payload shapes `ProviderInteractionPayloadV2`,
+  `AgentProposalPayloadV2`, `ProposalAdmissionPayloadV2`, `VerifiableAiRecordPayloadV2`:
+  `payload_kind` dropped (R1); every receipt reference is a V2 `receipt_digest`;
+  the interaction carries `prompt`/`response` text without the `@0.1` leaf digests
+  (M2-0 D1); the admission payload drops its outer `context_digest` (D3);
+  `capture_policy_version` / `record_policy` remain payload facts (G2-2).
+- New evidence-set presentations `ProposalAdmissionBundleV2`
+  (`vr-proposal-admission/v2`) and `VerifiableAiRecordArtifactV3`
+  (`vr-verifiable-ai-record/v3`, record + digest-keyed evidence map). The V1 shapes
+  and containers are unchanged and frozen.
+
 ## Breaking API changes
 
 - Removed `vertrule_schemas::governance::identity::{PolicyDigest, SchemaDigest}` and

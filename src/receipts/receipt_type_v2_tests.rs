@@ -64,7 +64,24 @@ fn serde_round_trip_all_variants() -> Result<(), anyhow::Error> {
             ReceiptTypeV2::RuntimePortSubmitOutcome,
             "\"vr.runtime_port.submit_outcome\"",
         ),
+        (
+            ReceiptTypeV2::AiProviderInteraction,
+            "\"vr.ai.provider_interaction\"",
+        ),
+        (
+            ReceiptTypeV2::WorkflowAgentProposal,
+            "\"vr.workflow.agent_proposal\"",
+        ),
+        (
+            ReceiptTypeV2::WorkflowProposalAdmission,
+            "\"vr.workflow.proposal_admission\"",
+        ),
+        (
+            ReceiptTypeV2::RecordVerifiableAiRecord,
+            "\"vr.record.verifiable_ai_record\"",
+        ),
     ];
+    assert_eq!(variants.len(), ReceiptTypeV2::ADMITTED.len());
     for (variant, expected_json) in variants {
         let json = serde_json::to_string(&variant)?;
         assert_eq!(
@@ -113,4 +130,21 @@ fn deserialize_rejects_case_variants() {
 #[test]
 fn ordering_follows_declaration() {
     assert!(ReceiptTypeV2::GovernanceDecision < ReceiptTypeV2::RuntimePortSubmitOutcome);
+    assert!(ReceiptTypeV2::RuntimePortSubmitOutcome < ReceiptTypeV2::AiProviderInteraction);
+    assert!(ReceiptTypeV2::AiProviderInteraction < ReceiptTypeV2::WorkflowAgentProposal);
+    assert!(ReceiptTypeV2::WorkflowAgentProposal < ReceiptTypeV2::WorkflowProposalAdmission);
+    assert!(ReceiptTypeV2::WorkflowProposalAdmission < ReceiptTypeV2::RecordVerifiableAiRecord);
+}
+
+#[test]
+fn v1_group2_family_labels_with_version_suffix_are_not_v2_labels() {
+    for v1 in [
+        "\"vr.ai.provider_interaction@0.1\"",
+        "\"vr.record.verifiable_ai_record@0.1\"",
+        "\"vr.workflow.agent_proposal@0.1\"",
+        "\"vr.workflow.proposal_admission@0.1\"",
+    ] {
+        let result: Result<ReceiptTypeV2, _> = serde_json::from_str(v1);
+        assert!(result.is_err(), "{v1} must not deserialize as V2");
+    }
 }

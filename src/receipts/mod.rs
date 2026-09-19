@@ -19,11 +19,13 @@ mod payload_schema_v2;
 mod present_slot;
 mod projection;
 mod proposal_admission;
+mod proposal_admission_v2;
 mod receipt_type;
 mod receipt_type_v2;
 mod runtime_port_submit_outcome;
 mod training_receipt;
 mod verifiable_ai_record;
+mod verifiable_ai_record_v2;
 mod verified_metadata;
 
 pub use boundary_origin::BoundaryOrigin;
@@ -46,6 +48,10 @@ pub use proposal_admission::{
     TextClaimAgentProposal, AGENT_PROPOSAL_PAYLOAD_KIND, AGENT_PROPOSAL_SCHEMA,
     PROPOSAL_ADMISSION_BUNDLE_FORMAT, PROPOSAL_ADMISSION_PAYLOAD_KIND, PROPOSAL_ADMISSION_SCHEMA,
 };
+pub use proposal_admission_v2::{
+    AgentProposalPayloadV2, ProposalAdmissionBundleV2, ProposalAdmissionPayloadV2,
+    PROPOSAL_ADMISSION_BUNDLE_FORMAT_V2,
+};
 pub use receipt_type::ReceiptType;
 pub use receipt_type_v2::ReceiptTypeV2;
 pub use runtime_port_submit_outcome::{
@@ -58,6 +64,10 @@ pub use verifiable_ai_record::{
     PROVIDER_INTERACTION_PAYLOAD_KIND, PROVIDER_INTERACTION_SCHEMA, VERIFIABLE_AI_RECORD_FORMAT,
     VERIFIABLE_AI_RECORD_FORMAT_V1, VERIFIABLE_AI_RECORD_FORMAT_V2,
     VERIFIABLE_AI_RECORD_PAYLOAD_KIND, VERIFIABLE_AI_RECORD_POLICY, VERIFIABLE_AI_RECORD_SCHEMA,
+};
+pub use verifiable_ai_record_v2::{
+    ProviderInteractionPayloadV2, VerifiableAiRecordArtifactV3, VerifiableAiRecordPayloadV2,
+    VERIFIABLE_AI_RECORD_FORMAT_V3,
 };
 pub use verified_metadata::VerifiedReceiptMetadata;
 

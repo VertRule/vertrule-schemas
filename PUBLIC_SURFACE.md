@@ -100,8 +100,12 @@ pub struct ReceiptEnvelopeV2 {
 // Closed semantic discriminator — NOT #[non_exhaustive]; a new label is a
 // schemas release AND a vertrule-verifier registry row.
 pub enum ReceiptTypeV2 { GovernanceDecision /* vr.governance.decision */,
-                         RuntimePortSubmitOutcome /* vr.runtime_port.submit_outcome */ }
-impl ReceiptTypeV2 { pub const ADMITTED: [Self; 2]; pub const fn label(self) -> &'static str; }
+                         RuntimePortSubmitOutcome /* vr.runtime_port.submit_outcome */,
+                         AiProviderInteraction /* vr.ai.provider_interaction */,
+                         WorkflowAgentProposal /* vr.workflow.agent_proposal */,
+                         WorkflowProposalAdmission /* vr.workflow.proposal_admission */,
+                         RecordVerifiableAiRecord /* vr.record.verifiable_ai_record */ }
+impl ReceiptTypeV2 { pub const ADMITTED: [Self; 6]; pub const fn label(self) -> &'static str; }
 
 // Admitted payload-schema labels (ADR-054 SchemaLabel class; ADR-057 D5).
 // The struct carries the label only; identity() derives
@@ -112,11 +116,31 @@ pub struct PayloadSchemaV2 { .. }                 // label() -> &'static str,
                                                   // identity() -> Result<DigestBytes, vr_identity::IdentityError>
 //   PayloadSchemaV2::VR_SURFACE_DECISION_0_1             vr.surface.decision@0.1
 //   PayloadSchemaV2::VR_RUNTIME_PORT_SUBMIT_OUTCOME_0_1  vr.runtime_port.submit_outcome@0.1
+//   PayloadSchemaV2::VR_AI_PROVIDER_INTERACTION_0_2      vr.ai.provider_interaction@0.2
+//   PayloadSchemaV2::VR_WORKFLOW_AGENT_PROPOSAL_0_2      vr.workflow.agent_proposal@0.2
+//   PayloadSchemaV2::VR_WORKFLOW_PROPOSAL_ADMISSION_0_2  vr.workflow.proposal_admission@0.2
+//   PayloadSchemaV2::VR_RECORD_VERIFIABLE_AI_RECORD_0_2  vr.record.verifiable_ai_record@0.2
 
 // Passive payload shapes
 pub struct RuntimePortSubmitOutcomePayload { .. } // closed; vr.runtime_port.submit_outcome@0.1
 pub struct TransitionCommitment { .. }
 pub enum RuntimePortCommandKind { Submit }
+
+// Group-2 (@0.2) payload shapes — no payload_kind; every receipt reference is a V2 receipt_digest
+pub struct ProviderInteractionPayloadV2 { schema, provider, requested_model, resolved_model?, provider_response_id?,
+                                          capture_policy_version, prompt, response, provider_attestation }   // no leaf digests (M2-0 D1)
+pub struct AgentProposalPayloadV2 { schema, proposal_digest, proposal: TextClaimAgentProposal }
+pub struct ProposalAdmissionPayloadV2 { schema, proposal_receipt_digest, admission_signal_digest, signal: ExternalAdmissionSignal,
+                                        admitted_claims, rejected_claims }                                   // no outer context_digest (D3)
+pub struct VerifiableAiRecordPayloadV2 { schema, record_policy, source_interaction_digest, extraction_interaction_digest,
+                                         proposal_receipt_digest, admission_receipt_digest, admitted_proposal_digest }
+
+// Evidence-set presentations (not receipts, not identity-bearing)
+pub const PROPOSAL_ADMISSION_BUNDLE_FORMAT_V2: &str = "vr-proposal-admission/v2";
+pub struct ProposalAdmissionBundleV2 { _format, proposal: ReceiptEnvelopeV2, admission: ReceiptEnvelopeV2,
+                                       admitted_proposal: AdmittedProposal, admitted_proposal_digest }
+pub const VERIFIABLE_AI_RECORD_FORMAT_V3: &str = "vr-verifiable-ai-record/v3";
+pub struct VerifiableAiRecordArtifactV3 { _format, record: ReceiptEnvelopeV2, evidence: BTreeMap<DigestBytes, ReceiptEnvelopeV2> }
 ```
 
 Dropped from V1 deliberately: `event_hash`, `event_hash_profile`, `boundary_origin`,

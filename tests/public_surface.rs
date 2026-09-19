@@ -21,10 +21,18 @@ use vertrule_schemas::ReceiptType;
 use vertrule_schemas::ReceiptTypeV2;
 
 // V2 payload-schema identities and passive payload shapes (ADR-056)
+use vertrule_schemas::AgentProposalPayloadV2;
 use vertrule_schemas::PayloadSchemaV2;
+use vertrule_schemas::ProposalAdmissionBundleV2;
+use vertrule_schemas::ProposalAdmissionPayloadV2;
+use vertrule_schemas::ProviderInteractionPayloadV2;
 use vertrule_schemas::RuntimePortCommandKind;
 use vertrule_schemas::RuntimePortSubmitOutcomePayload;
 use vertrule_schemas::TransitionCommitment;
+use vertrule_schemas::VerifiableAiRecordArtifactV3;
+use vertrule_schemas::VerifiableAiRecordPayloadV2;
+use vertrule_schemas::PROPOSAL_ADMISSION_BUNDLE_FORMAT_V2;
+use vertrule_schemas::VERIFIABLE_AI_RECORD_FORMAT_V3;
 
 // Validated scalars
 use vertrule_schemas::CanonicalPayload;
@@ -97,7 +105,7 @@ fn public_surface_nouns_are_usable() -> Result<(), anyhow::Error> {
         ReceiptTypeV2::GovernanceDecision.label(),
         "vr.governance.decision"
     );
-    assert_eq!(ReceiptTypeV2::ADMITTED.len(), 2);
+    assert_eq!(ReceiptTypeV2::ADMITTED.len(), 6);
     assert_eq!(
         PayloadSchemaV2::VR_SURFACE_DECISION_0_1.label(),
         "vr.surface.decision@0.1"
@@ -115,6 +123,26 @@ fn public_surface_nouns_are_usable() -> Result<(), anyhow::Error> {
     let _ = RuntimePortCommandKind::Submit;
     let _ = std::any::type_name::<RuntimePortSubmitOutcomePayload>();
     let _ = std::any::type_name::<TransitionCommitment>();
+    // Group-2 V2 shapes (M2-1): four types, four `@0.2` labels, two containers.
+    assert_eq!(
+        ReceiptTypeV2::AiProviderInteraction.label(),
+        "vr.ai.provider_interaction"
+    );
+    assert_eq!(
+        PayloadSchemaV2::VR_RECORD_VERIFIABLE_AI_RECORD_0_2.label(),
+        "vr.record.verifiable_ai_record@0.2"
+    );
+    assert_eq!(
+        PROPOSAL_ADMISSION_BUNDLE_FORMAT_V2,
+        "vr-proposal-admission/v2"
+    );
+    assert_eq!(VERIFIABLE_AI_RECORD_FORMAT_V3, "vr-verifiable-ai-record/v3");
+    let _ = std::any::type_name::<AgentProposalPayloadV2>();
+    let _ = std::any::type_name::<ProposalAdmissionPayloadV2>();
+    let _ = std::any::type_name::<ProposalAdmissionBundleV2>();
+    let _ = std::any::type_name::<ProviderInteractionPayloadV2>();
+    let _ = std::any::type_name::<VerifiableAiRecordPayloadV2>();
+    let _ = std::any::type_name::<VerifiableAiRecordArtifactV3>();
 
     // Suppress unused-import warnings for types used only as existence checks
     let _ = std::any::type_name::<PolicyId>();

@@ -31,11 +31,38 @@ pub enum ReceiptTypeV2 {
     /// (payload schema `vr.runtime_port.submit_outcome@0.1`).
     #[serde(rename = "vr.runtime_port.submit_outcome")]
     RuntimePortSubmitOutcome,
+    /// One captured provider interaction: the exact prompt and the exact
+    /// captured response text (payload schema
+    /// `vr.ai.provider_interaction@0.2`; ADR-050 under ADR-056).
+    #[serde(rename = "vr.ai.provider_interaction")]
+    AiProviderInteraction,
+    /// A non-authoritative agent-extracted text-claim proposal with its
+    /// interaction lineage (payload schema `vr.workflow.agent_proposal@0.2`;
+    /// ADR-049 under ADR-056).
+    #[serde(rename = "vr.workflow.agent_proposal")]
+    WorkflowAgentProposal,
+    /// The outcome of one deterministic admission transition over exactly
+    /// one sealed proposal (payload schema
+    /// `vr.workflow.proposal_admission@0.2`; ADR-049 under ADR-056).
+    #[serde(rename = "vr.workflow.proposal_admission")]
+    WorkflowProposalAdmission,
+    /// The root Verifiable AI Record binding its four child receipts and
+    /// the admitted-proposal identity (payload schema
+    /// `vr.record.verifiable_ai_record@0.2`; ADR-050 under ADR-056).
+    #[serde(rename = "vr.record.verifiable_ai_record")]
+    RecordVerifiableAiRecord,
 }
 
 impl ReceiptTypeV2 {
     /// Every admitted label, in declaration order.
-    pub const ADMITTED: [Self; 2] = [Self::GovernanceDecision, Self::RuntimePortSubmitOutcome];
+    pub const ADMITTED: [Self; 6] = [
+        Self::GovernanceDecision,
+        Self::RuntimePortSubmitOutcome,
+        Self::AiProviderInteraction,
+        Self::WorkflowAgentProposal,
+        Self::WorkflowProposalAdmission,
+        Self::RecordVerifiableAiRecord,
+    ];
 
     /// The wire label of this receipt type.
     #[must_use]
@@ -43,6 +70,10 @@ impl ReceiptTypeV2 {
         match self {
             Self::GovernanceDecision => "vr.governance.decision",
             Self::RuntimePortSubmitOutcome => "vr.runtime_port.submit_outcome",
+            Self::AiProviderInteraction => "vr.ai.provider_interaction",
+            Self::WorkflowAgentProposal => "vr.workflow.agent_proposal",
+            Self::WorkflowProposalAdmission => "vr.workflow.proposal_admission",
+            Self::RecordVerifiableAiRecord => "vr.record.verifiable_ai_record",
         }
     }
 }

@@ -43,6 +43,39 @@ impl PayloadSchemaV2 {
         label: "vr.runtime_port.submit_outcome@0.1",
     };
 
+    /// `vr.ai.provider_interaction@0.2` — the governing schema of a
+    /// `vr.ai.provider_interaction` payload (`ProviderInteractionPayloadV2`).
+    /// The `@0.1` label stays frozen under the legacy L4 law (ADR-054 §2
+    /// row 3) and is never reproduced in V2.
+    pub const VR_AI_PROVIDER_INTERACTION_0_2: Self = Self {
+        label: "vr.ai.provider_interaction@0.2",
+    };
+
+    /// `vr.workflow.agent_proposal@0.2` — the governing schema of a
+    /// `vr.workflow.agent_proposal` payload (`AgentProposalPayloadV2`). The
+    /// `@0.1` label stays frozen under the legacy L5 law (ADR-054 §2 row 7).
+    pub const VR_WORKFLOW_AGENT_PROPOSAL_0_2: Self = Self {
+        label: "vr.workflow.agent_proposal@0.2",
+    };
+
+    /// `vr.workflow.proposal_admission@0.2` — the governing schema of a
+    /// `vr.workflow.proposal_admission` payload
+    /// (`ProposalAdmissionPayloadV2`). The `@0.1` label stays frozen under
+    /// the legacy L5 law (ADR-054 §2 row 8).
+    pub const VR_WORKFLOW_PROPOSAL_ADMISSION_0_2: Self = Self {
+        label: "vr.workflow.proposal_admission@0.2",
+    };
+
+    /// `vr.record.verifiable_ai_record@0.2` — the governing schema of a
+    /// `vr.record.verifiable_ai_record` payload
+    /// (`VerifiableAiRecordPayloadV2`). The `@0.1` label stays frozen under
+    /// the legacy L4 law (ADR-054 §2 row 5); its ADR-054 §7 `SchemaLabel`
+    /// vector is historical evidence, not authority for the `@0.2`
+    /// reference semantics (M2-0 D2).
+    pub const VR_RECORD_VERIFIABLE_AI_RECORD_0_2: Self = Self {
+        label: "vr.record.verifiable_ai_record@0.2",
+    };
+
     /// The `SchemaId`-grammar label this schema is named by.
     #[must_use]
     pub const fn label(&self) -> &'static str {

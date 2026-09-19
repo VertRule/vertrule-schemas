@@ -119,7 +119,9 @@ impl ClaimAdmissionDecision {
 pub struct ExternalAdmissionSignal {
     /// Must be `proposal_approval` for this transition.
     pub purpose: AttestationPurpose,
-    /// Exact proposal receipt `event_hash` being reviewed.
+    /// Identity of the exact proposal receipt being reviewed: its V1
+    /// `event_hash`, or its V2 `receipt_digest` under a
+    /// `vr.workflow.proposal_admission@0.2` payload.
     pub subject_proposal_receipt_digest: DigestBytes,
     /// Context in which that proposal is reviewed.
     pub context_digest: DigestBytes,
